@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:id="@+id/li_profile_root"
+    android:background="@color/coloCreamyWhite">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:orientation="horizontal"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1.55"
+                android:padding="@dimen/_4sdp">
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:layout_centerInParent="true"
+                    android:padding="@dimen/_3sdp"
+                    android:indeterminateDrawable="@drawable/sellah_icon_red"
+                    />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/img_profile_pic"
+                    android:layout_width="@dimen/_150sdp"
+                    android:layout_height="@dimen/_150sdp"
+                    android:layout_gravity="center"
+                    app:civ_border_width="@dimen/_1sdp"
+                    app:civ_border_color="@color/colorGrey"
+                    />
+
+                <ImageView
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_alignParentEnd="true"
+                   android:layout_marginTop="@dimen/_3sdp"
+                    android:src="@drawable/trophy_icon"
+                    android:layout_alignParentRight="true" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/tv_profile_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    tools:text="CHO KOK YICK"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/_13sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_proffesion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    tools:text="IT Director"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/_11sdp" />
+
+                <LinearLayout
+                    android:id="@+id/li_follow_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="@dimen/_5sdp"
+                    android:gravity="center"
+                    android:paddingRight="@dimen/_5sdp">
+
+                    <TextView
+                        android:id="@+id/tv_followers_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00"
+                        android:maxLength="4"
+                        android:textColor="@color/colorRed"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/_4sdp"
+                        android:text="Followers"
+                        android:textSize="@dimen/_10sdp"/>
+                    <TextView
+                        android:id="@+id/tv_following_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/_8sdp"
+                        android:text="00"
+                        android:maxLength="4"
+                        android:textColor="@color/colorRed"
+                        android:textSize="@dimen/_10sdp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/_4sdp"
+                        android:text="Following"
+                        android:textSize="@dimen/_10sdp" />
+
+                </LinearLayout>
+
+                <Button
+                    android:layout_width="fill_parent"
+                    android:layout_height="@dimen/_26sdp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/round_black_border"
+                    android:text="Edit Profile"
+                    android:textAllCaps="false"
+                    android:id="@+id/btn_edit_profile"
+                    android:layout_gravity="center"
+                    android:textColor="@color/colorWhite" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5"
+                android:gravity="center">
+
+
+                <TextView
+                    android:id="@+id/txt_rationg"
+                    android:layout_width="@dimen/_30sdp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:background="@drawable/star_icon"
+                    android:gravity="center"
+                    android:text="3.5"
+                    android:textColor="@color/colorBlack"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.6dp"
+            android:layout_below="@+id/relativeLayout"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@color/colorLGrey" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/profile_TabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_28sdp"
+                android:layout_gravity="center"
+                app:tabSelectedTextColor="@color/colorRed"
+                app:tabIndicatorHeight="0dp"
+                app:tabTextColor="@color/colorGrey" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.6dp"
+                android:background="@color/colorLGrey" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/profile_ViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/profile_TabLayout"
+                android:layout_centerHorizontal="true"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+
+
