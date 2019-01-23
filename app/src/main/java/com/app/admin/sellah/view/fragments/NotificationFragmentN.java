@@ -120,7 +120,6 @@ public class NotificationFragmentN extends Fragment {
 
         return view;
     }
-
     private void setUpPostActivityList(NotificationListModel body) {
 
         notificationPostActivityAdapter = new NotificationActivityAdapter(body, getActivity(), 1, "p");

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -43,16 +44,27 @@ public class SplashScreen extends AppCompatActivity {
     Animation animation;
     MainActivityInterface mainActivityInterface;
     private String TAG= SplashScreen.class.getSimpleName();
-
+    SharedPreferences mPrefs;
+    final String welcomeScreenShownPref = "welcomeScreenShown";
+    Boolean welcomeScreenShown;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         makeTransperantStatusBar(this, true);
         setContentView(R.layout.splash_screen);
 //        permissions();
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+         welcomeScreenShown = mPrefs.getBoolean(welcomeScreenShownPref, false);
+        Log.e("onCreate: ",""+welcomeScreenShown );
+
         PermissionCheckUtil.create(this, () -> {
 
-            launchActivityHandler();
+
+
+                launchActivityHandler();
+
+
+
 
         });
         new ApisHelper().getCategories("");
@@ -344,7 +356,10 @@ public class SplashScreen extends AppCompatActivity {
                 if (readExternalStorage && camera) {
 
                 }*/
-                launchActivityHandler();
+
+
+                    launchActivityHandler();
+
 
                 break;
 
@@ -371,7 +386,22 @@ public class SplashScreen extends AppCompatActivity {
                     Intent intent = new Intent(SplashScreen.this, LoginActivity.class);
                     startActivity(intent);
                 }*/
-                handleNotificationData();
+                if (!welcomeScreenShown) {
+
+
+                    SharedPreferences.Editor editor = mPrefs.edit();
+                    editor.putBoolean(welcomeScreenShownPref, true);
+                    editor.commit(); // Very important to save the preference
+                    Intent intent = new Intent(SplashScreen.this, WelcomeActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                }
+                else
+                {
+                    handleNotificationData();
+                }
+
 
             }
 

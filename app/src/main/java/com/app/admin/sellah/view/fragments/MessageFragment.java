@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -61,7 +62,7 @@ public class MessageFragment extends Fragment {
     private MessageListAdapter newMsgAdapter;
     private ChattedListModel oldMsgList;
     private String TAG = MessageFragment.class.getSimpleName();
-
+    FloatingActionButton actionButton;
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -80,7 +81,8 @@ public class MessageFragment extends Fragment {
         newMessRecycler = view.findViewById(R.id.new_message_recycler);
         txtMessage = view.findViewById(R.id.txt_message);
         txtNewMessage = view.findViewById(R.id.txt_new_message);
-
+        actionButton = view.findViewById(R.id.floating_action_button);
+        onCickListners();
         //Notification New Message List
        /* notificationNewMessList();
         notificationFollowListAdapter = new NotificationFollowListAdapter(notificationNewMessList, getActivity(), 0);
@@ -340,6 +342,12 @@ public class MessageFragment extends Fragment {
 //            Log.e("message_Frag", "not-visible");
         }
     }
+
+    private void onCickListners() {
+        actionButton.setOnClickListener(view1 -> {getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new StreamedVideosFragment()).addToBackStack(null).commit();
+        });
+    }
+
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override

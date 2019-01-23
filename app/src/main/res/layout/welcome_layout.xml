@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textSize="@dimen/_18sdp"
+                android:layout_marginTop="@dimen/_50sdp"
+                android:textColor="#7d7d7d"
+                android:text="Sellah"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/wlcm_skip"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"                android:layout_marginRight="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_55sdp"
+                android:textColor="#949494"
+                android:text="Skip"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/wlcm_next"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_marginRight="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_55sdp"
+                android:textColor="#e66565"
+                android:text="Next"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <me.relex.circleindicator.CircleIndicator
+                android:id="@+id/indicator"
+                android:layout_alignBottom="@+id/pager"
+                android:layout_width="match_parent"
+                app:ci_width="@dimen/_6sdp"
+                app:ci_height="@dimen/_6sdp"
+                app:ci_drawable="@drawable/circle2"
+                app:ci_drawable_unselected="@drawable/circle1"
+                android:layout_height="48dp" />
+
+
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

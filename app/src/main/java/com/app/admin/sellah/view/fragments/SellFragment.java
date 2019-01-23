@@ -314,7 +314,7 @@ public class SellFragment extends Fragment implements SellProductInterface {
                 } else {
                     stateVO.setSelected(false);
                 }
-                paymentType = TextUtils.join(",", selection);
+                paymentType = TextUtils.join(", ", selection);
             }
 
             txtPaymentType.setText(paymentType);
@@ -360,7 +360,7 @@ public class SellFragment extends Fragment implements SellProductInterface {
                 ArrayList<String> selction = new ArrayList<>();
                 selction.add(selectDeliveryOption[1].toString());
                 selction.add(selectDeliveryOption[2].toString());
-                deliveryType = TextUtils.join(",", selction);
+                deliveryType = TextUtils.join(", ", selction);
 //                deliveryType = selectDeliveryOption[i].toString();
                 stateVO.setSelected(true);
             }
@@ -1035,13 +1035,20 @@ public class SellFragment extends Fragment implements SellProductInterface {
                 } else if (i == 7) {
                     model.setImage8(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image8"));
                 }
-                model.setProductVideo(ImageUploadHelper.convertImageTomultipart(Global.videopath, "product_video"));
+                if (Global.videopath.equals("no_image"))
+                {
+                   // model.setProductVideo(ImageUploadHelper.convertImageTomultipart("", "product_video"));
+                }
+                else
+                {
+                    model.setProductVideo(ImageUploadHelper.convertImageTomultipart(Global.videopath, "product_video"));
+                }
             }
             if (isEditing) {
                 model.setProduct_id(RequestBody.create(MediaType.parse("text/plain"), productId));
                 editProduct(model);
                 Log.e("EditProduct", "allDone");
-                Log.e("Videopath", Global.videopath);
+
             } else {
               /*  if (isPromotClicked) {
                     if (!promotepackageId.equalsIgnoreCase("NA")) {
@@ -1202,6 +1209,8 @@ public class SellFragment extends Fragment implements SellProductInterface {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
+                Log.e( "onFailure: ",t.getLocalizedMessage());
+                Log.e( "onFailure: ",""+t.getCause().toString());
                 Snackbar.make(rootTag, "Please try again later.", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
             }
@@ -1339,7 +1348,6 @@ public class SellFragment extends Fragment implements SellProductInterface {
             addProductTagsAdapter.notifyItemRangeRemoved(0, tagsize);
         }*/
     }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -1353,8 +1361,8 @@ public class SellFragment extends Fragment implements SellProductInterface {
         else {
             Bitmap thumb = ThumbnailUtils.createVideoThumbnail(Global.videopath, MediaStore.Images.Thumbnails.MICRO_KIND);
             thumbnailVideo.setImageBitmap(thumb);
-            thumbnailVideo.setScaleType(ImageView.ScaleType.FIT_XY);
-            thumbnailVideo.setPadding(0,0,0,0);
+            thumbnailVideo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
 
         }
     }

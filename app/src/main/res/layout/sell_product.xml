@@ -85,13 +85,14 @@
                     app:cardUseCompatPadding="true">
 
                     <ImageView
+
                         android:id="@+id/thumbnail_video"
                        android:layout_margin="@dimen/_5sdp"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:padding="@dimen/_5sdp"
-                        android:scaleType="centerInside"
+                        android:scaleType="centerCrop"
                         android:src="@drawable/rec_icon" />
 
                 </android.support.v7.widget.CardView>

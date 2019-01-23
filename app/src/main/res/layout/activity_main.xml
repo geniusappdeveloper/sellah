@@ -73,7 +73,7 @@
                         android:layout_width="@dimen/_18sdp"
                         android:layout_height="@dimen/_18sdp"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/engagement_icon"
+                        android:src="@drawable/notification_homebell"
                         android:tint="@color/colorRed"
                         />
                 </RelativeLayout>
@@ -549,7 +549,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom|left"
                     android:paddingLeft="@dimen/_22sdp"
-                    android:text="© 2018 Sellah v8.1"
+                    android:text="© 2018 Sellah v8.2"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/_10sdp" />
             </RelativeLayout>

@@ -29,6 +29,7 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
 
     List<ArrFollow>  newMessList;
     Context context;
+
     public NewnotificationAdapter(List<ArrFollow> results, Context activity) {
 
         this.newMessList = results;

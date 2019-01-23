@@ -19,6 +19,8 @@ import com.app.admin.sellah.controller.utils.Global;
 
 import java.io.File;
 
+import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
+
 public class Previewvideo extends AppCompatActivity {
 
 
@@ -28,7 +30,7 @@ public class Previewvideo extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        makeTransperantStatusBar(this, true);
         setContentView(R.layout.activity_videopreview);
         prevewvideo = findViewById(R.id.videoview);
         check = findViewById(R.id.check);
