@@ -28,35 +28,39 @@
                 >
 
                 <TextView
+                    android:id="@+id/live_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:text=" Live "
-                    android:padding="@dimen/_3sdp"
+                    android:padding="@dimen/_2sdp"
                     android:textColor="#fff"
                     android:background="@drawable/live_btn_bg"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_8sdp" />
 
                 <TextView
+                    android:id="@+id/live_time_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_marginRight="@dimen/_8sdp"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:text="01:24"
-                    android:padding="@dimen/_3sdp"
+                    android:padding="@dimen/_2sdp"
                     android:textColor="#fff"
                     android:background="@drawable/live_btn_bg"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_8sdp" />
 
                 <!--invisible due to new changes -->
                 <LinearLayout
+                    android:id="@+id/view_layout"
                     android:visibility="gone"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_3sdp"
-                    android:layout_marginLeft="@dimen/_3sdp"
+
                     android:alpha="0.7"
                     android:background="@drawable/round_black_live"
                     >

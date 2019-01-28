@@ -1,12 +1,16 @@
 package com.app.admin.sellah.view.fragments;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -87,7 +91,7 @@ public class NotificationFragment extends Fragment {
 
         });
 
-        messages.setOnClickListener(new View.OnClickListener() {
+       /* messages.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 notification.setBackgroundResource(R.drawable.noti_button_bg_normal_left);
@@ -95,7 +99,7 @@ public class NotificationFragment extends Fragment {
                 vpnotification.setCurrentItem(1);
             }
 
-        });
+        });*/
 
         vpnotification.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -209,18 +213,48 @@ public class NotificationFragment extends Fragment {
 
     }*/
 
+
     public void hideView() {
+
+        //             Vishal changes
+
         ((MainActivity) getActivity()).view.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).findViewById(R.id.rl_chat).setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).rel_search.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rel_search.setVisibility(View.GONE);
         ((MainActivity) getActivity()).searchEditText.setHint("Search Conversations");
         ((MainActivity) getActivity()).text_sell.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).text_sell.setText("Chat List");
+
+
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(3);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ((MainActivity) getActivity()).findViewById(R.id.rl_chat).setElevation(10);
+        }
+        ((MainActivity) getActivity()).findViewById(R.id.rl_insideback).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
 
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((MainActivity) getActivity()).findViewById(R.id.rl_chat).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) getActivity()).findViewById(R.id.rl_chat).setVisibility(View.GONE);
+    }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

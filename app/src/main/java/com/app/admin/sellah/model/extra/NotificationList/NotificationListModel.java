@@ -1,11 +1,14 @@
 
 package com.app.admin.sellah.model.extra.NotificationList;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class NotificationListModel {
+public class NotificationListModel implements Parcelable {
 
     @SerializedName("status")
     @Expose
@@ -75,4 +78,18 @@ public class NotificationListModel {
         this.arrPost = arrPost;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(status);
+        parcel.writeString(message);
+        parcel.writeString(listReadStatus);
+        parcel.writeString(message);
+        parcel.writeList(arrFollow);
+
+    }
 }

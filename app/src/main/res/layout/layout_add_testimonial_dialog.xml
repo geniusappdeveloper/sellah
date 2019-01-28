@@ -1,40 +1,57 @@
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:visibility="visible"
-    app:cardBackgroundColor="#ffffff"
-    app:cardCornerRadius="@dimen/_8sdp"
+    android:layout_gravity="bottom"
 
-    app:cardElevation="@dimen/_5sdp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    >
+
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
+        android:minWidth="320dp"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:padding="@dimen/_8sdp">
+        android:background="@drawable/round_border_testemonialheader"        android:layout_centerInParent="true">
+
+
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:id="@+id/review_txt"
+                android:elevation="@dimen/_5sdp"
+                android:background="@drawable/round_border_testemonialheader"
+
+                android:layout_height="@dimen/_40sdp">
+
+                <TextView
+                    android:layout_marginLeft="@dimen/_10sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Review Your Transaction"
+                    android:textColor="@color/colorDarkGray"
+                    android:textSize="@dimen/_16sdp"
+                    />
+
+            </RelativeLayout>
+
+
+
+
+
+
 
         <TextView
-            android:id="@+id/review_txt"
+            android:paddingLeft="@dimen/_10sdp"
+            android:paddingRight="@dimen/_10sdp"
+            android:layout_below="@+id/review_txt"
+            android:id="@+id/rate_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Review"
-            android:textColor="@color/colorDarkGray"
-            android:textSize="@dimen/_16sdp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/rate_txt"
-            android:layout_width="@dimen/_120sdp"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/review_txt"
-            android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/_10sdp"
-            android:text="Please rate your last transaction with jane?"
-            android:textColor="@color/colorDarkGray"
+            android:text="On a scale of 1 to 5, how would you rate your experience when shopping with iphone store SG?"
+            android:textColor="#999999"
             android:textSize="@dimen/_12sdp" />
 
         <RatingBar
@@ -51,40 +68,46 @@
 
 
         <TextView
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
             android:id="@+id/txt_testimonial"
-            android:layout_width="@dimen/_220sdp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/rtB_rating"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/_20sdp"
-            android:text="Testimonial"
+            android:text="Any testimonials or comments"
             android:textSize="@dimen/_12sdp"
-            android:textColor="@color/colorBlack" />
+            android:textColor="#999999" />
 
         <EditText
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
             android:id="@+id/edt_testimonials"
-            android:layout_width="@dimen/_220sdp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txt_testimonial"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/_8sdp"
             android:background="@drawable/edit_text_border"
             android:gravity="top"
-            android:hint="Can you tell us more about it?"
+            android:hint="Write down here"
             android:minLines="5"
             android:maxLines="5"
             android:padding="6dp"
             android:textSize="@dimen/_12sdp" />
 
         <Button
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
             android:id="@+id/btn_submit_review"
-            android:layout_width="@dimen/_120sdp"
-            android:layout_height="@dimen/_28sdp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
             android:layout_below="@+id/edt_testimonials"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/_20sdp"
             android:layout_marginBottom="@dimen/_10sdp"
-            android:background="@drawable/round_red_border"
+            android:background="@drawable/round_red_border_testimonial"
             android:gravity="center"
             android:text="Submit Review"
             android:textAllCaps="false"
@@ -92,4 +115,4 @@
 
 
     </RelativeLayout>
-</android.support.v7.widget.CardView>
+</RelativeLayout>

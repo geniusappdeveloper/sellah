@@ -21,8 +21,10 @@ import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.NotificationList.ArrFollow;
 import com.app.admin.sellah.model.extra.NotificationList.NotificationListModel;
+import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.NewnotificationAdapter;
 
 import java.io.IOException;
@@ -41,7 +43,9 @@ import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 public class Notification_dialog extends DialogFragment {
 
     NotificationListModel notificationListModel;
+    NotificationListModel notificationListModel1;
     List<ArrFollow> newMessList;
+    List<ArrFollow> global_newwmesslist;
     WebService service;
     View view;
     @BindView(R.id.notifcation_cancel)
@@ -54,7 +58,7 @@ public class Notification_dialog extends DialogFragment {
     LinearLayout filterDialogRoot;
     Unbinder unbinder;
     Dialog dialog;
-
+    NewnotificationAdapter notificationFollowListAdapter;
 
     @Nullable
     @Override
@@ -69,7 +73,26 @@ public class Notification_dialog extends DialogFragment {
 
 
         unbinder = ButterKnife.bind(this, view);
-         getNotificationList();
+
+        Bundle bundle = this.getArguments();
+        if (bundle!=null)
+        {
+            notificationListModel = bundle.getParcelable(SAConstants.Keys.NOTI_KEY);
+            global_newwmesslist = notificationListModel.getArrFollow();
+             notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist,notificationListModel, getActivity() );
+            LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+            notificationRv.setLayoutManager(horizontalLayoutManager1);
+            notificationRv.setAdapter(notificationFollowListAdapter);
+        }
+
+        else
+        {
+            getNotificationList();
+        }
+
+
+
+
 
         return view;
     }
@@ -84,8 +107,8 @@ public class Notification_dialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-        dialog = S_Dialogs.getLoadingDialog(getActivity());
-        dialog.show();
+       // dialog = S_Dialogs.getLoadingDialog(getActivity());
+      //  dialog.show();
     }
 
     @OnClick(R.id.notifcation_cancel)
@@ -103,13 +126,25 @@ public class Notification_dialog extends DialogFragment {
                     dialog.dismiss();
                 }
                 if (response.isSuccessful()) {
+
                     Log.e("GetNotificationList", "onResponse: " + response.body().getStatus());
-                    notificationListModel = response.body();
-                    newMessList = notificationListModel.getArrFollow();
-                    NewnotificationAdapter notificationFollowListAdapter = new NewnotificationAdapter(newMessList, getActivity() );
+                    notificationListModel1 = response.body();
+
+                    newMessList = notificationListModel1.getArrFollow();
+                    global_newwmesslist.addAll(notificationListModel1.getArrFollow());
+                    notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist,notificationListModel1, getActivity() );
                     LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                     notificationRv.setLayoutManager(horizontalLayoutManager1);
                     notificationRv.setAdapter(notificationFollowListAdapter);
+                    if (notificationListModel.getListReadStatus().equals("0"))
+                    {
+                        ((MainActivity)getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        ((MainActivity)getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                    }
+
 
 
                 } else {

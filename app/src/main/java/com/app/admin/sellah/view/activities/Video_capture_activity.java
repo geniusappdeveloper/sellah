@@ -30,6 +30,8 @@ import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import java.io.File;
 import java.io.IOException;
 
+import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
+
 public class Video_capture_activity extends AppCompatActivity implements SurfaceHolder.Callback {
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
@@ -47,6 +49,7 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        makeTransperantStatusBar(this, true);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_videocapture);
 
@@ -199,7 +202,7 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
         mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
 
-        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_480P));
+        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
         Global.videopath = Environment.getExternalStorageDirectory().getPath().concat("/"+String.valueOf(System.currentTimeMillis())+".3gp");
         mrec.setOutputFile(Global.videopath);

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
@@ -15,6 +16,7 @@ import com.app.admin.sellah.model.extra.LiveVideoModel.VideoList;
 import com.app.admin.sellah.view.activities.StreamedVideoDetail;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,13 @@ public class StreamedVideoAdapter extends RecyclerView.Adapter<StreamedVideoAdap
 
         holder.txtVideoTitle.setText(arrayList.get(position).getProductName() + "");
         holder.userName.setText(arrayList.get(position).getUsername() + "");
+        holder.view_layout.setVisibility(View.VISIBLE);
+        holder.livetextview.setVisibility(View.GONE);
+        try {
+            holder.live_time_textview.setText(Global.getTimeDuration(Global.convertUTCToLocal(arrayList.get(position).getStartTime()), Global.convertUTCToLocal(arrayList.get(position).getEndTime())));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         Glide.with(context)
                 .load(arrayList.get(position).getCoverImage())
                 .apply(Global.getGlideOptions())
@@ -93,7 +102,8 @@ public class StreamedVideoAdapter extends RecyclerView.Adapter<StreamedVideoAdap
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView Click, userProfile;
-        TextView userName, txtVideoTitle, txtVideoViewers;
+        TextView userName, txtVideoTitle, txtVideoViewers,livetextview,live_time_textview;
+        LinearLayout view_layout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -102,6 +112,9 @@ public class StreamedVideoAdapter extends RecyclerView.Adapter<StreamedVideoAdap
             userName = itemView.findViewById(R.id.txt_user_name);
             txtVideoTitle = itemView.findViewById(R.id.txt_title);
             txtVideoViewers = itemView.findViewById(R.id.txt_views);
+            livetextview = itemView.findViewById(R.id.live_textview);
+            live_time_textview = itemView.findViewById(R.id.live_time_textview);
+            view_layout = itemView.findViewById(R.id.view_layout);
         }
     }
 }

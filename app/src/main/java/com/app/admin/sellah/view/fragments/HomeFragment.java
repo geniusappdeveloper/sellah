@@ -1,6 +1,5 @@
 package com.app.admin.sellah.view.fragments;
 
-import android.animation.Animator;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,12 +40,15 @@ import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.BannerModel.BannerModel;
 import com.app.admin.sellah.model.extra.LiveVideoModel.LiveVideoModel;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
+import com.app.admin.sellah.model.extra.NotificationList.NotificationListModel;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.AllCategoryDialog;
+import com.app.admin.sellah.view.CustomDialogs.Notification_dialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomViews.TouchDetectableScrollView;
 import com.app.admin.sellah.view.activities.MainActivity;
@@ -71,6 +73,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.utils.Global.getTotalHeightofGridRecyclerView;
+import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_ACCEPT_REJECT;
@@ -126,6 +129,8 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.txt_search_sella)
     TextView txtSearchSella;
     Unbinder unbinder1;
+    @BindView(R.id.nolivevideo_text)
+    TextView nolivevideoText;
     private View view;
     Unbinder unbinder;
     View rootTag;
@@ -163,7 +168,8 @@ public class HomeFragment extends Fragment {
     private Timer timer;
     int timerDelay = 5000;
     private ImageView[] dotsLive;
-    private long timeVisibleDelay=300;
+    private long timeVisibleDelay = 300;
+    NotificationListModel notificationListModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -201,11 +207,32 @@ public class HomeFragment extends Fragment {
             unbinder = ButterKnife.bind(this, view);
         }
 
+
         rootTag = ((MainActivity) getActivity()).relRoot;
         productList = new GetProductList();
         resultList = new ArrayList<>();
         productList.setResult(resultList);
         searchSuggestions = new ArrayList<>();
+
+        // Notification data=========================
+
+        getNotificationList();
+        ((MainActivity) getActivity()).notificationRelativelayout.findViewById(R.id.notification_relativelayout).setOnClickListener(view1 -> {
+
+            if (isLogined(getActivity())) {
+
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(SAConstants.Keys.NOTI_KEY, notificationListModel);
+                Notification_dialog dialog = new Notification_dialog();
+                dialog.setArguments(bundle);
+                dialog.show(getActivity().getFragmentManager(), "");
+            } else {
+                S_Dialogs.getLoginDialog(getActivity()).show();
+            }
+
+
+        });
 
 
         //list1
@@ -224,7 +251,7 @@ public class HomeFragment extends Fragment {
 
         String first = " Sellah";
         String next = "<font color='#EE0000'>Search</font>";
-        txtSearchSella.setText(Html.fromHtml( next+first));
+        txtSearchSella.setText(Html.fromHtml(next + first));
 
         unbinder1 = ButterKnife.bind(this, view);
         return view;
@@ -236,6 +263,7 @@ public class HomeFragment extends Fragment {
         view.getLocationOnScreen(location);
         return location;
     }
+
     private void hideSearchBar() {
 
         ((MainActivity) getActivity()).rel_search.animate()
@@ -251,6 +279,7 @@ public class HomeFragment extends Fragment {
                 .alpha(1f)
                 .setDuration(timeVisibleDelay);
     }
+
     private void pagginationCode() {
 
         Rect scrollBounds = new Rect();
@@ -271,7 +300,7 @@ public class HomeFragment extends Fragment {
             public void onScroll() {
                 if (txtSearchSella.getLocalVisibleRect(scrollBounds)) {
 //                    Log.e(TAG, "View Visible" );
-                    Log.e(TAG, "onScrollUp: View Visible" );
+                    Log.e(TAG, "onScrollUp: View Visible");
                     hideSearchBar();
                     // Any portion of the imageView, even a single pixel, is within the visible window
                 } else {
@@ -485,7 +514,14 @@ public class HomeFragment extends Fragment {
         new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage), "", new ApisHelper.GetLiveVideoCallback() {
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel body) {
-                setLiveVideos(body);
+                if (body.getList().isEmpty())
+                { nolivevideoText.setVisibility(View.VISIBLE);}
+                else
+                {
+                    nolivevideoText.setVisibility(View.GONE);
+                    setLiveVideos(body);
+                }
+
             }
 
             @Override
@@ -903,4 +939,41 @@ public class HomeFragment extends Fragment {
             }
         }
     };
+
+
+    private void getNotificationList() {
+
+        Call<NotificationListModel> notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
+        notificationListCall.enqueue(new Callback<NotificationListModel>() {
+            @Override
+            public void onResponse(Call<NotificationListModel> call, Response<NotificationListModel> response) {
+
+                if (response.isSuccessful()) {
+                    Log.e("GetNotificationList", "onResponse: " + response.body().getStatus());
+                    notificationListModel = response.body();
+                    if (notificationListModel.getListReadStatus().equals("0")) {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                    } else {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                    }
+
+
+                } else {
+                    try {
+                        Log.e("GetNotificationList", "onResponse: errorBody" + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NotificationListModel> call, Throwable t) {
+
+                Log.e("GetNotificationList", "onFailure: " + t.getMessage());
+            }
+        });
+    }
+
+
 }

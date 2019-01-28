@@ -140,7 +140,17 @@ mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-
+        Log.e( "onPageScrolled: ",""+position );
+        if (position==4)
+        {
+            wlcmNext.setVisibility(View.VISIBLE);
+            wlcmSkip.setVisibility(View.GONE);
+        }
+        else
+        {
+            wlcmNext.setVisibility(View.GONE);
+            wlcmSkip.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

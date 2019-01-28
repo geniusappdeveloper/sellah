@@ -14,6 +14,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
         <LinearLayout
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -98,13 +99,6 @@
             <!--android:background="@drawable/red_border"-->
             <!--android:gravity="center" />-->
 
-        <View
-            android:id="@+id/top_view"
-            android:layout_width="match_parent"
-            android:layout_height="0.6dp"
-            android:layout_below="@+id/tabs1"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@color/colorGrey" />
 
     <com.app.admin.sellah.view.CustomViews.NonSwipeableViewPager
         android:layout_width="match_parent"

@@ -52,7 +52,7 @@ public class MessageFragment extends Fragment {
     //Mess recycler
     TextView txtNewMessage, txtMessage;
 
-    RecyclerView messRecycler;
+    RecyclerView messRecycler,ongoingrecycler;
 
     //New Mess Recycler
     RecyclerView newMessRecycler;
@@ -60,6 +60,7 @@ public class MessageFragment extends Fragment {
     private View view;
     private MessageListAdapter oldMsgAdapter;
     private MessageListAdapter newMsgAdapter;
+    private MessageListAdapter ongoingadapter;
     private ChattedListModel oldMsgList;
     private String TAG = MessageFragment.class.getSimpleName();
     FloatingActionButton actionButton;
@@ -79,6 +80,7 @@ public class MessageFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_message, container, false);
         messRecycler = view.findViewById(R.id.message_recycler);
         newMessRecycler = view.findViewById(R.id.new_message_recycler);
+        ongoingrecycler = view.findViewById(R.id.ongoing_transactionrecyclerview);
         txtMessage = view.findViewById(R.id.txt_message);
         txtNewMessage = view.findViewById(R.id.txt_new_message);
         actionButton = view.findViewById(R.id.floating_action_button);
@@ -144,7 +146,21 @@ public class MessageFragment extends Fragment {
                 }
             }
         };
+
+
+
+
+
+        ongoingadapter = new MessageListAdapter( getActivity(),3);
+        LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        ongoingrecycler.setLayoutManager(horizontalLayoutManager);
+        ongoingrecycler.setAdapter(ongoingadapter);
+
         getChatedListApi();
+
+
+
+
         return view;
     }
 

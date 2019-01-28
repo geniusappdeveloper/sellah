@@ -1,6 +1,7 @@
 package com.app.admin.sellah.view.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
@@ -8,9 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.Categories.Result;
 import com.app.admin.sellah.model.extra.NotificationList.ArrFollow;
@@ -29,11 +32,15 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
 
     List<ArrFollow>  newMessList;
     Context context;
+    NotificationListModel notificationListModel;
 
-    public NewnotificationAdapter(List<ArrFollow> results, Context activity) {
+
+
+    public NewnotificationAdapter(List<ArrFollow> results,NotificationListModel notificationListModel, Context activity) {
 
         this.newMessList = results;
         context = activity;
+        this.notificationListModel = notificationListModel;
 
 
     }
@@ -53,11 +60,33 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
         if (newMessList.get(position).getReadStatus().equals("0"))
         {
             holder.read.setText("Mark as Read");
+            holder.notification_rootlayout.setBackgroundColor(Color.parseColor("#fffaec"));
         }
         else
         {
-            holder.read.setText("");
+            holder.read.setVisibility(View.GONE);
+            holder.notification_rootlayout.setBackgroundColor(Color.parseColor("#ffffff"));
+
         }
+
+        holder.read.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new ApisHelper().readNotificationApi(context, newMessList.get(position).getNotiId(), new ApisHelper.ReadNotificationCallback() {
+                    @Override
+                    public void onReadNotificationSuccess(String msg) {
+                        notificationListModel.getArrFollow().get(position).setReadStatus("1");
+                        notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onReadNotificationFailure() {
+
+                    }
+                });
+
+            }
+        });
     }
 
     @Override
@@ -69,6 +98,7 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
     public class AllCategoryViewHolder extends RecyclerView.ViewHolder {
 
         TextView txtName,read,time;
+        RelativeLayout notification_rootlayout;
 
         public AllCategoryViewHolder(View view) {
             super(view);
@@ -76,11 +106,22 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
             txtName = view.findViewById(R.id.txt_name_noti);
             read = view.findViewById(R.id.mark_asread_noti);
             time= view.findViewById(R.id.time_noti);
+            notification_rootlayout= view.findViewById(R.id.notification_root_layout);
         }
     }
 
     public interface OnItemClickedListner{
         void onItemClicked();
+    }
+
+    @Override
+    public void setHasStableIds(boolean hasStableIds) {
+        super.setHasStableIds(hasStableIds);
+    }
+
+    public void reloadItems(List<ArrFollow> items) {
+        this.newMessList = items;
+        notifyDataSetChanged();
     }
 
 }

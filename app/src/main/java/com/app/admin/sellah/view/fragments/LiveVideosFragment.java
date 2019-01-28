@@ -353,8 +353,11 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
                 videoLists.addAll(msg.getList());
 
                 Log.e("csdvcsd", list.size() + "");
+                 if(pbHome.getVisibility()==View.VISIBLE)
+                 {
+                     pbHome.setVisibility(View.GONE);
+                 }
 
-                pbHome.setVisibility(View.GONE);
 //                Collections.reverse(videoLists);
                 isFeedsFetchInProgress = false;
                 videoCategoriesAdptNew.notifyItemRangeInserted(videoLists.size() > 0 ? videoLists.size() - 1 : 0, videoLists.size());

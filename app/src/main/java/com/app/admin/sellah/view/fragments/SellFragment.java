@@ -681,11 +681,15 @@ public class SellFragment extends Fragment implements SellProductInterface {
         conditionSpinAdapter.setDropDownViewResource(android.R.layout
                 .simple_spinner_dropdown_item);
 
+        Log.e( "conditoin: ","coming");
+        Log.e( "conditoin: ","g"+condition);
         spinCondition.setAdapter(conditionSpinAdapter);
+
+
         if (condition.equalsIgnoreCase("U")) {
             spinCondition.setSelection(2);
         } else {
-            spinCondition.setSelection(1);
+            spinCondition.setSelection(0);
         }
 
 
@@ -1199,7 +1203,7 @@ public class SellFragment extends Fragment implements SellProductInterface {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    Snackbar.make(rootTag, "Something went's wrong", Snackbar.LENGTH_SHORT)
+                    Snackbar.make(rootTag, "Something went wrong", Snackbar.LENGTH_SHORT)
                             .setAction("", null).show();
                 }
             }

@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="visible"
+    android:background="#fff"
     app:cardBackgroundColor="@color/coloCreamyWhite"
     app:cardCornerRadius="@dimen/_6sdp"
     app:cardElevation="@dimen/_3sdp"
@@ -30,7 +31,7 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentLeft="false"
                 android:layout_margin="@dimen/_9sdp"
-                android:padding="@dimen/_5sdp"
+                android:padding="@dimen/_1sdp"
                 android:src="@drawable/cross_icon"
                 android:tint="@color/colorWhite"
                 android:visibility="visible" />
@@ -62,7 +63,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="vertical">
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/notification_rv"
@@ -70,7 +70,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_320sdp"/>
             </LinearLayout>
-
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

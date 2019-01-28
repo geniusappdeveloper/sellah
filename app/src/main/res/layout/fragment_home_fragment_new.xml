@@ -96,6 +96,17 @@
                 android:layout_height="@dimen/_190sdp"
                 android:padding="@dimen/_5sdp">
 
+
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/nolivevideo_text"
+                    android:textSize="@dimen/_14sdp"
+                    android:gravity="center"
+                    android:text="Currently No Live Videos"
+                    android:background="@color/colorLGrey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
                 <android.support.v4.view.ViewPager
                     android:id="@+id/vp_live"
                     android:layout_width="match_parent"

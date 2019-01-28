@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
@@ -676,13 +677,16 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                     subCategoryGridAdapter.notifyDataSetChanged();
                     recSubCategory.setVisibility(View.VISIBLE);
                     getSubcategoryList(catId, sub_cat_id);
-                    ((MainActivity) getActivity()).rlMenu.setVisibility(View.VISIBLE);
+                    ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
                     ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
+                    ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
                 } else {
                     if (!isSearching) {
                         isSearching = true;
                         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
                         ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.VISIBLE);
+                        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
+
                     }
                 }
             }
@@ -1183,7 +1187,13 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
             }
         });
 
-//        ((MainActivity) getActivity()).backArrow.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlResetSearch.setOnClickListener(view1 -> {
+            ((MainActivity) getActivity()).searchEditText.setText("");
+            ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+            ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
+            ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
+
+        });
 
 
     }

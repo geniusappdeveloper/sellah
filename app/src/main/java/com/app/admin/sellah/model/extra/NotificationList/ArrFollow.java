@@ -1,10 +1,13 @@
 
 package com.app.admin.sellah.model.extra.NotificationList;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ArrFollow {
+public class ArrFollow  {
 
     @SerializedName("user_id")
     @Expose
@@ -95,5 +98,6 @@ public class ArrFollow {
     public void setNotiType(String notiType) {
         this.notiType = notiType;
     }
+
 
 }

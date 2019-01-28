@@ -35,6 +35,7 @@ public class SAConstants {
         public static final String Filter_recent="recent";
         public static final String Filter_popuarity="popuarity";
         public static final String PRODUCT_DETAIL="sa.product.detail";
+        public static final String NOTI_KEY="NOTI_KEy";
         public static final String PRODUCT_ID="sa.product.id";
         public static final String OTHER_USER_ID="sa.other.user.id";
         public static final String CARDHOLDER_NAME="sa.card.holder.name";

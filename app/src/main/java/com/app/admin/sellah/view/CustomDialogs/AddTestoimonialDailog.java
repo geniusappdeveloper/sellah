@@ -31,8 +31,7 @@ import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
 public class AddTestoimonialDailog extends AlertDialog {
 
-    @BindView(R.id.review_txt)
-    TextView reviewTxt;
+
     @BindView(R.id.rate_txt)
     TextView rateTxt;
     @BindView(R.id.rtB_rating)
@@ -67,7 +66,11 @@ public class AddTestoimonialDailog extends AlertDialog {
         webService = Global.WebServiceConstants.getRetrofitinstance();
         dialog = S_Dialogs.getLoadingDialog(context);
         setContentView(R.layout.layout_add_testimonial_dialog);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setAttributes(lp);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         ButterKnife.bind(this);
@@ -82,6 +85,8 @@ public class AddTestoimonialDailog extends AlertDialog {
 
 
     }
+
+
 
     @OnClick(R.id.btn_submit_review)
     public void onViewClicked() {
@@ -134,4 +139,7 @@ public class AddTestoimonialDailog extends AlertDialog {
     public interface AddtestimonialListner{
         void onSuccessListner();
     }
+
+
+
 }

@@ -50,6 +50,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     Context context;
     FragmentManager manager;
     int state;
+    String ongoing;
 //    private ChattedListModel notificationListFilter;
 
     public MessageListAdapter(List<Record> chattedListModel, Activity activity, int state, FragmentManager manager) {
@@ -59,6 +60,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         context = activity;
         this.state = state;
         this.manager = manager;
+        Log.e("adapter_state", "working");
+
+    }
+
+    public MessageListAdapter(Activity activity,int state) {
+
+//        notificationListFilter = chattedListModel;
+        context = activity;
+        this.state = state;
         Log.e("adapter_state", "working");
 
     }
@@ -78,82 +88,93 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     @Override
     public void onBindViewHolder(final MessagesViewHolder holder, final int position) {
 //        holder.imageView.setImageResource(chattedListModel.get(position).getProfileImage());
-        holder.imgNew.setVisibility(View.GONE);
-        Glide.with(context)
-                .load(chattedListModel.get(position).getFriendImage())
-                .apply(Global.getGlideOptions()).into(holder.imageView);
+       if (state==3)
+       {
+           holder.order.setVisibility(View.GONE);
+       }
 
-        holder.headingText.setText(!chattedListModel.get(position).getFriendName().equalsIgnoreCase("") ?
-                chattedListModel.get(position).getFriendName() : "Sellah! user");
-        holder.subHeadingText.setText(chattedListModel.get(position).getMessage());
-        holder.msgTime.setText(Global.formateDateTo_HHmm(Global.convertUTCToLocal(chattedListModel.get(position).getLastMsgTime())));
+       else
+       {
 
-        if (state == 0) {
-            if (position == 0) {
-                holder.order.setVisibility(View.VISIBLE);
-            } else {
-                holder.order.setVisibility(View.GONE);
-            }
+           holder.imgNew.setVisibility(View.GONE);
+           Glide.with(context)
+                   .load(chattedListModel.get(position).getFriendImage())
+                   .apply(Global.getGlideOptions()).into(holder.imageView);
 
-        } else {
+           holder.headingText.setText(!chattedListModel.get(position).getFriendName().equalsIgnoreCase("") ?
+                   chattedListModel.get(position).getFriendName() : "Sellah! user");
+           holder.subHeadingText.setText(chattedListModel.get(position).getMessage());
+           holder.msgTime.setText(Global.formateDateTo_HHmm(Global.convertUTCToLocal(chattedListModel.get(position).getLastMsgTime())));
 
-            holder.order.setVisibility(View.GONE);
-        }
+           if (state == 0) {
+               if (position == 0) {
+                   holder.order.setVisibility(View.VISIBLE);
+               } else {
+                   holder.order.setVisibility(View.GONE);
+               }
+
+           } else {
+
+               holder.order.setVisibility(View.GONE);
+           }
 
         /*if(chattedListModel.get(position).getIsRead().equalsIgnoreCase("Y")){
             holder.imgNew.setVisibility(View.VISIBLE);
         }else{
 
         }*/
-        holder.relDetails.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
+           holder.relDetails.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
 
-                    if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){
+                       if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){
 //                        you have blocked user
-                       S_Dialogs.getYouBlockedUserDialog(context,context.getString(R.string.dialog_title_you_block_user),(dialog,which)->{
-                           blockUnBlockUser("unblock",position,chattedListModel.get(position).getFriendId());
-                           dialog.dismiss();
-                       }).show();
-                    }else{
-                        S_Dialogs.getUserBlockedYouDialog(context).show();
+                           S_Dialogs.getYouBlockedUserDialog(context,context.getString(R.string.dialog_title_you_block_user),(dialog,which)->{
+                               blockUnBlockUser("unblock",position,chattedListModel.get(position).getFriendId());
+                               dialog.dismiss();
+                           }).show();
+                       }else{
+                           S_Dialogs.getUserBlockedYouDialog(context).show();
 //                        user has blocked you.
-                    }
+                       }
 
-                }else{
-                    Intent chatIntent = new Intent(context, ChatActivity.class);
-                    chatIntent.putExtra("otherUserId", chattedListModel.get(position).getFriendId());
-                    chatIntent.putExtra("otherUserImage", chattedListModel.get(position).getFriendImage());
-                    chatIntent.putExtra("otherUserName", chattedListModel.get(position).getFriendName());
-                    context.startActivity(chatIntent);
-                }
-            }
-        });
+                   }else{
+                       Intent chatIntent = new Intent(context, ChatActivity.class);
+                       chatIntent.putExtra("otherUserId", chattedListModel.get(position).getFriendId());
+                       chatIntent.putExtra("otherUserImage", chattedListModel.get(position).getFriendImage());
+                       chatIntent.putExtra("otherUserName", chattedListModel.get(position).getFriendName());
+                       context.startActivity(chatIntent);
+                   }
+               }
+           });
 
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
+           holder.imageView.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
 
-                    if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){
+                       if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){
 //                        you have blocked user
-                        S_Dialogs.getYouBlockedUserDialog(context,context.getString(R.string.dialog_title_you_block_user),(dialog,which)->{
-                            blockUnBlockUser("unblock",position,chattedListModel.get(position).getFriendId());
-                            dialog.dismiss();
-                        }).show();
-                    }else{
-                        S_Dialogs.getUserBlockedYouDialog(context).show();
+                           S_Dialogs.getYouBlockedUserDialog(context,context.getString(R.string.dialog_title_you_block_user),(dialog,which)->{
+                               blockUnBlockUser("unblock",position,chattedListModel.get(position).getFriendId());
+                               dialog.dismiss();
+                           }).show();
+                       }else{
+                           S_Dialogs.getUserBlockedYouDialog(context).show();
 //                        user has blocked you.
-                    }
+                       }
 
-                }else{
-                    loadFragment(new PersonalProfileFragment(), position);
-                }
+                   }else{
+                       loadFragment(new PersonalProfileFragment(), position);
+                   }
 
-            }
-        });
+               }
+           });
 
+
+
+       }
     }
     private void blockUnBlockUser(String blockStatus, int pos, String userId) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
@@ -191,7 +212,16 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public int getItemCount() {
-        return chattedListModel.size();
+
+        if (state==3)
+        {
+            return 1;
+        }
+        else
+        {
+            return chattedListModel.size();
+        }
+
     }
 
 

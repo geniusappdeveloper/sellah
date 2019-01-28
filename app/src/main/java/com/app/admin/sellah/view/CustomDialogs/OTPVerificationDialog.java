@@ -117,6 +117,18 @@ public class OTPVerificationDialog extends AlertDialog {
         KeepStatusBar();
 //        generateAndSendOtp();
 
+
+        SMSListener.bindListener(new OTPListener() {
+            @Override
+            public void onOTPReceived(String otp) {
+                Log.e( "onOTPReceived: ",otp );
+                otpView.setValue(otp);
+                setUpPinView();
+
+
+            }
+        });
+
     }
 
 
@@ -139,7 +151,7 @@ public class OTPVerificationDialog extends AlertDialog {
                 @Override
                 public void onOTPReceived(String extractedOTP) {
 //                et_otp.setText(extractedOTP);
-                    Log.e("Otp_received", extractedOTP);
+                    Log.e("oooooo", extractedOTP);
                 }
             });
         });
