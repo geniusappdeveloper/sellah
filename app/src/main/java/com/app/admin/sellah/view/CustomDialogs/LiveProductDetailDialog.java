@@ -1,7 +1,7 @@
 package com.app.admin.sellah.view.CustomDialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,29 +9,37 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.model.extra.Categories.GetCategoriesModel;
-import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -44,7 +52,7 @@ import butterknife.OnClick;
 
 import static android.app.Activity.RESULT_OK;
 
-public class LiveProductDetailDialog extends AlertDialog {
+public class LiveProductDetailDialog extends Dialog {
 
     UpdateDetailCallback callback;
 
@@ -52,28 +60,41 @@ public class LiveProductDetailDialog extends AlertDialog {
     ImageView downArrow;
     @BindView(R.id.edt_add_name)
     EditText edtAddName;
-    @BindView(R.id.il_name)
-    NoChangingBackgroundTextInputLayout ilName;
-    @BindView(R.id.edt_add_category)
-    EditText edtAddCategory;
-    @BindView(R.id.il_add_category)
-    NoChangingBackgroundTextInputLayout ilAddCategory;
+
+
     @BindView(R.id.edt_add_price)
     EditText edtAddPrice;
-    @BindView(R.id.il_add_price)
-    NoChangingBackgroundTextInputLayout ilAddPrice;
+
     @BindView(R.id.edt_description)
     EditText edtDescription;
-    @BindView(R.id.il_description)
-    NoChangingBackgroundTextInputLayout ilDescription;
+
     @BindView(R.id.submit)
     Button submit;
     @BindView(R.id.filter_dialog_root)
     LinearLayout filterDialogRoot;
     @BindView(R.id.spinner_catagory)
     Spinner spinnerCatagory;
-    @BindView(R.id.img_captured)
-    ImageView imgCaptured;
+    @BindView(R.id.root_live)
+    RelativeLayout rootLive;
+    @BindView(R.id.relative_spinnerrl)
+    RelativeLayout relativeSpinnerrl;
+    @BindView(R.id.cancel_detail)
+    ImageView cancelDetail;
+    @BindView(R.id.il_add_price)
+    NoChangingBackgroundTextInputLayout ilAddPrice;
+    @BindView(R.id.live_imgview)
+    ImageView liveImgview;
+    @BindView(R.id.live_imgview_name)
+    TextView liveImgviewName;
+    @BindView(R.id.dummylive1_text)
+    TextView dummylive1Text;
+    @BindView(R.id.dummylive2_text)
+    TextView dummylive2Text;
+    @BindView(R.id.editimage_btn_live)
+    Button editimageBtnLive;
+    @BindView(R.id.li_take_picture)
+    RelativeLayout liTakePicture;
+
     private ArrayList<EditText> allAddressFields;
     private ArrayList<TextInputLayout> allAddressInputLayouts;
     private HashMap<EditText, String> adressfieldsMessages;
@@ -97,14 +118,15 @@ public class LiveProductDetailDialog extends AlertDialog {
         ((Activity) context).startActivityForResult(intent, CAMERA_PIC_REQUEST);
     }
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setGravity(Gravity.BOTTOM);
         setContentView(R.layout.product_lay_details);
-        getWindow().setDimAmount(0.0f);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setCancelable(false);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         ButterKnife.bind(this);
 
         allAddressFields = new ArrayList<>();
@@ -113,14 +135,17 @@ public class LiveProductDetailDialog extends AlertDialog {
         allAddressFields.add(edtDescription);
 
         allAddressInputLayouts = new ArrayList<>();
-        allAddressInputLayouts.add(ilName);
-        allAddressInputLayouts.add(ilDescription);
-//        allAddressInputLayouts.add(ilAddPrice);
 
+
+        focuslisteneres();
+        submit.setEnabled(false);
+        spinnerCatagory.setGravity(Gravity.RIGHT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            rootLive.setElevation(9);
+        }
 
         adressfieldsMessages = new HashMap<>();
         adressfieldsMessages.put(edtAddName, "Please enter your product name");
-        adressfieldsMessages.put(edtAddCategory, "Please add product description");
 
 
         ArrayAdapter<String> conditionSpinAdapter = new ArrayAdapter<String>
@@ -133,12 +158,21 @@ public class LiveProductDetailDialog extends AlertDialog {
 
         spinnerCatagory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+
+
+
                 Object item = parent.getItemAtPosition(position);
+
                 Log.e("category", item + " ");
-                if (!item.toString().equalsIgnoreCase("category")) {
+                if (!item.toString().equalsIgnoreCase(
+                        "Select Category")) {
                     catId = ExpandableListData.getCatId(item.toString());
+                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
+
                 } else {
                     catId = "";
+                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
                 }
             }
 
@@ -151,39 +185,23 @@ public class LiveProductDetailDialog extends AlertDialog {
     private List<String> getCategoryList() {
         GetCategoriesModel model = ExpandableListData.getData();
         List<String> catList = new ArrayList<>();
-        catList.add("Category");
+        catList.add("Select Category");
         for (int i = 0; i < model.getResult().size(); i++) {
             catList.add(model.getResult().get(i).getName());
         }
         return catList;
     }
 
-    @OnClick(R.id.submit)
-    public void onViewClicked() {
-        if (isFormValid()) {
-            if (!spinnerCatagory.getSelectedItem().toString().equalsIgnoreCase("category")) {
-                if(!TextUtils.isEmpty(imagePath)){
-                    callback.onUpdateVideoValues(Global.getText(edtAddName), spinnerCatagory.getSelectedItem().toString(), Global.getText(edtAddPrice), Global.getText(edtDescription), catId,imagePath);
-                    dismiss();
-                }else{
-                    Toast.makeText(context, "Capture image for video cover", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(context, "Please select a category", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    }
 
     protected boolean isFormValid() {
         for (EditText editText : allAddressFields) {
             if (editText.getText().toString().trim().isEmpty()) {
-                allAddressInputLayouts.get(allAddressFields.indexOf(editText))
-                        .setError(adressfieldsMessages.get(editText));
-//                requestFocus(editText);
+
+               editText.requestFocus();
+
                 return false;
             } else {
-                allAddressInputLayouts.get(allAddressFields.indexOf(editText)).setErrorEnabled(false);
+
             }
         }
         return true;
@@ -197,6 +215,39 @@ public class LiveProductDetailDialog extends AlertDialog {
     @OnClick(R.id.li_take_picture)
     public void onCaptureViewClicked() {
         takePhotoFromCamera();
+        remove_focus();
+    }
+
+    @OnClick({R.id.editimage_btn_live, R.id.relative_spinnerrl, R.id.submit})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+
+            case R.id.editimage_btn_live:
+                takePhotoFromCamera();
+                break;
+
+            case R.id.relative_spinnerrl:
+                spinnerCatagory.performClick();
+                remove_focus();
+                break;
+            case R.id.submit:
+
+                if (isFormValid()) {
+                    if (!spinnerCatagory.getSelectedItem().toString().equalsIgnoreCase("Select Category")) {
+                        if (!TextUtils.isEmpty(imagePath)) {
+                            callback.onUpdateVideoValues(Global.getText(edtAddName), spinnerCatagory.getSelectedItem().toString(), Global.getText(edtAddPrice), Global.getText(edtDescription), catId, imagePath);
+                            dismiss();
+                        } else {
+                            Toast.makeText(context, "Capture image for video cover", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(context, "Please select a category", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+                break;
+        }
     }
 
     public interface UpdateDetailCallback {
@@ -213,7 +264,7 @@ public class LiveProductDetailDialog extends AlertDialog {
     }
 
     public void onActivityResult(int requestCode, int code, Intent data) {
-        if (requestCode == CAMERA_PIC_REQUEST && code==RESULT_OK) {
+        if (requestCode == CAMERA_PIC_REQUEST && code == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
 
@@ -222,14 +273,23 @@ public class LiveProductDetailDialog extends AlertDialog {
 //                    Base64.NO_WRAP);
 //            Log.e("ImageString", "onActivityResult: "+imgString);
             Uri tempUri = getImageUri(context.getApplicationContext(), imageBitmap);
-
+            dummylive1Text.setVisibility(View.GONE);
+            dummylive2Text.setVisibility(View.GONE);
+            liveImgview.setVisibility(View.VISIBLE);
+            liveImgviewName.setVisibility(View.VISIBLE);
+            editimageBtnLive.setVisibility(View.VISIBLE);
+            liTakePicture.setBackgroundResource(R.drawable.live_product_detail_background);
+            submit.setEnabled(true);
+            submit.setBackgroundResource(R.drawable.round_red_border_testimonial);
+            Glide.with(context).applyDefaultRequestOptions(new RequestOptions().transform(new RoundedCorners(10)))
+                    .load(tempUri).into(liveImgview);
+            liveImgviewName.setText(getFileName(tempUri));
             imagePath = getRealPathFromURI(tempUri);
-            Log.e("ImageString", "onActivityResult: "+imagePath);
-            imgCaptured.setPadding(0, 0, 0, 0);
-            imgCaptured.setImageBitmap(imageBitmap);
+            Log.e("ImageString", "onActivityResult: " + imagePath);
 //            uploadChatImage(ImageUploadHelper.convertImageTomultipart(imagePath, "image"));
         }
     }
+
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(),
@@ -242,6 +302,66 @@ public class LiveProductDetailDialog extends AlertDialog {
         cursor.moveToFirst();
         int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
         return cursor.getString(idx);
+    }
+
+    private void focuslisteneres() {
+
+        edtAddName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtAddName.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtAddName.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+
+        edtDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+    }
+
+    public String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
+    }
+
+
+    public void remove_focus()
+    {
+        edtDescription.clearFocus();
+        edtAddName.clearFocus();
     }
 
 }
