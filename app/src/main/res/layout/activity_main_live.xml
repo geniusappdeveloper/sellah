@@ -45,6 +45,7 @@
             android:visibility="visible" />
 
         <RelativeLayout
+            android:layout_marginTop="@dimen/_13sdp"
             android:id="@+id/relLayoutHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_110sdp">
@@ -58,7 +59,7 @@
                     android:layout_width="27dp"
                     android:layout_height="25dp"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/back_arrow"
+                    android:src="@drawable/back_icon_new"
                     android:tint="@color/colorWhite" />
             </RelativeLayout>
 
@@ -86,7 +87,7 @@
                     android:layout_height="@dimen/_25sdp"
                     android:layout_centerInParent="true"
                     android:padding="@dimen/_3sdp"
-                    android:src="@drawable/option_icon"
+                    android:src="@drawable/share_icon"
                     android:tint="@color/colorWhite" />
             </RelativeLayout>
             <!--   <RelativeLayout
@@ -97,6 +98,7 @@
 
                    android:layout_alignParentRight="true">-->
             <RelativeLayout
+                android:layout_marginTop="@dimen/_15sdp"
                 android:id="@+id/relLay_views"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
@@ -104,6 +106,7 @@
                 android:layout_toRightOf="@+id/relLay_live">
 
                 <LinearLayout
+                    android:layout_marginLeft="@dimen/_12sdp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:alpha="0.7"
@@ -149,6 +152,7 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:layout_marginTop="@dimen/_15sdp"
                 android:id="@+id/relLay_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
@@ -165,7 +169,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="@dimen/_3sdp"
                     android:alpha="0.7"
-                    android:background="@drawable/round_black_live"
+                    android:background="@drawable/live_btn_bg"
                     android:paddingBottom="@dimen/_3sdp"
                     android:paddingLeft="@dimen/_8sdp"
                     android:paddingRight="@dimen/_8sdp"
@@ -176,6 +180,7 @@
             </RelativeLayout>
 
             <ImageButton
+
                 android:id="@+id/flipCamera"
                 android:layout_width="@dimen/_45sdp"
                 android:layout_height="@dimen/_45sdp"
@@ -186,7 +191,7 @@
                 android:layout_marginTop="@dimen/_3sdp"
                 android:background="@drawable/switch_camera_icon"
                 android:padding="@dimen/_8sdp"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/txt_offer_from_seller"
@@ -212,6 +217,7 @@
                 android:layout_below="@+id/relLay_back_live">
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/txt_live"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

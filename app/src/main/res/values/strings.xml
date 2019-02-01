@@ -49,7 +49,7 @@
     <string name="live">Live</string>
     <string name="see_more">See more</string>
     <string name="dialog_content_forgot">Please Enter your Registered Email Address</string>
-    <string name="dialog_content_makeOffer">Original Product Price S$ </string>
+    <string name="dialog_content_makeOffer">Original Price </string>
     <string name="dialog_content_sendOffer">Enter offering amount </string>
     <string name="dialog_title_information">Information</string>
     <string name="dialog_message_logout">Do you want to logout of Sellah App?</string>
@@ -196,7 +196,7 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
     </string-array>
 
     <string-array name="add_product_category">
-        <item>Category</item>
+        <item>Select Category</item>
         <item>Women\'s Fashion</item>
         <item>Men\'s Fashion</item>
         <item>Electronics</item>
@@ -232,6 +232,7 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
 
 
     <string-array name="add_product_fixed">
+        <item>Select Type</item>
         <item>Fixed Price</item>
         <item>Yes</item>
         <item>Price Negotiable</item>
@@ -266,6 +267,7 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
     <string name="btnDisconnectText">Connected</string>
     <string name="btnConnectText">Connect</string>
     <string name="connect_to_stripe">Please connect your account to stripe payment gateway.</string>
+    <string name="title_activity_add_new_videos">AddNewVideos</string>
     <!--<string name="connected_to_stripe"></string>-->
 
 

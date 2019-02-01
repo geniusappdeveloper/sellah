@@ -561,12 +561,12 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
 
     @OnClick(R.id.txt_review)
     public void onReviewClicked() {
-        AddTestoimonialDailog.create(getActivity(), otherUserId, new AddTestoimonialDailog.AddtestimonialListner() {
-            @Override
-            public void onSuccessListner() {
-                txtReview.setVisibility(View.GONE);
-            }
-        }).show();
+        AddTestoimonialDailog dailog = new AddTestoimonialDailog();
+        Bundle bundle = new Bundle();
+        bundle.putString("other_id",otherUserId);
+        dailog.setArguments(bundle);
+        dailog.show(getActivity().getFragmentManager(),"testimonial");
+
     }
 
     private void setUpBottomView() {
@@ -629,6 +629,8 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                 break;
             case R.id.btn_send:
                 if (isOffer) {
+
+                    Log.e( "onViewClicked: ","dd" );
                     setUpBottomView();
                 } else {
                     attemptSend();

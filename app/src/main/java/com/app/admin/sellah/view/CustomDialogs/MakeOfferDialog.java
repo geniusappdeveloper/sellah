@@ -1,6 +1,5 @@
 package com.app.admin.sellah.view.CustomDialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -10,8 +9,11 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -39,7 +41,7 @@ import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
-public class MakeOfferDialog extends AlertDialog {
+public class MakeOfferDialog extends Dialog {
 
     OfferController controller;
     Context context;
@@ -59,6 +61,8 @@ public class MakeOfferDialog extends AlertDialog {
     RelativeLayout rlList;
     @BindView(R.id.li_sendOffer)
     LinearLayout liSendOffer;
+    @BindView(R.id.btn_chat_order_cancel)
+    ImageView btnChatOrderCancel;
     private WebService webService;
     private Dialog dialog;
     private ArrayList<CheckOutModel> recordList;
@@ -84,7 +88,9 @@ public class MakeOfferDialog extends AlertDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setGravity(Gravity.BOTTOM);
         setContentView(R.layout.layout_chat_order_dialog);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         webService = Global.WebServiceConstants.getRetrofitinstance();
         dialog = S_Dialogs.getLoadingDialog(context);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -98,7 +104,7 @@ public class MakeOfferDialog extends AlertDialog {
 
         pbLoading.setVisibility(View.GONE);
         recProduct.setVisibility(View.VISIBLE);
-        card1.setVisibility(View.VISIBLE);
+        card1.setVisibility(View.GONE);
         checkoutProductAdapter = new CheckoutProductAdapter(body.getResult(), context, new CheckoutProductAdapter.ActionCallback() {
             @Override
             public void onCheckclicked(String name, String id, String subtotal, String quantity) {
@@ -122,15 +128,23 @@ public class MakeOfferDialog extends AlertDialog {
         recProduct.setAdapter(checkoutProductAdapter);
     }
 
-    @OnClick(R.id.txt_send_offer)
-    public void onViewClicked() {
 
-        if (txtSubtotal.getText().toString().equalsIgnoreCase("S$ 0")) {
-            controller.onErrorSelection();
-        } else {
-            makeOfferApi(productId, txtSubtotal.getText().toString().replace("S$", ""), productName, "1");
+
+    @OnClick({R.id.btn_chat_order_cancel, R.id.txt_send_offer})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_chat_order_cancel:
+                dismiss();
+                break;
+            case R.id.txt_send_offer:
+
+                if (txtSubtotal.getText().toString().equalsIgnoreCase("S$ 0")) {
+                    controller.onErrorSelection();
+                } else {
+                    makeOfferApi(productId, txtSubtotal.getText().toString().replace("S$", ""), productName, "1");
+                }
+                break;
         }
-
     }
 
     public interface OfferController {
@@ -163,6 +177,8 @@ public class MakeOfferDialog extends AlertDialog {
                         Log.e("ForSaleData", response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Log.e("ForSaleData", e.getLocalizedMessage());
+
                     }
                 }
             }

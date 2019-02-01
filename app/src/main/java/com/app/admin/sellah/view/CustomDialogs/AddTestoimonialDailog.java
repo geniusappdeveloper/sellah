@@ -1,37 +1,55 @@
 package com.app.admin.sellah.view.CustomDialogs;
 
-import android.app.AlertDialog;
+
 import android.app.Dialog;
-import android.content.Context;
+import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.WindowManager;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
-import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.model.extra.commonResults.Common;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
-public class AddTestoimonialDailog extends AlertDialog {
+public class AddTestoimonialDailog extends DialogFragment {
 
 
+    Float givenRating;
+    String otherUserId;
+    @BindView(R.id.testimonial_cancel)
+    ImageView testimonialCancel;
+    private WebService webService;
+    AddtestimonialListner listner;
+    @BindView(R.id.review_txt)
+    RelativeLayout reviewTxt;
     @BindView(R.id.rate_txt)
     TextView rateTxt;
     @BindView(R.id.rtB_rating)
@@ -42,39 +60,20 @@ public class AddTestoimonialDailog extends AlertDialog {
     EditText edtTestimonials;
     @BindView(R.id.btn_submit_review)
     Button btnSubmitReview;
-    private WebService webService;
-    private Dialog dialog;
-    private Context context;
-    Float givenRating;
-    String otherUserId;
+    Unbinder unbinder;
 
-    AddtestimonialListner listner;
-    protected AddTestoimonialDailog(Context context, String otherUserId,AddtestimonialListner listner) {
-        super(context);
-        this.listner=listner;
-        this.context = context;
-        this.otherUserId=otherUserId;
-    }
 
-    public static AddTestoimonialDailog create(Context context,String otherUserId,AddtestimonialListner listner) {
-        return new AddTestoimonialDailog(context,otherUserId,listner);
-    }
-
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.layout_add_testimonial_dialog, container, false);
+        unbinder = ButterKnife.bind(this, view);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getDialog().setCanceledOnTouchOutside(false);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().setGravity(Gravity.BOTTOM);
         webService = Global.WebServiceConstants.getRetrofitinstance();
-        dialog = S_Dialogs.getLoadingDialog(context);
-        setContentView(R.layout.layout_add_testimonial_dialog);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        dialog.getWindow().setAttributes(lp);
-//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        ButterKnife.bind(this);
-
+        textwatcher();
         rtBRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
@@ -83,24 +82,14 @@ public class AddTestoimonialDailog extends AlertDialog {
             }
         });
 
-
+        return view;
     }
 
-
-
-    @OnClick(R.id.btn_submit_review)
-    public void onViewClicked() {
-        if (!Global.getText(edtTestimonials).equalsIgnoreCase("")) {
-            addTestimonialApi(otherUserId,Global.getText(edtTestimonials), String.valueOf(givenRating));
-        } else {
-            Toast.makeText(context, "Please give some review aboout user.", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     private void addTestimonialApi(String otherUserId, String feedBack, String rating) {
-        Dialog dialog = S_Dialogs.getLoadingDialog(context);
+        Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
-        Call<Common> addTestimonialCall = webService.addTestimonialApi(HelperPreferences.get(context).getString(UID), otherUserId, feedBack, rating);
+        Call<Common> addTestimonialCall = webService.addTestimonialApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId, feedBack, rating);
         addTestimonialCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
@@ -112,7 +101,7 @@ public class AddTestoimonialDailog extends AlertDialog {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
 
                         listner.onSuccessListner();
-                        S_Dialogs.getInformation(context,response.body().getMessage(),((dialog1, which) -> {
+                        S_Dialogs.getInformation(getActivity(), response.body().getMessage(), ((dialog1, which) -> {
                             dismiss();
                             listner.onSuccessListner();
                         })).show();
@@ -135,11 +124,61 @@ public class AddTestoimonialDailog extends AlertDialog {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
-    public interface AddtestimonialListner{
-        void onSuccessListner();
+    @OnClick({R.id.testimonial_cancel, R.id.btn_submit_review})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.testimonial_cancel:
+                dismiss();
+                break;
+            case R.id.btn_submit_review:
+
+                if (!Global.getText(edtTestimonials).equalsIgnoreCase("")) {
+                    addTestimonialApi(otherUserId, Global.getText(edtTestimonials), String.valueOf(givenRating));
+                } else {
+                    Toast.makeText(getActivity(), "Please give some review aboout user.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
 
+    public interface AddtestimonialListner {
+        void onSuccessListner();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+    }
+
+
+    public void textwatcher(){
+        edtTestimonials.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+              btnSubmitReview.setBackgroundResource(R.drawable.round_red_border_testimonial);
+            }
+        });
+    }
 
 }

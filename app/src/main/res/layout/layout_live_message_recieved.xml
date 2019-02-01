@@ -22,11 +22,7 @@
             android:id="@+id/card1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
-            app:cardBackgroundColor="#ffffff"
-            app:cardElevation="@dimen/_2sdp"
-            app:cardCornerRadius="@dimen/_5sdp"
-            app:cardUseCompatPadding="true">
+            android:visibility="visible">
             <ImageView
                 android:id="@+id/img_msg_options"
                 android:layout_width="@dimen/_14sdp"
@@ -44,7 +40,7 @@
                     android:id="@+id/txt_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorWhite"
                     android:text="Sure Jane! No Problem"
                     android:textSize="@dimen/_12sdp"
                     android:maxWidth="@dimen/_195sdp"/>

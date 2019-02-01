@@ -36,10 +36,30 @@
                             android:minHeight="?attr/actionBarSize" />-->
 
             <RelativeLayout
+                android:elevation="@dimen/_7sdp"
+                android:background="@color/colorWhite"
                 android:id="@+id/relativeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_38sdp"
                 >
+
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:id="@+id/rl_back"
+                    android:layout_width="@dimen/_40sdp"
+                    android:layout_height="@dimen/_40sdp"
+                    android:gravity="center"
+                    >
+
+                    <ImageView
+                        android:id="@+id/back"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="@dimen/_5sdp"
+                        android:src="@drawable/ic_chevron_left_black" />
+                </RelativeLayout>
+
 
                 <RelativeLayout
                     android:layout_centerVertical="true"
@@ -218,22 +238,6 @@
                     android:visibility="gone" />
             </RelativeLayout>
 
-            <RelativeLayout
-                android:visibility="gone"
-                android:id="@+id/rl_back"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:gravity="center"
-               >
-
-                <ImageView
-                    android:id="@+id/back"
-                    android:layout_width="@dimen/_40sdp"
-                    android:layout_height="@dimen/_40sdp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="@dimen/_5sdp"
-                    android:src="@drawable/ic_chevron_left_black" />
-            </RelativeLayout>
 
             <RelativeLayout
                 android:background="#fff"
@@ -313,7 +317,7 @@
             <View
                 android:id="@+id/top_view"
                 android:layout_width="match_parent"
-                android:layout_height="0.6dp"
+                android:layout_height="0dp"
                 android:layout_below="@+id/relativeLayout"
                 android:background="@color/colorGrey" />
 
@@ -600,7 +604,7 @@
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="bottom|left"
                     android:paddingLeft="@dimen/_22sdp"
-                    android:text="© 2018 Sellah v8.9"
+                    android:text="© 2018 Sellah v9.0"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/_10sdp"/>
             </RelativeLayout>

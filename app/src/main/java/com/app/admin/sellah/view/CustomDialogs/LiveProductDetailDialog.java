@@ -158,10 +158,6 @@ public class LiveProductDetailDialog extends Dialog {
 
         spinnerCatagory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-
-
-
                 Object item = parent.getItemAtPosition(position);
 
                 Log.e("category", item + " ");

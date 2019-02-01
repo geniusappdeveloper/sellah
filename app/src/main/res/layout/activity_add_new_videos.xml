@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:background="@color/colorWhite"
+        android:elevation="@dimen/_7sdp"
+        android:id="@+id/addnewvideo_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_38sdp">
+
+        <TextView
+            android:textStyle="bold"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_15sdp"
+            android:textColor="@color/colorBlack"
+            android:text="Add New Product"/>
+
+
+        <ImageView
+            android:id="@+id/addnewvide_back"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_chevron_left_black" />
+    </RelativeLayout>
+    <LinearLayout
+
+        android:layout_marginTop="@dimen/_3sdp"
+        android:layout_below="@+id/addnewvideo_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/_15sdp"
+        tools:context=".NewProduct">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_22sdp"
+            android:textColor="@color/colorBlack"
+            android:text="Add Nice Photos"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_13sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:textColor="@color/colorGrey"
+            android:text="You can add up to 5 (five) photos of products you want to sell."/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_13sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:textColor="@color/colorGrey"
+            android:text="Add photos"/>
+
+        <RelativeLayout
+
+            android:id="@+id/rl_addnewvideo"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_100sdp"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:background="@drawable/live_product_detail_dash_background"
+            >
+
+
+
+
+
+            <TextView
+                android:id="@+id/dummylive1_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="+"
+                android:layout_toLeftOf="@+id/dummylive2_text"
+                android:gravity="center_vertical"
+                android:textColor="#9e9e9e"
+                android:textSize="@dimen/_35sdp"
+                />
+
+
+            <TextView
+                android:layout_centerInParent="true"
+                android:id="@+id/dummylive2_text"
+                android:paddingTop="@dimen/_3sdp"
+                android:gravity="center_vertical"
+                android:textColor="#9e9e9e"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/_5sdp"
+                android:text="Capture video cover image"
+                android:textSize="@dimen/_12sdp"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:visibility="gone"
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_100sdp"
+                android:paddingLeft="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_3sdp">
+
+            </android.support.v7.widget.RecyclerView>
+        </RelativeLayout>
+
+
+
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/addmore_photos_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/live_product_detail_red_background"
+            android:text="Add more photos"
+            android:textSize="@dimen/_14sdp"
+            android:layout_gravity="center"
+            android:padding="@dimen/_4sdp"
+            android:gravity="center"
+            android:textColor="@color/colorRed"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/_7sdp"
+        android:padding="@dimen/_20sdp"
+        android:background="@drawable/shadow_bg">
+
+        <Button
+            android:id="@+id/addnewvideo_btn_nxt"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:gravity="center"
+            android:text="Next"
+            android:textSize="@dimen/_14sdp"
+            android:textColor="@color/colorWhite"
+            android:background="@drawable/round_red_border_testimonial"
+
+            android:layout_gravity="center"/>
+    </LinearLayout>
+</RelativeLayout>

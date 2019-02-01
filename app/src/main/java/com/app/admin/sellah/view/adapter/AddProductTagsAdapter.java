@@ -3,6 +3,7 @@ package com.app.admin.sellah.view.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,7 @@ public class AddProductTagsAdapter extends RecyclerView.Adapter<AddProductTagsAd
     private ArrayList<String> tag_list;
     Context context;
     SellProductInterface sellProductInterface;
-    public AddProductTagsAdapter(ArrayList<String> addList, FragmentActivity activity, SellProductInterface sellProductInterface) {
+    public AddProductTagsAdapter(ArrayList<String> addList, Context activity, SellProductInterface sellProductInterface) {
 
         this.tag_list = addList;
         context = activity;

@@ -1,6 +1,5 @@
 package com.app.admin.sellah.view.CustomDialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -9,10 +8,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
@@ -23,7 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class BuyerMakeOfferDialog extends AlertDialog {
+public class BuyerMakeOfferDialog extends Dialog {
 
     Context context;
     @BindView(R.id.txt_original_price)
@@ -37,20 +37,22 @@ public class BuyerMakeOfferDialog extends AlertDialog {
     @BindView(R.id.il_add_quantity)
     NoChangingBackgroundTextInputLayout ilAddQuantity;
     @BindView(R.id.btn_makeOffer)
-    TextView btnMakeOffer;
+    Button btnMakeOffer;
+    @BindView(R.id.txt_total_stroke)
+    TextView txtTotalStroke;
     private WebService webService;
     private Dialog dialog;
 
-    private String productQuantity="";
-    private String productPrice="";
+    private String productQuantity = "";
+    private String productPrice = "";
     OnmakeOfferClick callback;
 
-    protected BuyerMakeOfferDialog(Context context,String productPrice,String productQuantity,OnmakeOfferClick callback) {
+    protected BuyerMakeOfferDialog(Context context, String productPrice, String productQuantity, OnmakeOfferClick callback) {
         super(context);
         this.context = context;
-        this.productPrice=productPrice;
-        this.productQuantity=productQuantity;
-        this.callback=callback;
+        this.productPrice = productPrice;
+        this.productQuantity = productQuantity;
+        this.callback = callback;
     }
 
     @Override
@@ -59,11 +61,13 @@ public class BuyerMakeOfferDialog extends AlertDialog {
 //        webService = Global.WebServiceConstants.getRetrofitinstance();
 //        dialog = S_Dialogs.getLoadingDialog(context);
         setContentView(R.layout.buyer_offer_dialog);
-//        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         ButterKnife.bind(this);
 
-        setUpViews();
+        // new changes by me
+        //setUpViews();
         steTextWacher();
 
     }
@@ -71,13 +75,16 @@ public class BuyerMakeOfferDialog extends AlertDialog {
     private void setUpViews() {
         btnMakeOffer.setAlpha(0.5f);
         btnMakeOffer.setClickable(false);
-        ilAddQuantity.setError("Available products in stock : "+(Integer.parseInt(productQuantity)-1));
-        txtOriginalPrice.setText(productPrice);
+        ilAddQuantity.setError("Available products in stock : " + (Integer.parseInt(productQuantity) - 1));
+
     }
 
     private void steTextWacher() {
 //        ilAddQuantity.setError(productQuantity);
+        txtTotalStroke.setText(String.valueOf((Integer.parseInt(productQuantity) - 1)));
+        txtOriginalPrice.setText("$"+productPrice);
         ilAddPrice.setError("");
+
         edtAddPrice.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -91,7 +98,7 @@ public class BuyerMakeOfferDialog extends AlertDialog {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length()>0){
+                if (s.length() > 0) {
                     ilAddPrice.setErrorEnabled(false);
                     btnMakeOffer.setAlpha(1f);
                     btnMakeOffer.setClickable(true);
@@ -133,31 +140,31 @@ public class BuyerMakeOfferDialog extends AlertDialog {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length()>0){
-                    String string=s.toString();
-                    int remainingitems = Integer.parseInt(productQuantity)-Integer.parseInt(string);
-                    if(Integer.parseInt(string)<=Integer.parseInt(productQuantity)){
-                        ilAddQuantity.setError("Available products in stock : "+remainingitems);
+                if (s.length() > 0) {
+                    String string = s.toString();
+                    int remainingitems = Integer.parseInt(productQuantity) - Integer.parseInt(string);
+                    if (Integer.parseInt(string) <= Integer.parseInt(productQuantity)) {
+                        ilAddQuantity.setError("Available products in stock : " + remainingitems);
                         btnMakeOffer.setClickable(true);
                         btnMakeOffer.setAlpha(1f);
-                    }else{
+                    } else {
                         ilAddQuantity.setError("Entered quantity is not available in stock");
                         btnMakeOffer.setClickable(true);
                         btnMakeOffer.setAlpha(0.5f);
                     }
 
-                }else{
+                } else {
                     btnMakeOffer.setClickable(false);
                     btnMakeOffer.setAlpha(0.5f);
-                    ilAddQuantity.setError("Available products in stock : "+productQuantity);
+                    ilAddQuantity.setError("Available products in stock : " + productQuantity);
                 }
 
             }
         });
     }
 
-    public static BuyerMakeOfferDialog create(Context context,String productPrice,String productQuantity,OnmakeOfferClick callback) {
-        return new BuyerMakeOfferDialog(context,productPrice,productQuantity,callback);
+    public static BuyerMakeOfferDialog create(Context context, String productPrice, String productQuantity, OnmakeOfferClick callback) {
+        return new BuyerMakeOfferDialog(context, productPrice, productQuantity, callback);
     }
 
     @OnClick({R.id.btn_cancel, R.id.btn_makeOffer})
@@ -167,18 +174,18 @@ public class BuyerMakeOfferDialog extends AlertDialog {
                 dismiss();
                 break;
             case R.id.btn_makeOffer:
-                if(Global.getText(edtAddPrice).equalsIgnoreCase("")){
+                if (Global.getText(edtAddPrice).equalsIgnoreCase("")) {
                     ilAddPrice.setError("Please enter offering price");
-                }else if(Global.getText(edtAddPrice).equalsIgnoreCase("")){
+                } else if (Global.getText(edtAddPrice).equalsIgnoreCase("")) {
                     ilAddQuantity.setError("Please add product quantity.");
-                }else{
-                    callback.onMakeOfferClick(Global.getText(edtAddPrice).replace("S$",""),Global.getText(edtAddQuantity),BuyerMakeOfferDialog.this);
+                } else {
+                    callback.onMakeOfferClick(Global.getText(edtAddPrice).replace("S$", ""), Global.getText(edtAddQuantity), BuyerMakeOfferDialog.this);
                 }
                 break;
         }
     }
 
-    public interface OnmakeOfferClick{
+    public interface OnmakeOfferClick {
         void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog);
     }
 }
