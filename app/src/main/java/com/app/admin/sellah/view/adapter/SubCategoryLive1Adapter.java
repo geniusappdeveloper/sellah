@@ -2,6 +2,7 @@ package com.app.admin.sellah.view.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -59,6 +60,7 @@ public class SubCategoryLive1Adapter extends RecyclerView.Adapter<SubCategoryLiv
         if (row_index == position) {
             holder.view.setVisibility(View.VISIBLE);
             holder.textName.setTextColor(Color.parseColor("#000000"));
+            holder.textName.setTypeface(null,Typeface.BOLD);
            /* holder.rlSubCatRoot.setBackgroundResource(R.drawable.selected_subcat_drawable);
             holder.textName.setTextColor(context.getResources().getColor(R.color.colorWhite));*/
         } else {

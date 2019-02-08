@@ -115,7 +115,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     LinearLayout linear;
     List<Record> list;
     @BindView(R.id.txt_user_name)
-    TextView txtUserName;
+    public TextView txtUserName;
     @BindView(R.id.card_top_view)
     CardView cardTopView;
     @BindView(R.id.card_bottom_view)
@@ -219,6 +219,8 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         record.setFriendImage(otherUserImage);
         record.setFriendId(otherUserId);
 
+
+        txtUserName.setText(otherUserName);
         isUserExistes = false;
         initChatIndex = 0;
         for (Record rec : chatedListRecord) {
@@ -250,7 +252,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         }
         setUpchatHeaderList();
         //setupVp(initChatIndex);
-        // txtUserName.setText(otherUserName);
+
     }
 
     @Override
@@ -292,6 +294,10 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         PopupMenu popup = new PopupMenu(ChatActivity.this, btnMenu);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_report, popup.getMenu());
+         MenuItem item = popup.getMenu().findItem(R.id.menu_report);
+         MenuItem item1 = popup.getMenu().findItem(R.id.menu_block_user);
+         item.setTitle("Report "+otherUserName);
+         item1.setTitle("Block "+otherUserName);
         popup.show();
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
@@ -506,11 +512,14 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                     if (!TextUtils.isEmpty(chatedListRecord.get(position).getLastSeenTime()))
                         txtLastSeen.setText("Last seen " + ": " + Global.getTimeAgo(Global.convertUTCToLocal(chatedListRecord.get(position).getLastSeenTime())));
                 }
-                if (!TextUtils.isEmpty(otherUserName)) {
+
+                /*now showing only one uername */
+
+                /*if (!TextUtils.isEmpty(otherUserName)) {
                     txtUserName.setText(otherUserName);
                 } else {
                     txtUserName.setText("Sellah! user");
-                }
+                }*/
                 try {
                     if (!TextUtils.isEmpty(chatedListRecord.get(position).getIsBlocked()) && chatedListRecord.get(position).getIsBlocked().equalsIgnoreCase("y")) {
                         isBlocked = true;

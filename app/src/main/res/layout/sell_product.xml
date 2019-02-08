@@ -54,7 +54,7 @@ to make their products look better by choosing the way they comfortable the most
                 android:layout_height="@dimen/_50sdp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/_20sdp"
-                android:src="@drawable/profile" />
+                android:src="@drawable/selladdnew_product" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -91,7 +91,7 @@ to make their products look better by choosing the way they comfortable the most
                 android:layout_height="@dimen/_50sdp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/_20sdp"
-                android:src="@drawable/profile" />
+                android:src="@drawable/selllivevideo_icon" />
 
             <TextView
                 android:layout_width="match_parent"

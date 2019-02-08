@@ -5,6 +5,7 @@
     android:id="@+id/fr_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context=".view.fragments.ChatDetailFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -12,11 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/chat_background" />
+
 
         <TextView
             android:id="@+id/txt_review"
@@ -47,6 +44,7 @@
             app:cardElevation="@dimen/_3sdp">
 
             <LinearLayout
+                android:background="@color/colorRed"
                 android:id="@+id/linear"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_40sdp"
@@ -55,22 +53,23 @@
                 android:padding="@dimen/_3sdp">
 
                 <ImageView
+
                     android:id="@+id/img_send_camera"
                     android:layout_width="@dimen/_22sdp"
                     android:layout_height="@dimen/_22sdp"
                     android:layout_gravity="center"
-                    android:background="@drawable/round_gray_border"
-                    android:padding="@dimen/_6sdp"
+                    android:padding="@dimen/_2sdp"
                     android:src="@drawable/add_plus_button"
-                    android:tint="@color/colorGrey" />
+                    android:tint="@color/colorWhite" />
 
                 <ImageView
+                    android:padding="@dimen/_2sdp"
                     android:id="@+id/img_send_gallery"
                     android:layout_width="@dimen/_22sdp"
                     android:layout_height="@dimen/_22sdp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
-
+                    android:tint="@color/colorWhite"
                     android:src="@drawable/gallery_icon" />
 
                 <EditText
@@ -96,7 +95,7 @@
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
                     android:background="@drawable/send_button_background"
-                    android:padding="@dimen/_6sdp"
+                    android:padding="@dimen/_4sdp"
                     android:src="@drawable/cart_icon_96dp"
                     android:tint="@color/colorWhite" />
             </LinearLayout>

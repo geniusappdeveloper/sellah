@@ -21,7 +21,7 @@
             android:background="@drawable/round_border_testemonialheader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
-            android:elevation="@dimen/_7sdp"
+            android:elevation="@dimen/_5sdp"
             android:orientation="vertical">
 
             <TextView
@@ -60,7 +60,7 @@
                     android:id="@+id/rec_product"
                     android:visibility="invisible"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/_200sdp"
+                    android:layout_height="@dimen/_240sdp"
                     android:layout_marginTop="@dimen/_8sdp" />
 
                 <android.support.v7.widget.CardView

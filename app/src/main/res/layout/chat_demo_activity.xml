@@ -81,7 +81,19 @@
                 android:layout_alignParentEnd="true"
                 android:layout_height="@dimen/_35sdp"
                 android:layout_alignParentRight="true">
+
                 <ImageView
+                    android:layout_centerInParent="true"
+                    android:id="@+id/img_send_camera"
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/_5sdp"
+                    android:src="@drawable/share_live_caht"
+                    android:tint="#fff" />
+
+                <ImageView
+                    android:visibility="gone"
                     android:padding="@dimen/_3sdp"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
@@ -107,7 +119,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/_23sdp"
                     android:alpha="0.7"
-                    android:background="@drawable/round_black_live"
                     android:gravity="center">
 
                     <ImageView
@@ -158,6 +169,7 @@
                 android:layout_alignParentRight="true">
 
                 <TextView
+                    android:background="@drawable/live_btn_bg"
                     android:id="@+id/txt_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -165,7 +177,6 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="@dimen/_3sdp"
                     android:alpha="0.7"
-                    android:background="@drawable/round_black_live"
                     android:paddingBottom="@dimen/_3sdp"
                     android:paddingLeft="@dimen/_8sdp"
                     android:paddingRight="@dimen/_8sdp"
@@ -799,12 +810,12 @@
             </LinearLayout>
         </RelativeLayout>-->
         <RelativeLayout
+            android:visibility="gone"
             android:id="@+id/card_bottom_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
             android:layout_alignParentBottom="true"
             android:alpha="0.8"
-            android:visibility="gone"
             android:background="@color/colorTrans">
 
             <RelativeLayout
@@ -820,23 +831,14 @@
                 android:layout_centerVertical="true"
                 android:padding="5dp">
 
-                <ImageView
-                    android:id="@+id/img_send_camera"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center"
-                    android:padding="@dimen/_5sdp"
-                    android:background="@drawable/round_gray_border"
-                    android:src="@drawable/share_icon"
-                    android:tint="#fff" />
 
                 <ImageView
                     android:id="@+id/img_send_gallery"
-                    android:layout_width="@dimen/_22sdp"
+                    android:layout_width="@dimen/_24sdp"
                     android:layout_height="@dimen/_22sdp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
-                    android:src="@drawable/gallery_icon" />
+                    android:src="@drawable/gallery_icon_livechat" />
 
                <!-- <EditText
                     android:id="@+id/edt_message"
@@ -867,10 +869,12 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_weight="1.6"
-                    android:background="@drawable/edittextb_back"
+                    android:background="@drawable/edittextb_back_chat"
                     android:hint="Type a message here"
                     android:padding="@dimen/_6sdp"
+                    android:textColorHint="@color/colorWhite"
                     android:maxHeight="@dimen/_100sdp"
+                    android:textColor="@color/colorWhite"
                     android:scrollbars="vertical"
                     android:inputType="textMultiLine"
                     android:textSize="@dimen/_12sdp" />

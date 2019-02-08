@@ -46,7 +46,8 @@
                     android:layout_margin="@dimen/_5sdp"
                     android:padding="@dimen/_3sdp"
                     android:tint="@color/colorRed"
-                    android:alpha="0.85"
+                    android:alpha="0.70"
+                    app:tint="@color/colorWhite"
                     android:visibility="gone"
                     android:src="@drawable/video_indicator_icon"/>
 

@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_2sdp"
         android:paddingRight="@dimen/_5sdp"
-        android:background="@drawable/textview_back">
+        android:background="@color/colorRed">
 
         <TextView
             android:id="@+id/tag_text"
@@ -21,7 +21,7 @@
             android:textSize="@dimen/_12sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginRight="@dimen/_5sdp"
-            android:textColor="@color/colorBlack" />
+            android:textColor="@color/colorWhite" />
     </RelativeLayout>
 
 </LinearLayout>

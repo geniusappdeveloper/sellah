@@ -10,17 +10,6 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/_8sdp">
 
-        <TextView
-            android:id="@+id/txt_heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_marginTop="@dimen/_3sdp"
-            android:padding="@dimen/_5sdp"
-            android:text="For Sale"
-            android:textAllCaps="false"
-            android:textColor="@color/colorGrey"
-            android:textSize="@dimen/_13sdp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/salesRecycler"

@@ -2,14 +2,17 @@ package com.app.admin.sellah.view.adapter;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,10 +48,14 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
     long subTotal = 0;
     WebService service;
     ActionCallback actionCallback;
+    Button txtsend_offer;
+    int pos=-1;
+    boolean check;
 
-    public CheckoutProductAdapter(List<Result> itemList, Context context, ActionCallback checkSelection) {
+    public CheckoutProductAdapter(List<Result> itemList, Context context,Button txt_sendoffer, ActionCallback checkSelection) {
         this.recordList = itemList;
         this.context = context;
+        this.txtsend_offer =txt_sendoffer;
         isCheckList = new boolean[itemList.size()];
         controller = new ChatActivity();
 //        this.dialog = dialog;
@@ -71,9 +78,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
 
     @Override
     public void onBindViewHolder(CheckOutItemHolder holder, final int position) {
-
         holder.chkSelect.setChecked(isCheckList[position]);
-
 //        if(dialog.){}
 //        txtSubTotal.setText(subTotal);
 
@@ -86,6 +91,39 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
                 .into(holder.imgProduct);
 
         holder.chkSelect.setTag(position);
+
+        holder.checkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+               pos =position;
+               notifyDataSetChanged();
+
+
+
+            }
+        });
+
+        if (pos ==position)
+        {
+            holder.checkout.setBackgroundColor(Color.parseColor("#dbdbdb"));
+
+
+        }
+        else
+        {
+            holder.checkout.setBackgroundColor(Color.parseColor("#ffffff"));
+
+        }
+
+        txtsend_offer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                holder.imgMakeOffer.performClick();
+
+            }
+        });
 
         holder.imgMakeOffer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,6 +187,11 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public int getItemCount() {
         return recordList.size();
     }
@@ -157,6 +200,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
         CheckBox chkSelect;
         TextView txtProductName, txtProductCost;
         ImageView imgProduct, imgMakeOffer;
+        RelativeLayout checkout;
 
         public CheckOutItemHolder(View view) {
             super(view);
@@ -165,6 +209,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             txtProductCost = view.findViewById(R.id.txt_product_cost);
             imgProduct = view.findViewById(R.id.img_product);
             imgMakeOffer = view.findViewById(R.id.img_btn_make_offer);
+            checkout = view.findViewById(R.id.root_checkout);
         }
     }
 

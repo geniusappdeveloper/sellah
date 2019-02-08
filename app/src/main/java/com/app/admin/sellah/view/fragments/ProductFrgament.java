@@ -2,6 +2,7 @@ package com.app.admin.sellah.view.fragments;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,10 +11,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,6 +38,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,7 +51,6 @@ import android.widget.Toast;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ReportApi;
 import com.app.admin.sellah.controller.WebServices.WebService;
-import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.ImageUploadHelper;
@@ -99,8 +101,10 @@ import static android.app.Activity.RESULT_OK;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.ADDPRODUCTTAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.HOMETAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
+import static com.app.admin.sellah.controller.utils.Global.MIUISetStatusBarLightMode;
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
+import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.MAKE_OFFER_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -157,20 +161,16 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     TextView txtProductLocation;
     @BindView(R.id.txt_product_condition)
     TextView txtProductCondition;
-    @BindView(R.id.txt_product_price)
-    TextView txtProductPrice;
-    @BindView(R.id.txt_product_quantity)
-    TextView txtProductQuantity;
+
     @BindView(R.id.card1)
-    CardView card1;
+    RelativeLayout card1;
     @BindView(R.id.txt_product_description)
     TextView txtProductDescription;
     @BindView(R.id.img_user_profile)
     CircleImageView imgUserProfile;
     @BindView(R.id.tv_status)
     TextView tvStatus;
-    @BindView(R.id.imageview2)
-    ImageView imageview2;
+
     @BindView(R.id.linear)
     LinearLayout linear;
     @BindView(R.id.item_recycler)
@@ -195,10 +195,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     ImageView btnSend;
     @BindView(R.id.li_chat_offer)
     LinearLayout liChatOffer;
-    @BindView(R.id.txt_product_category)
-    TextView txtProductCategory;
-    @BindView(R.id.rel_category)
-    LinearLayout relCategory;
+
     @BindView(R.id.img_online)
     ImageView imgOnline;
     @BindView(R.id.rv_offer_list)
@@ -219,12 +216,17 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     CardView cardPromoteDetail;
     @BindView(R.id.isvideo_icon)
     ImageView isvideoIcon;
+    @BindView(R.id.txt_negotiable_product)
+    TextView txtNegotiableProduct;
+    @BindView(R.id.txt_sellall_product)
+    TextView txtSellallProduct;
+    @BindView(R.id.productback)
+    ImageView productback;
     private RecyclerView tagRcView;
     ArrayList<String> tagList;
     Button btn_makeOffer;
     ImageView user_profile;
     Unbinder unbinder;
-
     Result productDetial;
     WebService service;
     private Dialog dialog;
@@ -237,7 +239,6 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
         view = inflater.inflate(R.layout.product_fragment, container, false);
-        setHasOptionsMenu(true);
         unbinder = ButterKnife.bind(this, view);
         hideSearch();
         service = Global.WebServiceConstants.getRetrofitinstance();
@@ -272,9 +273,25 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
 
         listeners();
-
+        txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
         getSuggestedPostList();
+        productback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = getArguments();
+                String myString = bundle.containsKey("from_add") ? bundle.getString("from_add") : "default";
 
+                Log.e("onClick: ", myString);
+                if (myString.equalsIgnoreCase("from_add")) {
+                    Log.e("onClick: ", "ff");
+                    ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
+                    //getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment());
+                } else {
+                    Log.e("onClick: ", "esl");
+                    getActivity().onBackPressed();
+                }
+            }
+        });
 
        /* LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRecyclerView.setLayoutManager(mLayoutManager);
@@ -310,38 +327,44 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                 txtProductName.setText(productDetial1.getName());
 //        txtProductLocation.setText(productDetial.get);
 
-                if (productDetial1.getProductVideo().equals("")||productDetial1.getProductVideo()==null)
-                {
+                if (productDetial1.getProductVideo().equals("") || productDetial1.getProductVideo() == null) {
                     isvideoIcon.setVisibility(View.GONE);
-                }
-                else
-                {
+                } else {
                     isvideoIcon.setVisibility(View.VISIBLE);
                     videourl = productDetial1.getProductVideo();
                 }
 
+                if (!productDetial1.getFixedPrice().equalsIgnoreCase("N")) {
+                    txtNegotiableProduct.setText("Negotiable");
+
+                } else {
+                    txtNegotiableProduct.setText("Non-negotiable");
+                }
+
                 if (!productDetial1.getOnlineStatus().equalsIgnoreCase("off")) {
-                    tvStatus.setText("Now Online");
+                    tvStatus.setText("Online");
                     imgOnline.setVisibility(View.VISIBLE);
                 } else {
                     tvStatus.setText("Last seen at : " + Global.getTimeAgo(Global.convertUTCToLocal(productDetial.getLastSeenTime())));
                     imgOnline.setVisibility(View.GONE);
                 }
-                txtProductPrice.setText(productDetial1.getPrice());
+
                 if (productDetial1.getProductType().equalsIgnoreCase("U")) {
                     txtProductCondition.setText("Used");
                 } else {
                     txtProductCondition.setText("New");
                 }
-                txtProductQuantity.setText(productDetial1.getQuantity());
+
                 txtProductDescription.setText(productDetial1.getDescription());
-                txtProductCategory.setText(productDetial1.getCategoryName());
+
 
                 if (HelperPreferences.get(getActivity()).getString(UID) != null && HelperPreferences.get(getActivity()).getString(UID).equalsIgnoreCase(productDetial.getUserId())) {
                     rateImage.setVisibility(View.GONE);
                     liChatOffer.setVisibility(View.GONE);
                 } else {
-                    rateImage.setVisibility(View.VISIBLE);
+
+                    /* no need of rate image now */
+                    rateImage.setVisibility(View.GONE);
                     liChatOffer.setVisibility(View.VISIBLE);
                 }
                 if (!productDetial1.getIsWishlist().equalsIgnoreCase("Y")) {
@@ -452,8 +475,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
             case R.id.isvideo_icon:
 
-                Intent previewintent = new Intent(getActivity(),Previewvideo.class);
-                previewintent.putExtra("video",videourl);
+                Intent previewintent = new Intent(getActivity(), Previewvideo.class);
+                previewintent.putExtra("video", videourl);
                 startActivity(previewintent);
 
                 break;
@@ -604,18 +627,21 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).text_sell.setText("Golf Plus 2005");
         ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
-        ((MainActivity) getActivity()).rloptions.setVisibility(View.VISIBLE);
-//        ((MainActivity) getActivity()).rlTitle.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(0);
 
         /**********************************************************************************************/
-    /*    ((MainActivity) getActivity()).rlBack.setOnClickListener(new View.OnClickListener() {
+        ((MainActivity) getActivity()).rlBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().onBackPressed();
+
+
+
             }
-        });*/
+        });
+
         /**********************************************************************************************/
 
     }
@@ -1072,9 +1098,17 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.GONE);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ACTIVITY_SELECT_IMAGE) {
+
             if (data != null) {
                 Uri pickedImage = data.getData();
                 // Let's read picked image path using content resolver
@@ -1176,9 +1210,11 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     }
 
     private void setCommentData(CommentModel commentData) {
+
+
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRecyclerView.setLayoutManager(mLayoutManager);
-        gAdapter = new ProductInfoCommentAdapter(getActivity(), commentData, getActivity().getSupportFragmentManager(), productDetial.getId(), new ProductInfoCommentAdapter.CommentCallbacks() {
+        gAdapter = new ProductInfoCommentAdapter(getActivity(), txtSellallProduct, commentData, getActivity().getSupportFragmentManager(), productDetial.getId(), new ProductInfoCommentAdapter.CommentCallbacks() {
             @Override
             public void onEditComment() {
                 getCommentApi(productDetial.getId());
@@ -1492,7 +1528,10 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         });
     }
 
-    @OnClick(R.id.rel_category)
+    /*category click not need now
+     */
+
+   /* @OnClick(R.id.rel_category)
     public void onCategoryClicked() {
         Bundle extras = new Bundle();
         extras.putString(SAConstants.Keys.CAT_ID, productDetial.getCatId());
@@ -1503,7 +1542,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(HOMETAG).commit();
 
     }
-
+*/
 
     public void getProductDetailsApi(String productId) {
 
@@ -1555,6 +1594,20 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
             }
         });
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.VISIBLE);
+
+    }
+
 }
 
 

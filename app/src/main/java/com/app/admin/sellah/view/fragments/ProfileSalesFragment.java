@@ -50,8 +50,6 @@ public class ProfileSalesFragment extends Fragment {
     @BindView(R.id.img_no_data)
     ImageView imgNoData;
     Unbinder unbinder;
-    @BindView(R.id.txt_heading)
-    TextView txtHeading;
 
     public void onAttachToParentFragment(Fragment fragment) {
         try {
@@ -108,10 +106,10 @@ public class ProfileSalesFragment extends Fragment {
             return 0;
         }
     }
-
+    Call<GetProductList> recordsCall;
     private void getSaledata() {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
-        Call<GetProductList> recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
+         recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -132,10 +130,10 @@ public class ProfileSalesFragment extends Fragment {
             }
         });
     }
-
+    Call<Common> markAsSoldCall;
     private void removeSaledata(String productId, int pos) {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
-        Call<Common> markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
+         markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
         markAsSoldCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
@@ -197,16 +195,24 @@ public class ProfileSalesFragment extends Fragment {
 
     public void showErrorMsg() {
         if (view != null) {
-            txtHeading.setVisibility(View.GONE);
             imgNoData.setVisibility(View.VISIBLE);
         }
     }
 
     public void hideErrorMsg() {
         if (view != null) {
-            txtHeading.setVisibility(View.VISIBLE);
             imgNoData.setVisibility(View.GONE);
-        }
+
+            }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (recordsCall!=null)
+        {recordsCall.cancel();}
+        if (markAsSoldCall!=null)
+        {markAsSoldCall.cancel();}
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.model.extra.commentModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.EditCommentDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.ImageViewerActivity;
@@ -34,6 +35,9 @@ import com.app.admin.sellah.model.extra.commentModel.CommentModel;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.view.fragments.PersonalProfileFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,13 +52,36 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
     String productId;
     CommentCallbacks callbacks;
     private PopupMenu popup;
+    TextView seeall;
+    CommentModel model;
+    List<Result> list= new ArrayList<>();
 
-    public ProductInfoCommentAdapter(Context con, CommentModel items, FragmentManager manager, String productId, CommentCallbacks callbacks) {
-        this.items = items;
+
+    public ProductInfoCommentAdapter(Context con,TextView seeall, CommentModel items, FragmentManager manager, String productId, CommentCallbacks callbacks) {
+        this.model = items;
         context = con;
         this.manager = manager;
         this.productId = productId;
         this.callbacks = callbacks;
+        this.seeall =seeall;
+
+        if (items.getResult().size()<2){
+           this.items =model;
+
+        }
+
+        else
+        {
+
+            for (int i =0;i<2;i++)
+            {
+
+                list.add( model.getResult().get(i));
+                this.items = new CommentModel();
+                this.items.setResult(list);
+
+            }
+        }
     }
 
 
@@ -68,10 +95,26 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.profile.setText("@ " + items.getResult().get(position).getUsername());
+
+
+
+
+            seeall.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                        items.setResult(model.getResult());
+                        notifyDataSetChanged();
+
+                }
+            });
+        holder.profile.setText(items.getResult().get(position).getUsername());
         holder.ptime.setText(Global.getTimeAgo(Global.convertUTCToLocal(items.getResult().get(position).getCreatedAt())));
         holder.desc.setText(items.getResult().get(position).getComment());
 //        if(holder.desc.getLineCount()>0){
+
+
+
         holder.desc.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -96,9 +139,12 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
         }else{
             holder.relLikeCount.setVisibility(View.GONE);
         }
-//            makeTextViewResizable(holder.desc, 3, "... See More", true);
+//        makeTextViewResizable(holder.desc, 3, "... See More", true);
 //        }
         /*holder.image.setImageResource(items.get(position).getImage());*/
+
+
+
 
         Glide.with(context)
                 .load(items.getResult().get(position).getImage())
@@ -175,7 +221,8 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
         }
     }
 
-    public boolean loadFragment(Fragment fragment, int pos) {
+        public boolean loadFragment(Fragment fragment, int pos) {
+
         if (fragment != null) {
             Bundle bundle = new Bundle();
             bundle.putString(SAConstants.Keys.OTHER_USER_ID, items.getResult().get(pos).getUserId());
@@ -306,7 +353,6 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
 
     public interface CommentCallbacks {
         void onEditComment();
-
         void onDeleteComment(int pos);
     }
 }

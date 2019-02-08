@@ -20,10 +20,10 @@ import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
-import com.app.admin.sellah.model.extra.ProfileModel.ProfileModel;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SAConstants;
+import com.app.admin.sellah.model.extra.ProfileModel.ProfileModel;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
@@ -76,6 +76,8 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
     ProgressBar progressBar;
     @BindView(R.id.li_follow_list)
     LinearLayout liFollowList;
+    @BindView(R.id.tv_location)
+    TextView tvLocation;
 
     @Nullable
     @Override
@@ -135,6 +137,7 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
 
         if (body != null) {
             try {
+                tvLocation.setText("Singapore");
                 if (!TextUtils.isEmpty(body.getResult().getUsername())) {
                     tvProfileName.setText(body.getResult().getUsername());
                 } else {
@@ -163,7 +166,7 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
         adapter.addFrag(new ProfileSalesFragment(), "For Sale");
         adapter.addFrag(new WishListFragment(), "WishList");
-        adapter.addFrag(new ProfileRecordFragment(), "Records");
+        adapter.addFrag(new ProfileRecordFragment(), "Statistics");
         viewPager.setAdapter(adapter);
     }
 
@@ -210,7 +213,7 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
     @Override
     public void tabTextController(int count) {
         try {
-            profileTabLayout.getTabAt(0).setText("For Sale (" + count + ")");
+           // profileTabLayout.getTabAt(0).setText("For Sale (" + count + ")");
         } catch (Exception e) {
         }
     }

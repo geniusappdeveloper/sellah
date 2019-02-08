@@ -33,6 +33,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/_10sdp"
             android:text="Use These Tags "
+            android:textStyle="bold"
             android:textColor="@color/colorWhite"
             android:textSize="16sp" />
 

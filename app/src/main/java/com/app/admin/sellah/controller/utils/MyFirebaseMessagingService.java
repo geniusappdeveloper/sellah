@@ -58,8 +58,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }
 
             if (remoteMessage.getData().size() > 0) {
+
+
                 Log.e(TAG, "Data Payload: " + remoteMessage.getData().toString());
-                if(!SCREEN_STATUS.equalsIgnoreCase(ChatActivity.class.getSimpleName())){
+                Log.e(TAG, "Data Payload: " + SCREEN_STATUS);
+                if(!SCREEN_STATUS.equalsIgnoreCase(ChatActivity.class.getSimpleName()))
+                {
+
+                    Log.e(TAG, "chat: ");
                     try {
                         JSONObject json = new JSONObject(remoteMessage.getData());
                         handleDataMessage(json);
@@ -67,8 +73,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         Log.e(TAG, "Exception: " + e.getMessage());
                     }
                 }
-            }else{
+                else
+                {
+                    JSONObject json = new JSONObject(remoteMessage.getData());
+                    String mJsonString = String.valueOf(json);
+                    JsonParser parser = new JsonParser();
+                    JsonElement mJson = parser.parse(mJsonString);
+                    Gson gson = new Gson();
+                    NotificationModel object = gson.fromJson(mJson, NotificationModel.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(NT_DATA, object);
+                        Intent pushNotification = new Intent(PUSH_NOTIFICATION);
+                        pushNotification.putExtras(bundle);
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+
+                }
+
+
+
+
+            }
+
+            else{
                 if(!SCREEN_STATUS.equalsIgnoreCase(ChatActivity.class.getSimpleName())){
+
+                    Log.e(TAG, "screeen: ");
                     handleNotification(remoteMessage.getNotification().getBody());
                 }
             }
@@ -80,6 +109,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void handleNotification(String message) {
         if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
+
+
             // app is in foreground, broadcast the push message
             Intent pushNotification = new Intent(PUSH_NOTIFICATION);
             pushNotification.putExtra("message", message);

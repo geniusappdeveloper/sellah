@@ -19,6 +19,7 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -128,7 +129,7 @@ public class LiveProductDetailDialog extends Dialog {
         setCancelable(false);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         ButterKnife.bind(this);
-
+         touchlistener();
         allAddressFields = new ArrayList<>();
         allAddressFields.add(edtAddName);
 //        allAddressFields.add(edtAddCategory);
@@ -161,18 +162,23 @@ public class LiveProductDetailDialog extends Dialog {
                 Object item = parent.getItemAtPosition(position);
 
                 Log.e("category", item + " ");
+
                 if (!item.toString().equalsIgnoreCase(
                         "Select Category")) {
+
                     catId = ExpandableListData.getCatId(item.toString());
+
                     ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
 
                 } else {
+
                     catId = "";
                     ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
                 }
             }
 
             public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -193,7 +199,7 @@ public class LiveProductDetailDialog extends Dialog {
         for (EditText editText : allAddressFields) {
             if (editText.getText().toString().trim().isEmpty()) {
 
-               editText.requestFocus();
+                editText.requestFocus();
 
                 return false;
             } else {
@@ -224,7 +230,7 @@ public class LiveProductDetailDialog extends Dialog {
 
             case R.id.relative_spinnerrl:
                 spinnerCatagory.performClick();
-                remove_focus();
+
                 break;
             case R.id.submit:
 
@@ -310,6 +316,10 @@ public class LiveProductDetailDialog extends Dialog {
 
 
                 } else {
+
+                    if (TextUtils.isEmpty(edtAddName.getText().toString()))
+                        edtAddName.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+                        else
                     edtAddName.setBackgroundResource(R.drawable.live_product_detail_background);
                 }
             }
@@ -324,7 +334,11 @@ public class LiveProductDetailDialog extends Dialog {
 
 
                 } else {
-                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                    if (TextUtils.isEmpty(edtDescription.getText().toString()))
+                        edtDescription.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+                        else
+                        edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
                 }
             }
         });
@@ -358,6 +372,17 @@ public class LiveProductDetailDialog extends Dialog {
     {
         edtDescription.clearFocus();
         edtAddName.clearFocus();
+    }
+
+    public void touchlistener()
+    {
+        spinnerCatagory.setOnTouchListener((view, motionEvent) -> {
+
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                remove_focus();
+            }
+            return false;
+        });
     }
 
 }

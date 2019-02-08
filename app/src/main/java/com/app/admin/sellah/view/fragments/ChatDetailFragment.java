@@ -26,6 +26,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,8 +68,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -130,7 +133,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     private boolean isOffer;
     String roomName = "";
     //private boolean ActivityPaused = false;
-
+    Call<ChatListModel> chatListCall;
     public ChatDetailFragment() {
 
     }
@@ -160,6 +163,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
         mSocket = app.getSocket();
         isOffer = true;
         service = Global.WebServiceConstants.getRetrofitinstance();
+
         models = new ArrayList<>();
         setUpMessgae(models);
         setUpSendButton();
@@ -181,9 +185,19 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
         super.onPause();
         //ActivityPaused  = true;
         Log.e("OnPause", "OnPause");
+
         disconnectSocket();
         isConnected = false;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (chatListCall!=null)
+        chatListCall.cancel();
+    }
+
+
 
     private void ConnectToSocket() {
 
@@ -390,6 +404,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     private void setUpMessgae(List<ChatMessageModel> models) {
 
         try {
+
             adapter = new ChatAdapter(models, getActivity(),txtReview);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
             recMessage.setLayoutManager(linearLayoutManager);
@@ -397,6 +412,8 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             recMessage.setAdapter(adapter);
             if (models.size() > 0) {
                 recMessage.scrollToPosition(models.size() - 1);
+
+
             }
             if (Build.VERSION.SDK_INT >= 11) {
                 recMessage.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -429,19 +446,104 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     }
 
     private void getChathistoryApi(String otherUserId) {
-        Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
+      //  Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
 //        dialog.show();
-        Call<ChatListModel> chatListCall = service.getChatDetailApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
+       chatListCall = service.getChatDetailApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
+
+
         chatListCall.enqueue(new Callback<ChatListModel>() {
             @Override
             public void onResponse(Call<ChatListModel> call, Response<ChatListModel> response) {
                 if (response.isSuccessful()) {
-                    if (dialog != null && dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+
+
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         models.clear();
-                        models.addAll(response.body().getRecord());
+
+                         ChatMessageModel chatMessageModel ;
+
+                        for (int i=0;i<response.body().getRecord().size();i++)
+                        {
+                          chatMessageModel=  new ChatMessageModel();
+                            java.text.DateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            if (models.isEmpty())
+                            {
+
+                                Log.e("date1: ",response.body().getRecord().get(i).getCreatedAt() );
+                                try {
+                                    Date strDate = readFormat.parse(response.body().getRecord().get(i).getCreatedAt());
+                                    chatMessageModel.setMessage("");
+                                    chatMessageModel.setStatus("");
+                                    chatMessageModel.setMessage("");
+                                    chatMessageModel.setMsgId("1");
+                                    chatMessageModel.setSenderId("");
+                                    chatMessageModel.setReceiverId("");
+                                    chatMessageModel.setType("");
+                                    chatMessageModel.setToday_boolean(true);
+                                    chatMessageModel.setToday(datefun(strDate));
+                                    models.add(chatMessageModel);
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+
+
+
+                            }
+                            else
+                            {
+
+                                try
+                                {
+                                    Date strDate = readFormat.parse(response.body().getRecord().get(i-1).getCreatedAt());
+                                    Date strDate2 = readFormat.parse(response.body().getRecord().get(i).getCreatedAt());
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                    String dateString = formatter.format(new Date(strDate.getTime()));
+                                    String dateString1 = formatter.format(new Date(strDate2.getTime()));
+
+                                    Log.e("date2: ",dateString);
+
+                                    if (!dateString1.equalsIgnoreCase(dateString))
+                                    {
+                                        String monthName = new SimpleDateFormat("MMMM").format(strDate2.getTime());
+                                        SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
+                                        String goal = outFormat.format(strDate2);
+
+                                        Log.e("goal: ",datefun(strDate2));
+                                        Log.e("date: ",dateString1 );
+                                        chatMessageModel.setMessage("");
+                                        chatMessageModel.setStatus("");
+                                        chatMessageModel.setMsgId("1");
+                                        chatMessageModel.setSenderId("");
+                                        chatMessageModel.setReceiverId("");
+                                        chatMessageModel.setType("");
+                                        chatMessageModel.setToday_boolean(true);
+                                        chatMessageModel.setToday(datefun(strDate2));
+                                        models.add(chatMessageModel);
+                                    }
+
+
+
+
+
+
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                            response.body().getRecord().get(i).setToday_boolean(false);
+                            response.body().getRecord().get(i).setToday(response.body().getRecord().get(i).getCreatedAt());
+                            models.add(response.body().getRecord().get(i));
+
+
+
+
+                        }
+                       // models.addAll(response.body().getRecord());
                         Log.e("Chat_detailApi", "onResponse: success"+response.body().toString() );
 
                     /*    if(){
@@ -454,8 +556,14 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                             ((ChatActivity)getActivity()).imgOnline.setVisibility(View.VISIBLE);
                             ((ChatActivity)getActivity()).txtLastSeen.setVisibility(View.GONE);
                         } else {
-                            ((ChatActivity)getActivity()).imgOnline.setVisibility(View.INVISIBLE);
-                            ((ChatActivity)getActivity()).txtLastSeen.setVisibility(View.VISIBLE);
+
+                             if (((ChatActivity)getActivity()).imgOnline.getVisibility()==View.VISIBLE)
+                             {
+                                 ((ChatActivity)getActivity()).imgOnline.setVisibility(View.INVISIBLE);
+                                 ((ChatActivity)getActivity()).txtLastSeen.setVisibility(View.VISIBLE);
+                             }
+
+
                             if (!TextUtils.isEmpty(response.body().getLastSeenTime()))
                                 ((ChatActivity)getActivity()).txtLastSeen.setText("Last seen " + ": " + Global.getTimeAgo(Global.convertUTCToLocal(response.body().getLastSeenTime())));
                         }
@@ -484,9 +592,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
 
             @Override
             public void onFailure(Call<ChatListModel> call, Throwable t) {
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
                 Log.e("Chat_detailApiFailure", "onFailure: "+t.getMessage() );
             }
         });
@@ -821,18 +927,25 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             if(pos==ChatActivity.currentPage)
             disconnectSocket();
         }*/
-    private BroadcastReceiver mMessageReceiver1 = new BroadcastReceiver() {
+    private  BroadcastReceiver mMessageReceiver1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             try {
+
+
                 NotificationModel message = intent.getParcelableExtra(NT_DATA);
-                Log.e("receiver", "Got message: ChatFragment" + message.getMessage() + ":" + message.getNotiType());
+                Log.e("receiver", "Got message: ChatFragment" + message.getMessage() + ":" + message.getNotiType() + message.getMsgId());
                 if (message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_ACCEPT_REJECT) ||
                         message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_PAYMENT)) {
+
+                    Log.e("modelee" ,"s"+models.size());
                     for (int i = 0; i < models.size(); i++) {
+
+
                         ChatMessageModel model = models.get(i);
-                        Log.e("receiver", "onReceive: msgIds" + message.getMsgId() + " : " + models.get(i).getMsgId());
+
+                        Log.e("receiver", "onReceivemsg:" + message.getMsgId() + " : " + models.get(i).getMsgId());
                         if (model.getMsgId().equalsIgnoreCase(message.getMsgId())) {
                             Log.e("index", "onReceive: " + models.indexOf(model));
                             models.get(models.indexOf(model)).setStatus(message.getStatus());
@@ -850,5 +963,42 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             }
         }
     };
+
+
+    public static String getDate(long timestamp) {
+        Calendar nowTime = Calendar.getInstance();
+        Calendar neededTime = Calendar.getInstance();
+        neededTime.setTimeInMillis(timestamp * 1000L);
+
+        if (nowTime.get(Calendar.DATE) == neededTime.get(Calendar.DATE)) {
+            //here return like "Today at 12:00"
+            return "Today " + DateFormat.format("hh:mm:ss aa", neededTime);
+
+        } else if (nowTime.get(Calendar.DATE) - neededTime.get(Calendar.DATE) == 1) {
+            //here return like "Yesterday at 12:00"
+            return "Yesterday " + DateFormat.format("hh:mm:ss aa", neededTime);
+
+        } else {
+            //here return like "May 31, 12:00"
+            return DateFormat.format("dd-MM-yyyy hh:mm:ss aa", neededTime).toString();
+        }
+
+    }
+
+
+
+
+    public String datefun(Date date)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        String monthName = new SimpleDateFormat("MMMM").format(cal.getTime());
+        SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
+        String da = outFormat.format(cal.getTime());
+        int day   = cal.get(Calendar.DAY_OF_WEEK_IN_MONTH);
+        String overall  = da +", " +day+" "+monthName;
+        return overall;
+    }
+
 }
 

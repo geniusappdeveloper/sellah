@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:elevation="@dimen/_5sdp"
             android:background="@drawable/round_border_testemonialheader"
-            android:layout_height="@dimen/_40sdp">
+            android:layout_height="?android:attr/actionBarSize">
 
             <TextView
                 android:layout_marginLeft="@dimen/_15sdp"

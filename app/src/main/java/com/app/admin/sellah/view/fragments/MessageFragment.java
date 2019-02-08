@@ -12,6 +12,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
@@ -63,7 +65,7 @@ public class MessageFragment extends Fragment {
     private MessageListAdapter ongoingadapter;
     private ChattedListModel oldMsgList;
     private String TAG = MessageFragment.class.getSimpleName();
-    FloatingActionButton actionButton;
+    CardView actionButton;
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -78,6 +80,7 @@ public class MessageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_message, container, false);
+        messRecycler = view.findViewById(R.id.message_recycler);
         messRecycler = view.findViewById(R.id.message_recycler);
         newMessRecycler = view.findViewById(R.id.new_message_recycler);
         ongoingrecycler = view.findViewById(R.id.ongoing_transactionrecyclerview);
@@ -453,7 +456,7 @@ public class MessageFragment extends Fragment {
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Delete",
                         0,
-                        Color.parseColor("#E35252"),
+                        Color.parseColor("#666666"),
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
@@ -465,7 +468,7 @@ public class MessageFragment extends Fragment {
                 underlayButtons.add(new SwipeHelper.UnderlayButton(
                         "Report",
                         0,
-                        Color.parseColor("#EEC12D"),
+                        Color.parseColor("#ffc53e"),
                         new SwipeHelper.UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {

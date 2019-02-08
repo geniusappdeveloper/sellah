@@ -30,7 +30,7 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
 
     @Override
     public WishRecordAdapter.WishHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.wish_list_birth_adapter, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profiile_record_adapter, parent, false);
         WishRecordAdapter.WishHolder gvh = new WishRecordAdapter.WishHolder(view);
         return gvh;
     }
@@ -57,7 +57,7 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
         holder.BirthText.setText(recordList.getResult().get(position).getName());
         holder.costText.setText("S$ "+recordList.getResult().get(position).getPrice());
         holder.timeText.setText(getTimeAgo(convertUTCToLocal(recordList.getResult().get(position).getCreatedAt())));
-        holder.remove.setVisibility(View.GONE);
+
 
     }
 
@@ -67,21 +67,18 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
     }
 
     public class WishHolder extends RecyclerView.ViewHolder {
-        ImageView profileImg,messImg,shareImg;
+        ImageView profileImg;
         TextView BirthText,costText,timeText;
-        ImageButton remove;
+
 
 
         public WishHolder(View view) {
             super(view);
 
             profileImg = view.findViewById(R.id.img_product);
-            messImg = view.findViewById(R.id.mess_image);
-            shareImg = view.findViewById(R.id.share_image);
             BirthText = view.findViewById(R.id.text_birthday);
             costText = view.findViewById(R.id.cake_cost);
             timeText = view.findViewById(R.id.text_time);
-            remove = view.findViewById(R.id.wish_remove_img);
         }
 
 

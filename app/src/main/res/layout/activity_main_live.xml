@@ -45,7 +45,6 @@
             android:visibility="visible" />
 
         <RelativeLayout
-            android:layout_marginTop="@dimen/_13sdp"
             android:id="@+id/relLayoutHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_110sdp">
@@ -83,11 +82,23 @@
                 android:layout_alignParentRight="true">
 
                 <ImageView
+                    android:id="@+id/img_send_camera"
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:padding="@dimen/_5sdp"
+                    android:src="@drawable/share_live_caht"
+                    android:tint="#fff" />
+
+
+                <ImageView
+                    android:visibility="gone"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_centerInParent="true"
                     android:padding="@dimen/_3sdp"
-                    android:src="@drawable/share_icon"
+                    android:src="@drawable/option_icon"
                     android:tint="@color/colorWhite" />
             </RelativeLayout>
             <!--   <RelativeLayout
@@ -98,7 +109,8 @@
 
                    android:layout_alignParentRight="true">-->
             <RelativeLayout
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_10sdp"
                 android:id="@+id/relLay_views"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
@@ -106,11 +118,9 @@
                 android:layout_toRightOf="@+id/relLay_live">
 
                 <LinearLayout
-                    android:layout_marginLeft="@dimen/_12sdp"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:alpha="0.7"
-                    android:background="@drawable/round_black_live"
                     android:gravity="center">
 
                     <ImageView
@@ -152,7 +162,7 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:id="@+id/relLay_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
@@ -167,9 +177,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="@dimen/_3sdp"
                     android:alpha="0.7"
-                    android:background="@drawable/live_btn_bg"
+                    android:background="@color/colorRed"
                     android:paddingBottom="@dimen/_3sdp"
                     android:paddingLeft="@dimen/_8sdp"
                     android:paddingRight="@dimen/_8sdp"
@@ -180,18 +189,19 @@
             </RelativeLayout>
 
             <ImageButton
-
                 android:id="@+id/flipCamera"
-                android:layout_width="@dimen/_45sdp"
-                android:layout_height="@dimen/_45sdp"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/relLay_duration"
                 android:layout_marginRight="@dimen/_8sdp"
                 android:layout_marginTop="@dimen/_3sdp"
+                android:alpha="0.80"
+                android:backgroundTint="@color/colorWhite"
                 android:background="@drawable/switch_camera_icon"
                 android:padding="@dimen/_8sdp"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/txt_offer_from_seller"
@@ -211,13 +221,13 @@
                 android:visibility="gone" />
 
             <RelativeLayout
+                android:visibility="gone"
                 android:id="@+id/relLay_live"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_below="@+id/relLay_back_live">
 
                 <TextView
-                    android:visibility="gone"
                     android:id="@+id/txt_live"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -568,15 +578,6 @@
                 android:layout_centerVertical="true"
                 android:padding="5dp">
 
-                <ImageView
-                    android:id="@+id/img_send_camera"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/round_gray_border"
-                    android:padding="@dimen/_5sdp"
-                    android:src="@drawable/share_icon"
-                    android:tint="#fff" />
 
                 <ImageView
                     android:id="@+id/img_send_gallery"
@@ -584,7 +585,7 @@
                     android:layout_height="@dimen/_22sdp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
-                    android:src="@drawable/gallery_icon" />
+                    android:src="@drawable/gallery_icon_livechat" />
 
                 <!-- <EditText
                      android:id="@+id/edt_message"
@@ -615,10 +616,12 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_weight="1.6"
-                    android:background="@drawable/edittextb_back"
+                    android:background="@drawable/edittextb_back_chat"
                     android:hint="Type a message here"
                     android:inputType="textMultiLine"
                     android:maxHeight="@dimen/_100sdp"
+                    android:textColor="@color/colorWhite"
+                    android:textColorHint="@color/colorWhite"
                     android:padding="@dimen/_6sdp"
                     android:scrollbars="vertical"
                     android:textSize="@dimen/_12sdp" />
@@ -630,8 +633,6 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_marginRight="@dimen/_8sdp"
-                    android:background="@drawable/send_button_background"
-                    android:padding="@dimen/_6sdp"
                     android:src="@drawable/send_50dp"
                     android:tint="@color/colorWhite" />
             </LinearLayout>

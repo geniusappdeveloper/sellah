@@ -36,6 +36,7 @@ public class ProfileRecordFragment extends Fragment {
     @BindView(R.id.img_no_data)
     ImageView imgNoData;
     Unbinder unbinder;
+    Call<GetProductList> recordsCall;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class ProfileRecordFragment extends Fragment {
     }
 
     private void getRecordsData() {
-        Call<GetProductList> recordsCall = service.getRecordsApi(HelperPreferences.get(getActivity()).getString(UID));
+         recordsCall = service.getRecordsApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -79,6 +80,13 @@ public class ProfileRecordFragment extends Fragment {
         }else{
             hideErrorMsg();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (recordsCall!=null)
+        {recordsCall.cancel();}
     }
 
     @Override

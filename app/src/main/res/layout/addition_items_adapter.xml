@@ -21,6 +21,23 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher_background" />
 
+
+        <TextView
+            android:id="@+id/suggest_feature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:alpha="0.85"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/live_btn_bg"
+            android:padding="@dimen/_3sdp"
+            android:text="Featured"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/_10sdp"
+            />
+
+
     </RelativeLayout>
 
     <TextView

@@ -17,7 +17,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_70sdp"
+        android:layout_height="?android:attr/actionBarSize"
         android:layout_marginTop="@dimen/_3sdp"
         android:layout_marginBottom="@dimen/_3sdp"
         android:background="@color/colorWhite">
@@ -54,6 +54,7 @@
 
             <me.crosswall.lib.coverflow.core.PagerContainer
                 android:id="@+id/pager_container"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_centerHorizontal="true"
                 android:layout_height="wrap_content">
@@ -65,6 +66,7 @@
             </me.crosswall.lib.coverflow.core.PagerContainer>
 
             <RelativeLayout
+                android:layout_centerVertical="true"
                 android:layout_below="@+id/pager_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

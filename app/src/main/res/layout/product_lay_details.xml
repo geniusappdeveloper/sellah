@@ -180,7 +180,7 @@
                     <TextView
                         android:layout_marginLeft="@dimen/_18sdp"
                         android:layout_marginRight="@dimen/_18sdp"
-                        android:hint="Product Name"
+                        android:hint="Video Title"
                         android:textColorHint="#9e9e9e"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -196,7 +196,7 @@
                         android:background="@drawable/live_product_detail_grey_background"
                         android:paddingLeft="@dimen/_5sdp"
                         android:singleLine="true"
-                        android:hint="Enter Product Name"
+                        android:hint="Enter Video Title"
                         android:textColorHint="#c9c9c9"
                         android:textSize="@dimen/_12sdp" />
 

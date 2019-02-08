@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -49,7 +50,7 @@ public class WishListFragment extends Fragment {
     @BindView(R.id.rv_suggested_post)
     RecyclerView rvSuggestedPost;
     private SuggestedPostAdapter suggestedPostAdapter;
-
+    Call<GetProductList> addCommentCall;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.wish_list_fragment, container, false);
@@ -111,7 +112,7 @@ public class WishListFragment extends Fragment {
         wishListAdapterBirth = new WishListAdapter(wishListModel, getActivity(), (productId, pos) -> {
             removeItemFromWishlist(productId, pos);
         });
-        LinearLayoutManager birthHorizontalManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager birthHorizontalManager = new GridLayoutManager(getActivity(), 2);
         wishRecyler.setLayoutManager(birthHorizontalManager);
         wishRecyler.setAdapter(wishListAdapterBirth);
         wishListAdapterBirth.notifyDataSetChanged();
@@ -153,7 +154,7 @@ public class WishListFragment extends Fragment {
     }
 
     private void getSuggestedPostList() {
-        Call<GetProductList> addCommentCall = service.suggestedProductsApi("");
+         addCommentCall = service.suggestedProductsApi("");
         addCommentCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -188,4 +189,11 @@ public class WishListFragment extends Fragment {
         rvSuggestedPost.setAdapter(suggestedPostAdapter);
     }
 
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (addCommentCall!=null)
+        {addCommentCall.cancel();}
+    }
 }

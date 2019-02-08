@@ -105,7 +105,7 @@ public class MakeOfferDialog extends Dialog {
         pbLoading.setVisibility(View.GONE);
         recProduct.setVisibility(View.VISIBLE);
         card1.setVisibility(View.GONE);
-        checkoutProductAdapter = new CheckoutProductAdapter(body.getResult(), context, new CheckoutProductAdapter.ActionCallback() {
+        checkoutProductAdapter = new CheckoutProductAdapter(body.getResult(), context,txtSendOffer, new CheckoutProductAdapter.ActionCallback() {
             @Override
             public void onCheckclicked(String name, String id, String subtotal, String quantity) {
                 txtSubtotal.setText("S$ " + subtotal);

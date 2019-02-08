@@ -53,6 +53,13 @@ import butterknife.Unbinder;
 import static android.app.Activity.RESULT_OK;
 import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
 
+/**
+ * PaymentFragment.class
+ * By Raghubeer singh virk
+ *
+ * @implSpec have options to connect account with stripe and manage saved cards.
+ * @implNote allows add card functionality id sellah account is connected with stripe connect.
+ */
 @SuppressLint("ValidFragment")
 public class PaymentFragment extends Fragment {
     @BindView(R.id.txt_card_detail)
@@ -110,6 +117,8 @@ public class PaymentFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
+
+        // Check weigher sellah account is connected with stripe or not
         if (TextUtils.isEmpty(HelperPreferences.get(getActivity()).getString(API_ACCESS_TOKEN))) {
 //            relStripeConnect.setVisibility(View.VISIBLE);
             relAddCard.setVisibility(View.GONE);
@@ -119,6 +128,8 @@ public class PaymentFragment extends Fragment {
 //            relStripeConnect.setVisibility(View.GONE);
             relAddCard.setVisibility(View.VISIBLE);
         }
+
+        //Get saved cards list from server
         new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
             @Override
             public void onGetDataSuccess(CardDetailModel body) {
@@ -139,7 +150,7 @@ public class PaymentFragment extends Fragment {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
-                setUpcards(body.getCards());
+                setUpcards(body.getCards());//set card list adapter
             }
 
             @Override
@@ -203,6 +214,11 @@ public class PaymentFragment extends Fragment {
         }
     }
 
+    /**
+     * Stripe connect Method
+     *
+     * @implNote enables functionality to connect sellah account with stripe
+     */
     private void StripConnect() {
         StripeAppmApp = new StripeApp(getActivity(), "geniusAppDeveloper", "ca_9bmLYpWBQDumLtFp2KZ7bE90kHjXS5le",
                 "sk_test_QW9KCbQ08S6BSGogNk3XKDTa", "https://developer.android.com", "read_write");
@@ -377,51 +393,5 @@ public class PaymentFragment extends Fragment {
         }
 
     }
-/*
-
-    @OnClick(R.id.btn_stripe_connect)
-    public void onStripeConnectClicked() {
-        */
-/*Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
-        CreateStripeAccount stripeAccount = new CreateStripeAccount(getActivity(), new CreateStripeAccount.CreateAccountController() {
-            @Override
-            public void onAccountCreationSuccess(Account account) {
-                new ApisHelper().linkStripApi(getActivity(), account.getId(), new ApisHelper.StripeConnectCallback() {
-                    @Override
-                    public void onStripeConnectSuccess(String msg) {
-                        Snackbar.make(((MainActivity) getActivity()).relRoot, msg, Snackbar.LENGTH_SHORT)
-                                .setAction("", null).show();
-                        relStripeConnect.setVisibility(View.GONE);
-                        relAddCard.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onStripeConnectFailure() {
-                        Snackbar.make(getActivity().getWindow().getDecorView(), "Unable to link account with stripe at this movements", Snackbar.LENGTH_SHORT)
-                                .setAction("", null).show();
-
-                    }
-                });
-            }
-
-            @Override
-            public void onAccountCreationFailure() {
-
-            }
-        });
-        stripeAccount.setDialog(dialog);
-        stripeAccount.showDialog();
-        stripeAccount.execute("sk_test_4eC39HqLyjWDarjtT1zdp7dc");*//*
-     */
-    /*
-
-     *//*
-
-        String url = "https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_9bmL4zjsRk60bCUfXO6KcJLjkqhupXIB&scope=read_write&redirect_uri=https://developer.android.com/";
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
-    }
-*/
 
 }

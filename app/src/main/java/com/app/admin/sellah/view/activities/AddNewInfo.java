@@ -2,6 +2,7 @@ package com.app.admin.sellah.view.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,16 +17,20 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SellProductInterface;
+import com.app.admin.sellah.model.AddProductDatabase;
 import com.app.admin.sellah.model.extra.Categories.GetCategoriesModel;
 import com.app.admin.sellah.view.CustomDialogs.Add_New_Product_tutorial_secondDialog;
 import com.app.admin.sellah.view.adapter.AddProductTagsAdapter;
@@ -38,7 +43,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+
 import static com.app.admin.sellah.controller.utils.Global.StatusBarLightMode;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
 public class AddNewInfo extends AppCompatActivity implements SellProductInterface {
 
@@ -67,8 +74,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     RelativeLayout subCatRl;
     @BindView(R.id.edt_price)
     EditText edtPrice;
-    @BindView(R.id.rl6)
-    RelativeLayout rl6;
+
     @BindView(R.id.spin_fixed_price)
     Spinner spinFixedPrice;
     @BindView(R.id.fix_img)
@@ -83,8 +89,6 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     RelativeLayout conditionRl;
     @BindView(R.id.edt_quantity)
     EditText edtQuantity;
-    @BindView(R.id.quantity_rl)
-    RelativeLayout quantityRl;
     @BindView(R.id.add_product_tags_recycler)
     RecyclerView addProductTagsRecycler;
     @BindView(R.id.edtDescription)
@@ -107,16 +111,20 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     ImageView addTags;
     @BindView(R.id.addnewinfo_back)
     ImageView addnewinfoBack;
-    private ArrayList<String> subCategory= new ArrayList<>();;
+    @BindView(R.id.horizontal_infoview)
+    HorizontalScrollView horizontalInfoview;
+    private ArrayList<String> subCategory;
     @BindView(R.id.cat_img)
     ImageView catImg;
-    @BindView(R.id.spinner_catagory)
+    @BindView(R.id.spinner_catagoryinfo)
     Spinner spinnerCatagory;
     @BindView(R.id.cat_rl)
     RelativeLayout catRl;
-    String subCatId,tag;
+    String subCatId, tag="";
     ArrayList<String> tagList = new ArrayList<>();
     AddProductTagsAdapter addProductTagsAdapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,22 +134,10 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
         ButterKnife.bind(this);
 
         spinneradapters();
-        edtTags.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (b) {
-                    Add_New_Product_tutorial_secondDialog dialog = new Add_New_Product_tutorial_secondDialog();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("x", (int) edtTags.getX());
-                    bundle.putInt("y", (int) edtTags.getY());
-                    dialog.setArguments(bundle);
-                    dialog.show(getFragmentManager(), "");
-                    edtTags.setVisibility(View.GONE);
-                    addTags.setVisibility(View.VISIBLE);
+        focuslisteneres();
+        setUpTagLayoutAdapter();
+            getdata();
 
-                }
-            }
-        });
 
 
     }
@@ -154,6 +150,10 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
         List<String> categoryList = new ArrayList<>();
         HashMap<String, ArrayList<String>> subCategoryList = new HashMap<>();
         categoryList.add("Select Category");
+        subCategory = new ArrayList<>();
+        subCategory.clear();
+        subCategory.add("Select Sub-Category");
+
         try {
             for (int i = 0; i < model.getResult().size(); i++) {
                 ArrayList<String> subCategories = new ArrayList<>();
@@ -166,7 +166,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                     subCategories.add(model.getResult().get(i).getSubcategories().get(j).getName());
                 }
                 categoryList.add(model.getResult().get(i).getName());
-                Log.e( "spinneradapters: ",""+ categoryList);
+                Log.e("spinneradapters: ", "" + categoryList);
                 subCategoryList.put(model.getResult().get(i).getName(), subCategories);
             }
         } catch (Exception e) {
@@ -185,25 +185,34 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 Object item = parent.getItemAtPosition(position);
-
+                remove_focus();
                 Log.e("onItemSelected: ", "1");
-                ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.GRAY);
+
                 if (!item.toString().equalsIgnoreCase("Select Category")) {
+                    Log.e("category1", item + " ");
+                    AddProductDatabase.catid = model.getResult().get(position - 1).getCatId();
                     ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
+                    catRl.setBackgroundResource(R.drawable.live_product_detail_background);
+                    catImg.setImageDrawable(getResources().getDrawable(R.drawable.down_arrow));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        catImg.setImageTintList(null);
+                    }
                     try {
-                        subCategory = new ArrayList<>();
+                        subCategory.clear();
                         subCategory.addAll(subCategoryList.get(item));
                         subCategory.remove(1);
+                        spinnerSubCatagory.getAdapter().notify();
                     } catch (Exception e) {
 
                     }
 
                 } else {
-                    Log.e("onItemSelected: ", "2");
-                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.GRAY);
+                    catRl.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+                    catImg.setImageDrawable(getResources().getDrawable(R.drawable.down_grey));
+                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
+                    subCategory.clear();
+                    subCategory.add("Select Sub-Category");
 
-                  //  subCategory = new ArrayList<>();
-                  //  subCategory.add("Select Sub-Category");
                 }
             }
 
@@ -211,47 +220,8 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             }
         });
 
-        Log.e("spinneradapters: ","f"+subCategory );
 
 //      *************************************Sub-Category Spinner adapter*******************************
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
-                (this, R.layout.spinner_dropdown,
-                        subCategory);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout
-                .simple_spinner_dropdown_item);
-        if (!subCategory.isEmpty())
-        {
-            spinnerSubCatagory.setAdapter(spinnerArrayAdapter);
-
-            spinnerSubCatagory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Object item = parent.getItemAtPosition(position);
-                    Log.e("Subcategory", item + " ");
-                    if (!item.toString().equalsIgnoreCase("Select Sub-Category")) {
-
-                        ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
-                        subCatId = model.getResult().get(spinnerCatagory.getSelectedItemPosition() - 1).getSubcategories().get(position).getId();
-                        Log.e("SubCat_id", "onItemSelected: " + subCatId);
-
-                    } else {
-                        subCatId = "";
-                        ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
-
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-        }
-
-
-
-
 
 
         //      *************************************price Method Spinner adapter*******************************
@@ -266,15 +236,17 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Object item = parent.getItemAtPosition(position);
-
+                remove_focus();
                 if (!item.toString().equalsIgnoreCase("Select Type")) {
 
-                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
+                    ((TextView) spinFixedPrice.getSelectedView()).setTextColor(Color.BLACK);
+                    fixedRl.setBackgroundResource(R.drawable.live_product_detail_background);
+                    fixImg.setImageDrawable(getResources().getDrawable(R.drawable.down_arrow));
 
                 } else {
 
-                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
-
+                    ((TextView) spinFixedPrice.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
+                    fixImg.setImageDrawable(getResources().getDrawable(R.drawable.down_grey));
                 }
             }
 
@@ -296,15 +268,17 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Object item = parent.getItemAtPosition(position);
+                remove_focus();
+                if (!item.toString().equalsIgnoreCase("Select Condition")) {
 
-                if (!item.toString().equalsIgnoreCase("Select Type")) {
-
-                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.BLACK);
+                    ((TextView) spinCondition.getSelectedView()).setTextColor(Color.BLACK);
+                    conditionRl.setBackgroundResource(R.drawable.live_product_detail_background);
+                    conditionImg.setImageDrawable(getResources().getDrawable(R.drawable.down_arrow));
 
                 } else {
 
-                    ((TextView) spinnerCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
-
+                    ((TextView) spinCondition.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
+                    conditionImg.setImageDrawable(getResources().getDrawable(R.drawable.down_grey));
                 }
             }
 
@@ -314,15 +288,67 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             }
         });
 
+        //sub category==========================
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>
+                (this, R.layout.spinner_dropdown,
+                        subCategory);
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout
+                .simple_spinner_dropdown_item);
+        if (!subCategory.isEmpty()) {
+            spinnerSubCatagory.setAdapter(spinnerArrayAdapter);
+
+            spinnerSubCatagory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Object item = parent.getItemAtPosition(position);
+                    remove_focus();
+                    if (!item.toString().equalsIgnoreCase("Select Sub-Category")) {
+                        AddProductDatabase.subcatid = model.getResult().get(spinnerCatagory.getSelectedItemPosition() - 1).getSubcategories().get(position).getId();
+                        ((TextView) spinnerSubCatagory.getSelectedView()).setTextColor(Color.BLACK);
+                        subCatRl.setBackgroundResource(R.drawable.live_product_detail_background);
+                        subCatImg.setImageDrawable(getResources().getDrawable(R.drawable.down_arrow));
+                        // subCatId = model.getResult().get(spinnerCatagory.getSelectedItemPosition() - 1).getSubcategories().get(position).getId();
+                        Log.e("SubCat_id", "onItemSelected: " + subCatId);
+
+                    } else {
+                        AddProductDatabase.subcatid  = "";
+                        ((TextView) spinnerSubCatagory.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
+                        subCatImg.setImageDrawable(getResources().getDrawable(R.drawable.down_grey));
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+        }
+
 
     }
 
 
-    @OnClick({R.id.addnewinfo_back, R.id.add_tags, R.id.add_info_post})
+
+
+    @OnClick({R.id.cat_rl, R.id.sub_cat_rl, R.id.fixed_rl, R.id.condition_rl, R.id.addnewinfo_back, R.id.add_tags, R.id.add_info_post})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.cat_rl:
+                remove_focus();
+                break;
+            case R.id.sub_cat_rl:
+                remove_focus();
+                break;
+            case R.id.fixed_rl:
+                remove_focus();
+                break;
+            case R.id.condition_rl:
+                break;
+
             case R.id.addnewinfo_back:
-                onBackPressed();
+                    onBackPressed();
                 break;
             case R.id.add_tags:
                 if (tagList.size() != 3) {
@@ -343,6 +369,8 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
                 break;
             case R.id.add_info_post:
+
+                 adddata();
                 Intent intent = new Intent(AddNewInfo.this, AddNewTransaction.class);
                 startActivity(intent);
                 break;
@@ -350,7 +378,6 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     }
 
     private void setUpTagLayoutAdapter() {
-
 
 
         //tags set Adapter
@@ -367,8 +394,12 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     public void setTagVisiblity(boolean visible) {
         if (visible) {
             addTags.setVisibility(View.VISIBLE);
+            horizontalInfoview.setBackgroundResource(R.drawable.live_product_detail_background);
+
         } else {
             addTags.setVisibility(View.GONE);
+            horizontalInfoview.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+
         }
     }
 
@@ -380,4 +411,186 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
             addPhoto.setVisibility(View.GONE);
         }
     }
+
+
+    public void remove_focus() {
+        edtDescription.clearFocus();
+        edtQuantity.clearFocus();
+        edtPrice.clearFocus();
+        edtProductName.clearFocus();
+        if (TextUtils.isEmpty(edtDescription.getText().toString())) {
+            edtDescription.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtQuantity.getText().toString())) {
+            edtQuantity.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtPrice.getText().toString())) {
+            edtPrice.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtProductName.getText().toString())) {
+            edtProductName.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+    }
+
+    private void focuslisteneres() {
+
+        edtTags.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    Add_New_Product_tutorial_secondDialog dialog = new Add_New_Product_tutorial_secondDialog();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("x", (int) edtTags.getX());
+                    bundle.putInt("y", (int) edtTags.getY());
+                    dialog.setArguments(bundle);
+                    dialog.show(getFragmentManager(), "");
+                    edtTags.setVisibility(View.GONE);
+                    addTags.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
+
+
+        edtProductName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtProductName.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtProductName.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+        edtQuantity.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtQuantity.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtQuantity.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+        edtPrice.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtPrice.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtPrice.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+
+        edtDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
+    }
+
+
+    private void adddata() {
+
+
+
+                 AddProductDatabase data = new AddProductDatabase();
+
+                 data.tagListG.clear();
+                 data.tagListG.addAll(tagList);
+                 if (!edtProductName.getText().toString().trim().isEmpty())
+
+                data.name = edtProductName.getText().toString().trim();
+
+
+                if (!spinnerCatagory.getSelectedItem().toString().isEmpty())
+                    data.category = spinnerCatagory.getSelectedItemPosition();
+
+        if (!spinnerSubCatagory.getSelectedItem().toString().isEmpty())
+            data.sub_category = spinnerSubCatagory.getSelectedItemPosition();
+
+
+                if (!edtPrice.getText().toString().isEmpty())
+                    data.price = edtPrice.getText().toString();
+
+                if (!spinFixedPrice.getSelectedItem().toString().isEmpty())
+                    data.type = spinFixedPrice.getSelectedItemPosition();
+
+                if (!spinCondition.getSelectedItem().toString().isEmpty())
+                    data.condition = spinCondition.getSelectedItemPosition();
+
+                if (!edtQuantity.getText().toString().isEmpty())
+                    data.quantity = edtQuantity.getText().toString();
+
+                if (!tag.isEmpty())
+                    data.tags = tag;
+                if (!edtDescription.getText().toString().isEmpty())
+                    data.description = edtDescription.getText().toString();
+
+
+    }
+
+
+    private void getdata() {
+
+
+
+
+        if (!AddProductDatabase.name.isEmpty()) {
+            edtProductName.setText(AddProductDatabase.name);
+
+
+            if (AddProductDatabase.category>=0)
+                spinnerCatagory.setSelection(AddProductDatabase.category);
+
+
+            if (AddProductDatabase.sub_category>=0)
+                spinnerSubCatagory.setSelection(AddProductDatabase.sub_category);
+
+            if (!AddProductDatabase.price.isEmpty())
+                 edtPrice.setText(AddProductDatabase.price);
+
+            if (AddProductDatabase.type>=0)
+                 spinFixedPrice.setSelection(AddProductDatabase.type);
+
+            if (AddProductDatabase.condition>=0)
+                 spinCondition.setSelection(AddProductDatabase.condition);
+
+            if (!AddProductDatabase.quantity.isEmpty())
+                 edtQuantity.setText(AddProductDatabase.quantity);
+
+            if (!AddProductDatabase.tags.isEmpty())
+                 tag=AddProductDatabase.tags;
+            if (!AddProductDatabase.description.isEmpty())
+                 edtDescription.setText(AddProductDatabase.description);
+
+
+        }
+
+
+
+    }
+
+
 }

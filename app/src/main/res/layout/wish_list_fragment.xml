@@ -11,17 +11,6 @@
         android:id="@+id/wishlist_root"
         android:paddingBottom="@dimen/_8sdp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_marginTop="@dimen/_3sdp"
-            android:padding="@dimen/_5sdp"
-            android:text="Wishlist"
-            android:textAllCaps="false"
-            android:textColor="@color/colorGrey"
-            android:textSize="@dimen/_13sdp" />
-
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/wishListRecycler"
@@ -36,7 +25,7 @@
             android:layout_marginTop="5dp"
             android:padding="@dimen/_5sdp"
             android:text="You May Also Like"
-            android:textColor="@color/colorGrey"
+            android:textColor="@color/colorBlack"
             android:textSize="@dimen/_13sdp"
             android:nestedScrollingEnabled="false"/>
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,16 @@ public class SuggestedPostAdapter extends RecyclerView.Adapter<SuggestedPostAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.item_name.setText(add_items.getResult().get(position).getName());
+
+        if (add_items.getResult().get(position).getPromoteProduct().equalsIgnoreCase("Y"))
+        {
+           holder.feature.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            holder.feature.setVisibility(View.GONE);
+
+        }
         holder.item_cost.setText("S$ "+add_items.getResult().get(position).getPrice());
         Glide.with(context)
                 .load(!add_items.getResult().get(position).getProductImages().isEmpty() ? add_items.getResult().get(position).getProductImages().get(0).getImage() : "")
@@ -66,13 +77,14 @@ public class SuggestedPostAdapter extends RecyclerView.Adapter<SuggestedPostAdap
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView add_image;
-        public TextView item_name,item_cost;
+        public TextView item_name,item_cost,feature;
 
         public ViewHolder(View itemView) {
             super(itemView);
             add_image = (ImageView) itemView.findViewById(R.id.additional_image);
             item_name = (TextView) itemView.findViewById(R.id.tb_item_name);
             item_cost = (TextView) itemView.findViewById(R.id.tb_item_cost);
+            feature = (TextView) itemView.findViewById(R.id.suggest_feature);
 
         }
     }

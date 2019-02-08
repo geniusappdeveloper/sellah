@@ -93,15 +93,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.WishHo
         return wishList.getResult().size();
     }
     public class WishHolder extends RecyclerView.ViewHolder {
-        ImageView profileImg,messImg,shareImg;
+        ImageView profileImg;
         TextView BirthText,costText,timeText;
         ImageButton remove;
 
         public WishHolder(View view) {
             super(view);
             profileImg = view.findViewById(R.id.img_product);
-            messImg = view.findViewById(R.id.mess_image);
-            shareImg = view.findViewById(R.id.share_image);
             BirthText = view.findViewById(R.id.text_birthday);
             costText = view.findViewById(R.id.cake_cost);
             timeText = view.findViewById(R.id.text_time);

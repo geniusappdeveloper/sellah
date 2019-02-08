@@ -8,12 +8,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,10 +63,15 @@ public class ChatAdapter extends RecyclerView.Adapter {
     private RecyclerViewClickListener onBottomReachedListener;
     private WebService service;
     private StripeApp StripeAppmApp;
+    private int currentFlag = 0;
+    private String user_id= "";
+    private String reciever_d= "";
 
+    String friendname;
     public static class SendMessageViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView userImage;
+        LinearLayout ll_sendchat;
         TextView txtMessage, txtMsgTime;
 
         public SendMessageViewHolder(View itemView) {
@@ -72,7 +79,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             this.userImage = itemView.findViewById(R.id.img_user);
             this.txtMessage = itemView.findViewById(R.id.txt_message);
             this.txtMsgTime = itemView.findViewById(R.id.txt_msg_time);
-
+            this.ll_sendchat = itemView.findViewById(R.id.ll_sendmsg);
         }
     }
 
@@ -82,16 +89,31 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
         CircleImageView userImage;
         TextView txtMessage, txtMsgTime;
-
+        LinearLayout ll_recmsg;
         public RecievedMessageViewHolder(View itemView) {
             super(itemView);
-
             this.userImage = itemView.findViewById(R.id.img_user);
             this.txtMessage = itemView.findViewById(R.id.txt_message);
             this.txtMsgTime = itemView.findViewById(R.id.txt_msg_time);
+            this.ll_recmsg = itemView.findViewById(R.id.ll_recmsg);
 
         }
     }
+
+
+    public static class TodayViewHolder extends RecyclerView.ViewHolder {
+
+        TextView today;
+
+        public TodayViewHolder(View itemView) {
+            super(itemView);
+
+            this.today = itemView.findViewById(R.id.today);
+
+
+        }
+    }
+
 
     public static class ImageSentViewHolder extends RecyclerView.ViewHolder {
 
@@ -124,15 +146,21 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     public static class MakeOfferViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtItemName, txtItemQuantity, txtItemCost, txtCanceled;
+        TextView txtItemName, txtItemQuantity,dollarsign, txtItemCost, txtCanceled,aftertext_itemsendername,texitem_sendername,aftertxtItemName, aftertxtItemQuantity, aftertxtItemCost;
         Button btnAccept, btnCanceld, btnPay;
-        LinearLayout liOffer, liPay, liOfferStatus;
+        LinearLayout liOffer, liPay, liOfferStatus,upperchat_layout,beforeaccept,afteraccept;
 
 
         public MakeOfferViewHolder(View itemView) {
             super(itemView);
 
+            this.aftertxtItemName = (TextView) itemView.findViewById(R.id.aftertxt_item_name);
+            this.dollarsign = (TextView) itemView.findViewById(R.id.dollar_sign);
+            this.aftertxtItemQuantity = (TextView) itemView.findViewById(R.id.aftertxt_item_quantity);
+            this.aftertxtItemCost = (TextView) itemView.findViewById(R.id.aftertxt_item_cost);
+            this.aftertext_itemsendername = (TextView) itemView.findViewById(R.id.aftertxt_item_sender_name);
             this.txtItemName = (TextView) itemView.findViewById(R.id.txt_item_name);
+            this.texitem_sendername = (TextView) itemView.findViewById(R.id.txt_item_sender_name);
             this.txtItemQuantity = (TextView) itemView.findViewById(R.id.txt_item_quantity);
             this.txtItemCost = (TextView) itemView.findViewById(R.id.txt_item_cost);
             this.txtCanceled = (TextView) itemView.findViewById(R.id.txt_offer_status);
@@ -142,6 +170,9 @@ public class ChatAdapter extends RecyclerView.Adapter {
             this.liOffer = itemView.findViewById(R.id.li_confirm_order);
             this.liPay = itemView.findViewById(R.id.li_pay_order);
             this.liOfferStatus = itemView.findViewById(R.id.li_offer_status);
+            this.upperchat_layout = itemView.findViewById(R.id.uppperchatlayout);
+            this.beforeaccept = itemView.findViewById(R.id.beforeacpt__offer__layout);
+            this.afteraccept = itemView.findViewById(R.id.afteracpt_offerlayout);
 
         }
     }
@@ -177,6 +208,10 @@ public class ChatAdapter extends RecyclerView.Adapter {
             case SAConstants.Keys.TYPE_RECIEVED_IMAGE:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_received_image, parent, false);
                 return new ImageReceivedViewHolder(view);
+
+            case 101:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_today_layout, parent, false);
+                return new TodayViewHolder(view);
         }
         return null;
     }
@@ -184,31 +219,50 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
-            if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
+          friendname = ((ChatActivity)context).txtUserName.getText().toString();
+        user_id = messagelist.get(position).getSenderId();
+        reciever_d = messagelist.get(position).getReceiverId();
 
-                handleOfferData(holder, position);
-
-            } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
-
-                handleSentImageData(holder, position);
-
-            } else {
-                handleSentMessageData(holder, position);
-            }
-        } else {
-            if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
-
-                handleOfferData(holder, position);
-
-            } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
-
-                handleRecievedImageData(holder, position);
-
-            } else {
-                handleRecievMessageData(holder, position);
-            }
+        if (messagelist.get(position).isToday_boolean())
+        {
+            ((TodayViewHolder)holder).today.setText(messagelist.get(position).getToday());
         }
+        else
+        {
+
+            if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
+
+                if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
+
+                    handleOfferData(holder, position);
+
+                } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
+
+                    handleSentImageData(holder, position);
+
+                } else {
+
+
+
+                    handleSentMessageData(holder, position);
+                }
+            } else {
+                if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
+
+                    handleOfferData(holder, position);
+
+                } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
+
+                    handleRecievedImageData(holder, position);
+
+                } else {
+                    handleRecievMessageData(holder, position);
+                }
+            }
+
+        }
+
+
        /* if (messagelist.get(position).isSender()) {
 
 
@@ -242,7 +296,49 @@ public class ChatAdapter extends RecyclerView.Adapter {
 //        notifyDataSetChanged();
     }
 
-    private void handleRecievMessageData(RecyclerView.ViewHolder holder, int position) {
+
+
+    private void handleRecievMessageData(RecyclerView.ViewHolder holder, int position)
+    {
+
+        if (position==0)
+        {
+            ((RecievedMessageViewHolder) holder).ll_recmsg.setBackgroundResource(R.drawable.recchat1);
+
+
+        }
+
+
+        else
+        {
+
+            if (position+1<messagelist.size())
+            {
+
+                if (!messagelist.get(position-1).getReceiverId().equals(reciever_d))
+                {
+                    ((RecievedMessageViewHolder) holder).ll_recmsg.setBackgroundResource(R.drawable.recchat1);
+                }
+                else if (!messagelist.get(position+1).getReceiverId().equals(reciever_d))
+                {
+                    ((RecievedMessageViewHolder) holder).ll_recmsg.setBackgroundResource(R.drawable.recchat3);
+                }
+                else
+                {
+                    ((RecievedMessageViewHolder) holder).ll_recmsg.setBackgroundResource(R.drawable.recchat2);
+                }
+
+            }
+            else
+            {
+                ((RecievedMessageViewHolder) holder).ll_recmsg.setBackgroundResource(R.drawable.recchat3);
+            }
+
+
+
+
+        }
+
         ((RecievedMessageViewHolder) holder).txtMessage.setText(messagelist.get(position).getMessage());
         ((RecievedMessageViewHolder) holder).userImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -272,6 +368,62 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     private void handleSentMessageData(RecyclerView.ViewHolder holder, int position) {
 
+            if (position==0)
+            {
+                ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat1);
+
+            }
+
+
+            else
+            {
+
+                if (position+1<messagelist.size())
+                {
+                    if (!messagelist.get(position-1).getSenderId().equals(user_id))
+                    {
+                        ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat1);
+                    }
+                    else if (!messagelist.get(position+1).getSenderId().equals(user_id))
+                    {
+                        ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat3);
+                    }
+                    else
+                    {
+                        ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat2);
+                    }
+
+                }
+                else
+                {
+                    ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat3);
+                }
+
+
+
+
+            }
+      /*  if(currentFlag==0)
+        {
+            ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat1);
+        }
+        else if(currentFlag==2)
+        {
+            ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat3);
+
+        }
+        else
+        {
+            ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat2);
+
+
+        }*/
+
+
+
+       // if (messagelist.get(position).getSenderId().equals(messagelist.get(getItemCount())))
+
+
         ((SendMessageViewHolder) holder).txtMessage.setText(messagelist.get(position).getMessage());
         Glide.with(context).load(messagelist.get(position).getSenderImage()).apply(Global.getGlideOptions())
                 .into(((SendMessageViewHolder) holder).userImage);
@@ -281,6 +433,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
     }
 
     private void handleSentImageData(RecyclerView.ViewHolder holder, int position) {
+
+
         Glide.with(context).load(messagelist.get(position).getImageUrl()).apply(Global.getGlideOptions())
                 .into(((ImageSentViewHolder) holder).imgSent);
         Glide.with(context).load(messagelist.get(position).getSenderImage()).apply(Global.getGlideOptions())
@@ -378,6 +532,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             ((MakeOfferViewHolder) holder).txtItemQuantity.setText("1");
         }
         ((MakeOfferViewHolder) holder).txtItemCost.setText(messagelist.get(position).getProductCost());
+        Log.e("status: ",  messagelist.get(position).getStatus());
         if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
             showOfferStatusSenderSide(((MakeOfferViewHolder) holder), messagelist.get(position).getStatus(), position);
             ((MakeOfferViewHolder) holder).btnPay.setOnClickListener(new View.OnClickListener() {
@@ -417,14 +572,19 @@ public class ChatAdapter extends RecyclerView.Adapter {
             ((MakeOfferViewHolder) holder).btnAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    Log.e( "onClick: ","ff"+ HelperPreferences.get(context).getString(API_ACCESS_TOKEN));
+
+                    acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
+
 //                    HelperPreferences.get(context).remove(API_ACCESS_TOKEN);
-                    if (!TextUtils.isEmpty(HelperPreferences.get(context).getString(API_ACCESS_TOKEN))) {
+                    /*if (!TextUtils.isEmpty(HelperPreferences.get(context).getString(API_ACCESS_TOKEN))) {
                         acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
                     } else {
                         S_Dialogs.getStipeConnectDialog(context, ((dialog, which) -> {
                             StripConnect((MakeOfferViewHolder) holder, position);
                         })).show();
-                    }
+                    }*/
                 }
             });
         }
@@ -432,34 +592,54 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     }
 
+
     @Override
     public int getItemViewType(int position) {
 
-        if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
-            if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
 
-                return SAConstants.Keys.TYPE_MAKEOFFER;
 
-            } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
+            if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
 
-                return SAConstants.Keys.TYPE_IMAGE;
 
+                if (messagelist.get(position).isToday_boolean())
+                {
+                    return 101;
+                }
+
+                if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
+
+                    return SAConstants.Keys.TYPE_MAKEOFFER;
+
+                } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
+
+                    return SAConstants.Keys.TYPE_IMAGE;
+
+                } else {
+                    return SAConstants.Keys.TYPE_SEND;
+                }
             } else {
-                return SAConstants.Keys.TYPE_SEND;
+
+                if (messagelist.get(position).isToday_boolean())
+                {
+                    return 101;
+                }
+
+                if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
+
+                    return SAConstants.Keys.TYPE_MAKEOFFER;
+
+                } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
+
+                    return SAConstants.Keys.TYPE_RECIEVED_IMAGE;
+
+                } else {
+                    return SAConstants.Keys.TYPE_RECEIVED;
+                }
             }
-        } else {
-            if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
 
-                return SAConstants.Keys.TYPE_MAKEOFFER;
 
-            } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
 
-                return SAConstants.Keys.TYPE_RECIEVED_IMAGE;
 
-            } else {
-                return SAConstants.Keys.TYPE_RECEIVED;
-            }
-        }
 
     }
 
@@ -486,15 +666,41 @@ public class ChatAdapter extends RecyclerView.Adapter {
         return formattedDate;
     }
 
+
+
+
     public void showAcceptRejectoption(MakeOfferViewHolder holder) {
+
+        // new changes vishal
+        holder.beforeaccept.setVisibility(View.VISIBLE);
+        holder.afteraccept.setVisibility(View.GONE);
+        (holder).upperchat_layout.setBackgroundResource(R.drawable.recchat2);
+        (holder).texitem_sendername.setVisibility(View.VISIBLE);
+        (holder).texitem_sendername.setText(friendname +" has sent you an offer");
+        (holder).dollarsign.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        (holder).texitem_sendername.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        (holder).txtItemName.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        (holder).txtItemCost.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        (holder).txtItemQuantity.setTextColor(context.getResources().getColor(R.color.colorWhite));
 
         (holder).txtCanceled.setVisibility(View.GONE);
         (holder).liOffer.setVisibility(View.VISIBLE);
         (holder).liPay.setVisibility(View.GONE);
 
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.beforeaccept.getLayoutParams();
+        params.setMargins(23, 0, 100, 0);
+        holder.beforeaccept.setLayoutParams(params);
+
     }
 
     public void showStatus(MakeOfferViewHolder holder, String status, int colorId) {
+
+
+        holder.beforeaccept.setVisibility(View.GONE);
+        holder.afteraccept.setVisibility(View.VISIBLE);
+        holder.aftertxtItemName.setText(messagelist.get(holder.getAdapterPosition()).getProductName());
+        holder.aftertxtItemQuantity.setText(messagelist.get(holder.getAdapterPosition()).getQuantity());
+        holder.aftertxtItemCost.setText(messagelist.get(holder.getAdapterPosition()).getProductCost());
         (holder).txtCanceled.setVisibility(View.VISIBLE);
         (holder).txtCanceled.setText(status);
         (holder).txtCanceled.setTextColor(context.getResources().getColor(colorId));
@@ -503,37 +709,64 @@ public class ChatAdapter extends RecyclerView.Adapter {
     }
 
     public void showPayOptions(MakeOfferViewHolder holder) {
+
+
+         holder.texitem_sendername.setVisibility(View.GONE);
+        holder.beforeaccept.setVisibility(View.VISIBLE);
+        holder.afteraccept.setVisibility(View.GONE);
+        (holder).upperchat_layout.setBackgroundResource(R.drawable.chat_upper_layout);
+        (holder).dollarsign.setTextColor(context.getResources().getColor(R.color.colorRed));
         (holder).txtCanceled.setVisibility(View.GONE);
         (holder).liOffer.setVisibility(View.GONE);
         (holder).liPay.setVisibility(View.VISIBLE);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)holder.beforeaccept.getLayoutParams();
+        params.setMargins(50, 0, 50, 0);
+        holder.beforeaccept.setLayoutParams(params);
+
+
     }
 
     public void showOfferStatusSenderSide(MakeOfferViewHolder holder, String status, int pos) {
+
+        Log.e( "showOfferStatusSe: ",status );
         if (status.equalsIgnoreCase("p")) {
-            showStatus(holder, "Pending", R.color.colorGrey);
+
+            holder.aftertext_itemsendername.setText("Sending offer to "+friendname);
+
+            showStatus(holder, "Pending", R.color.colorWhite);
         } else if (status.equalsIgnoreCase("a")) {
+
             showPayOptions(holder);
         } else if (status.equalsIgnoreCase("s")) {
-            showStatus(holder, "Purchased", R.color.colorRed);
+
+            holder.aftertext_itemsendername.setText("Product successfully purchased from "+friendname);
+            showStatus(holder, "Purchased", R.color.colorWhite);
         } else {
-            showStatus(holder, "Rejected", R.color.colorGrey);
+            holder.aftertext_itemsendername.setText("Offer rejected "+friendname);
+            showStatus(holder, "Rejected", R.color.colorWhite);
         }
     }
 
     public void showOfferStatusReceiverSide(MakeOfferViewHolder holder, String status, int pos) {
+
+        Log.e( "recieveeroffer: ",status );
         if (status.equalsIgnoreCase("p")) {
             showAcceptRejectoption(holder);
         } else if (status.equalsIgnoreCase("a")) {
-            showStatus(holder, "Accepted", R.color.colorRed);
+            holder.aftertext_itemsendername.setText("You accepted "+friendname+"'s"+" offer");
+            showStatus(holder, "Accepted", R.color.colorWhite);
         } else if (status.equalsIgnoreCase("s")) {
-            showStatus(holder, "Sold", R.color.colorRed);
+            holder.aftertext_itemsendername.setText("Product successfully sold to "+friendname);
+            showStatus(holder, "Sold", R.color.colorWhite);
         } else {
+            holder.aftertext_itemsendername.setText("You rejected the offer from "+friendname);
             showStatus(holder, "Rejected", R.color.colorGrey);
         }
     }
 
     private void acceptDeclineApi(MakeOfferViewHolder holder, String offerId, String status, int pos) {
-        Log.e("OfferId", "acceptDeclineApi: " + offerId + " : ");
+        Log.e("OfferId", "acceptDeclineApi: " + offerId + " : " + HelperPreferences.get(context).getString(UID));
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
         Call<MakeOfferModel> acceptDeclineCall = service.acceptDeclineOfferApi(HelperPreferences.get(context).getString(UID), offerId, status);

@@ -54,7 +54,7 @@ public class GolfAdapter  extends PagerAdapter {
                 .into(myImage);
 
 //        myImage.setBackgroundResource(images.get(position).t);
-        view.addView(myImageLayout, 0);
+        view.addView(myImageLayout);
         myImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,6 +75,6 @@ public class GolfAdapter  extends PagerAdapter {
 
     @Override
     public float getPageWidth(int position) {
-        return(0.65f);
+        return(1);
     }
 }

@@ -70,6 +70,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.Fabric;
+
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -106,6 +107,7 @@ public class Global extends MultiDexApplication {
         Fabric.with(this, new Crashlytics());
         MultiDex.install(this);
         mInstance = this;
+
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         TypefaceUtil.setDefaultFont(getApplicationContext(), "SERIF", "fonts/product_sans_regular.ttf");
 //        TypefaceUtil.overrideFont(getApplicationContext(), "SERIF", "fonts/product_sans_regular.ttf");

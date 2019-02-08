@@ -21,6 +21,11 @@ import com.app.admin.sellah.model.extra.SendOffer.SendOfferModel;
 import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.activities.MainActivity;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -30,6 +35,8 @@ import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
 
 public class ApisHelper {
 
@@ -66,10 +73,10 @@ public class ApisHelper {
         });
 
     }
-
+    Call<BannerModel> categoriesModelCall;
     public void getBanner(String user_id, OnGetDataListners listners) {
 
-        Call<BannerModel> categoriesModelCall = service.getbannersApi(user_id);
+         categoriesModelCall = service.getbannersApi(user_id);
         categoriesModelCall.enqueue(new Callback<BannerModel>() {
             @Override
             public void onResponse(Call<BannerModel> call, Response<BannerModel> response) {
@@ -96,9 +103,9 @@ public class ApisHelper {
         });
 
     }
-
+    Call<CardDetailModel> stripePaymentApi;
     public void getCardApi(Context context, OnGetCardDataListners listners) {
-        Call<CardDetailModel> stripePaymentApi = service.getCardApi(HelperPreferences.get(context).getString(UID));
+         stripePaymentApi = service.getCardApi(HelperPreferences.get(context).getString(UID));
         stripePaymentApi.enqueue(new Callback<CardDetailModel>() {
             @Override
             public void onResponse(Call<CardDetailModel> call, Response<CardDetailModel> response) {
@@ -336,18 +343,27 @@ public class ApisHelper {
     public void getProfileData(Context context, GetProfileCallback callback) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<ProfileModel> getProfileCall = service.getProfileApi(HelperPreferences.get(context).getString(UID));
-        getProfileCall.enqueue(new Callback<ProfileModel>() {
+        Log.e("user", "" + HelperPreferences.get(context).getString(UID));
+        Call<JsonObject> getProfileCall = service.getProfileApi1(HelperPreferences.get(context).getString(UID));
+        getProfileCall.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call<ProfileModel> call, Response<ProfileModel> response) {
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+
                 if (response.isSuccessful()) {
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
-                    HelperPreferences.get(context).saveString(API_ACCESS_TOKEN, response.body().getResult().getStripeId());
+
                     callback.onGetProfileSuccess(response.body());
-                    Log.e("profile_success", "" + response.body().getResult().getImage());
-                    ;
+
+
+
+                    //Log.e("profile_success1", "" + response.body().toString());
+
+                  /*  HelperPreferences.get(context).saveString(API_ACCESS_TOKEN, response.body().getResult().getStripeId());
+                    callback.onGetProfileSuccess(response.body());
+                    Log.e("profile_success", "" + response.body().getResult().getImage());;*/
                 } else {
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
@@ -362,7 +378,7 @@ public class ApisHelper {
             }
 
             @Override
-            public void onFailure(Call<ProfileModel> call, Throwable t) {
+            public void onFailure(Call<JsonObject> call, Throwable t) {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
@@ -761,7 +777,7 @@ public class ApisHelper {
     }
 
     public interface GetProfileCallback {
-        void onGetProfileSuccess(ProfileModel msg);
+        void onGetProfileSuccess(JsonObject msg);
 
         void onGetProfileFailure();
     }
@@ -807,4 +823,17 @@ public class ApisHelper {
 
         void onSortLiveVideoFailure();
     }
+
+    public void cancel_banner_request()
+    {
+        if (categoriesModelCall!=null)
+        {
+            categoriesModelCall.cancel();
+        }
+
+    }
+
+    public void cancel_striipe_request()
+    {if (stripePaymentApi!=null)
+    {stripePaymentApi.cancel();}}
 }
