@@ -9,8 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,20 +28,16 @@ import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.stripe.StripeApp;
 import com.app.admin.sellah.controller.stripe.StripeButton;
 import com.app.admin.sellah.controller.stripe.StripeConnectListener;
-import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
-import com.app.admin.sellah.model.extra.CardDetails.Card;
 import com.app.admin.sellah.model.extra.CardDetails.CardDetailModel;
 import com.app.admin.sellah.view.CustomAnimations.MyBounceInterpolator;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
 import com.app.admin.sellah.view.activities.MainActivity;
-import com.app.admin.sellah.view.adapter.CardListAdapter;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,30 +56,30 @@ import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TO
  */
 @SuppressLint("ValidFragment")
 public class PaymentFragment extends Fragment {
-    @BindView(R.id.txt_card_detail)
-    TextView txtCardDetail;
+
     @BindView(R.id.edt_card_edit)
     TextView edtCardEdit;
-    @BindView(R.id.bankImg)
-    ImageView bankImg;
-    @BindView(R.id.banl_acct_text)
-    TextView banlAcctText;
-    @BindView(R.id.dbs_text)
-    TextView dbsText;
-    @BindView(R.id.txt_card_number)
-    TextView txtCardNumber;
-    @BindView(R.id.txt_connect_stripe)
-    TextView txtConnectStripe;
+
+
+
+
     @BindView(R.id.rel_stripe_connect)
     RelativeLayout relStripeConnect;
-    @BindView(R.id.rel_add_card)
-    RelativeLayout relAddCard;
+
     @BindView(R.id.btn_stripe_connect)
     StripeButton btnStripeConnect;
-    @BindView(R.id.rec_cards)
-    RecyclerView recCards;
-    @BindView(R.id.txt_connection_status)
-    TextView txtConnectionStatus;
+
+
+    @BindView(R.id.p_onnewcardnumber)
+    TextView pOnnewcardnumber;
+    @BindView(R.id.p_onnewcardholdername)
+    TextView pOnnewcardholdername;
+    @BindView(R.id.p_onnewcard_expire)
+    TextView pOnnewcardExpire;
+    @BindView(R.id.p_onnewcard_cvv)
+    TextView pOnnewcardCvv;
+    @BindView(R.id.rl_addnewstrpeaccount)
+    RelativeLayout rlAddnewstrpeaccount;
     private Dialog dialog;
     private Animation myAnim;
     HashMap<EditText, String> bankDetaildialogMessages;
@@ -93,8 +87,6 @@ public class PaymentFragment extends Fragment {
     ArrayList<TextInputLayout> allBankdetailInputLayouts;
     final int GET_NEW_CARD = 2;
 
-    @BindView(R.id.txt_edit_bank_detail)
-    TextView txtEditbankDetail;
 
     Unbinder unbinder;
 
@@ -109,119 +101,28 @@ public class PaymentFragment extends Fragment {
     public PaymentFragment(String stripeId) {
         this.stripeId = stripeId;
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.account_payment_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
-        Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
-        dialog.show();
 
-        // Check weigher sellah account is connected with stripe or not
+
         if (TextUtils.isEmpty(HelperPreferences.get(getActivity()).getString(API_ACCESS_TOKEN))) {
-//            relStripeConnect.setVisibility(View.VISIBLE);
-            relAddCard.setVisibility(View.GONE);
-            txtConnectionStatus.setVisibility(View.VISIBLE);
+
         } else {
-            txtConnectionStatus.setVisibility(View.GONE);
-//            relStripeConnect.setVisibility(View.GONE);
-            relAddCard.setVisibility(View.VISIBLE);
+
         }
-
-        //Get saved cards list from server
-        new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
-            @Override
-            public void onGetDataSuccess(CardDetailModel body) {
-//                cardDetailModel = body;
-                /*if (body.getRecord().size() > 0) {
-
-                    cardHolderName = body.getRecord().get(0).getCardHolderName();
-                    cardNumber = body.getRecord().get(0).getCardNumber();
-                    cardExp = body.getRecord().get(0).getExpDate();
-                    txtCardNumber.setText("ending in " + cardNumber.substring(12));
-                    edtCardEdit.setText("EDIT");
-
-                } else {
-                    txtCardNumber.setText("No card detail available");
-                    edtCardEdit.setText("ADD");
-                }*/
-
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                setUpcards(body.getCards());//set card list adapter
-            }
-
-            @Override
-            public void onGetDataFailure() {
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-//                cardDetailModel = new GetCardDetailModel();
-                txtCardNumber.setText("No card detail available");
-                txtCardNumber.setVisibility(View.VISIBLE);
-//                edtCardEdit.setText("ADD");
-            }
-        });
 
         StripConnect();
         return view;
     }
 
-    private void setUpcards(List<Card> cards) {
-        if (cards != null && cards.size() > 0) {
-//            txtCardNumber.setText("No card detail available");
-            txtCardNumber.setVisibility(View.GONE);
-            CardListAdapter cardListAdapter = new CardListAdapter(getActivity(), cards, new CardListAdapter.OnCardOptionSelection() {
-                @Override
-                public void onCardSelectionClick(int pos, String cardId) {
 
-                }
-
-                @Override
-                public void onCardRemoveListner(int pos, int updatedSize) {
-
-                }
-            });
-            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-            recCards.setLayoutManager(layoutManager);
-            recCards.setAdapter(cardListAdapter);
-            Global.getTotalHeightofLinearRecyclerView(getActivity(), recCards, R.layout.card_adapter_layout, 0);
-        } else {
-            Global.getTotalHeightofLinearRecyclerView(getActivity(), recCards, R.layout.card_adapter_layout, 0);
-            txtCardNumber.setText("No card detail available");
-            txtCardNumber.setVisibility(View.VISIBLE);
-        }
-//        recCards.setAnimation(new DefaultItemAnimator());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getUserVisibleHint()) {
-            new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
-                @Override
-                public void onGetDataSuccess(CardDetailModel body) {
-                    setUpcards(body.getCards());
-                }
-
-                @Override
-                public void onGetDataFailure() {
-
-                }
-            });
-        }
-    }
-
-    /**
-     * Stripe connect Method
-     *
-     * @implNote enables functionality to connect sellah account with stripe
-     */
     private void StripConnect() {
-        StripeAppmApp = new StripeApp(getActivity(), "geniusAppDeveloper", "ca_9bmLYpWBQDumLtFp2KZ7bE90kHjXS5le",
-                "sk_test_QW9KCbQ08S6BSGogNk3XKDTa", "https://developer.android.com", "read_write");
+
+        StripeAppmApp = new StripeApp(getActivity(), "geniusAppDeveloper", "ca_EWK1BYRqruSX1X92DbtLY8UiV46ADGoC",
+                "sk_test_HDkDbhty58uz3aaJi2TDllrR", "https://developer.android.com", "read_write");
 //        mStripeButton = (StripeButton) findViewById(R.id.btnStripeConnect);
         btnStripeConnect.setStripeApp(StripeAppmApp);
         btnStripeConnect.setConnectMode(StripeApp.CONNECT_MODE.DIALOG);
@@ -238,7 +139,7 @@ public class PaymentFragment extends Fragment {
                             Snackbar.make(((MainActivity) getActivity()).relRoot, msg, Snackbar.LENGTH_SHORT)
                                     .setAction("", null).show();
                             HelperPreferences.get(getActivity()).saveString(API_ACCESS_TOKEN, StripeAppmApp.getUserId());
-                            txtConnectionStatus.setVisibility(View.GONE);
+
                         }
 
                         @Override
@@ -269,17 +170,11 @@ public class PaymentFragment extends Fragment {
 
     @OnClick(R.id.edt_card_edit)
     public void editCardDetail() {
-        Intent intent = new Intent(getActivity(), AddCreditCardDetailFragment.class);
-   /*     intent.putExtra(SAConstants.Keys.CARDHOLDER_NAME, cardHolderName);
-        intent.putExtra(SAConstants.Keys.CARD_NUMBER, cardNumber);
-        intent.putExtra(SAConstants.Keys.CARD_EXP_YEAR, cardExp);*/
+        Intent intent = new Intent(getActivity(), ShowCreditCardDetailFragment.class);
         startActivityForResult(intent, GET_NEW_CARD);
     }
 
-    @OnClick(R.id.txt_edit_bank_detail)
-    public void editBankDetail() {
-        bankDetail();
-    }
+
 
     public void bankDetail() {
 
@@ -387,11 +282,13 @@ public class PaymentFragment extends Fragment {
             String cvv = data.getStringExtra(CreditCardUtils.EXTRA_CARD_CVV);
 
 
-//            Log.e("Card_deails",cardHolderName);
-            // Your processing goes here.
-
         }
 
     }
 
+    @OnClick(R.id.rl_addnewstrpeaccount)
+    public void onViewClicked() {
+
+        btnStripeConnect.performClick();
+    }
 }

@@ -1126,6 +1126,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                                         clearForm(rootTag);
 
+
                                         Bundle bundle = new Bundle();
                                         bundle.putParcelable(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0));
                                         ProductFrgament fragment = new ProductFrgament();

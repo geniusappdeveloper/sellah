@@ -6,7 +6,7 @@
     android:id="@+id/rel_account_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/coloCreamyWhite"
+    android:background="@color/colorWhite"
     android:orientation="vertical">
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,15 +28,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:text="Display Name"
-                android:textColorHint="@color/colorGrey"
+                android:textColor="@color/colorGrey"
+                android:textColorHint="@color/light_grey"
                 android:textSize="@dimen/_13sdp" />
 
-            <ImageView
-                android:id="@+id/img_mandate_name"
+            <TextView
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:gravity="center"
+                android:textColor="@color/colorRed"
+                android:text="*"
+                android:textSize="@dimen/_7sdp"
                 android:layout_width="@dimen/_5sdp"
                 android:layout_height="@dimen/_5sdp"
                 android:layout_gravity="left|center"
-                android:src="@drawable/red_dot_icon"
                 android:visibility="visible" />
         </LinearLayout>
             <EditText
@@ -46,44 +50,72 @@
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/edit_text_border"
+                android:background="@drawable/live_product_detail_grey_background"
                 android:hint="Your Name"
                 android:paddingLeft="@dimen/_5sdp"
                 android:singleLine="true"
                 android:textSize="@dimen/_12sdp" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="@dimen/_5sdp">
 
                 <TextView
+                    android:id="@+id/txt_onlides"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:text="One Line Description "
-                    android:textColorHint="@color/colorGrey"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_13sdp" />
 
-                <ImageView
-                    android:id="@+id/img_mandate_desc"
+                <TextView
+                    android:layout_toRightOf="@+id/txt_onlides"
+                    android:layout_marginBottom="@dimen/_2sdp"
+                    android:gravity="center"
+                    android:textColor="@color/colorRed"
+                    android:text="*"
+                    android:textSize="@dimen/_7sdp"
                     android:layout_width="@dimen/_5sdp"
                     android:layout_height="@dimen/_5sdp"
                     android:layout_gravity="left|center"
-                    android:src="@drawable/red_dot_icon"
                     android:visibility="visible" />
-            </LinearLayout>
+
+
+
+                <TextView
+
+                    android:layout_toLeftOf="@+id/totoal_onlle"
+                    android:id="@+id/online_wordcount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/colorGrey"
+                    android:textSize="@dimen/_13sdp" />
+                <TextView
+                    android:layout_marginRight="@dimen/_13sdp"
+                    android:layout_alignParentRight="true"
+                    android:id="@+id/totoal_onlle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="/120"
+                    android:textColor="@color/colorGrey"
+                    android:textSize="@dimen/_13sdp" />
+
+            </RelativeLayout>
 
 
             <EditText
+                android:maxLength="120"
                 android:id="@+id/edt_profile_description"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/edit_text_border"
+                android:background="@drawable/live_product_detail_grey_background"
                 android:hint="Describe your profile in one sentence"
                 android:paddingLeft="@dimen/_5sdp"
                 android:singleLine="true"
@@ -95,6 +127,7 @@
                 android:layout_marginTop="@dimen/_5sdp">
 
                 <TextView
+                    android:textColor="@color/colorGrey"
                     android:id="@+id/current_delivery_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -105,16 +138,20 @@
                     android:textSize="@dimen/_13sdp"
                     android:layout_marginLeft="12dp"
                     android:layout_alignParentLeft="true" />
-                <ImageView
-                    android:id="@+id/img_mandate_address"
+                <TextView
                     android:layout_toRightOf="@+id/current_delivery_tv"
+                    android:layout_marginBottom="@dimen/_2sdp"
+                    android:gravity="center"
+                    android:textColor="@color/colorRed"
+                    android:text="*"
+                    android:textSize="@dimen/_7sdp"
                     android:layout_width="@dimen/_5sdp"
                     android:layout_height="@dimen/_5sdp"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/red_dot_icon"
+                    android:layout_gravity="left|center"
                     android:visibility="visible" />
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/current_delivery_edit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -128,7 +165,24 @@
 
             </RelativeLayout>
 
+            <EditText
+                android:id="@+id/edt_profile_newaddress"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_80sdp"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:background="@drawable/live_product_detail_grey_background"
+                android:hint="Insert delivery address here"
+                android:paddingLeft="@dimen/_5sdp"
+                android:gravity="start"
+                android:paddingTop="@dimen/_5sdp"
+                android:singleLine="true"
+                android:textSize="@dimen/_12sdp" />
+
+
             <RelativeLayout
+                android:visibility="gone"
                 android:id="@+id/rel_current_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -136,8 +190,7 @@
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:background="@drawable/edit_text_border"
-                android:padding="@dimen/_5sdp"
-                android:visibility="gone">
+                android:padding="@dimen/_5sdp">
 
                 <TextView
                     android:id="@+id/current_delivery_name"
@@ -228,12 +281,15 @@
                 android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_13sdp" />
 
-            <ImageView
-                android:id="@+id/img_mandate_phone"
+            <TextView
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:gravity="center"
+                android:textColor="@color/colorRed"
+                android:text="*"
+                android:textSize="@dimen/_7sdp"
                 android:layout_width="@dimen/_5sdp"
                 android:layout_height="@dimen/_5sdp"
                 android:layout_gravity="left|center"
-                android:src="@drawable/red_dot_icon"
                 android:visibility="visible" />
         </LinearLayout>
 
@@ -253,12 +309,12 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="1.1"
-                    android:background="@drawable/edit_text_border"
+                    android:background="@drawable/live_product_detail_background"
                     android:gravity="center"
                     android:visibility="visible"
                     app:ccp_defaultNameCode="SG"
                     app:ccp_defaultPhoneCode="65"
-                    app:ccp_showFlag="true"
+                    app:ccp_showFlag="false"
                     app:ccp_showNameCode="false"
                     app:ccp_textSize="@dimen/_12sdp" />
 
@@ -270,7 +326,7 @@
                     android:layout_marginLeft="@dimen/_2sdp"
                     android:layout_toRightOf="@id/ccp"
                     android:layout_weight=".6"
-                    android:background="@drawable/edit_text_border"
+                    android:background="@drawable/live_product_detail_grey_background"
                     android:hint="(XXXX-XXXX)"
                     android:inputType="phone"
                     android:maxLength="15"
@@ -281,19 +337,20 @@
                     android:textSize="@dimen/_12sdp" />
 
                 <ImageView
+                    android:layout_marginLeft="@dimen/_2sdp"
                     android:id="@+id/img_edit"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="end"
                     android:layout_weight="1.32"
-                    android:background="@drawable/edit_text_border"
+                    android:background="@drawable/live_product_detail_background"
                     android:padding="@dimen/_4sdp"
                     android:src="@drawable/ic_edit_gray_24dp" />
             </LinearLayout>
 
 
             <RelativeLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp">
@@ -306,22 +363,38 @@
                     android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_13sdp" />
 
-                <ImageView
-                    android:layout_width="@dimen/_5sdp"
-                    android:layout_height="@dimen/_5sdp"
-                    android:layout_marginLeft="@dimen/_35sdp"
-                    android:src="@drawable/red_dot_icon"
-                    android:visibility="gone" />
+                <TextView
+
+                    android:layout_toLeftOf="@+id/totoal"
+                    android:id="@+id/about_wordcount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/colorGrey"
+                    android:textSize="@dimen/_13sdp" />
+                <TextView
+                    android:layout_marginRight="@dimen/_13sdp"
+                    android:layout_alignParentRight="true"
+                    android:id="@+id/totoal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="/500"
+                    android:textColor="@color/colorGrey"
+                    android:textSize="@dimen/_13sdp" />
+
+
             </RelativeLayout>
 
             <EditText
+                 android:maxLength="500"
+                android:paddingTop="@dimen/_5sdp"
                 android:id="@+id/edt_description"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_80sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/edit_text_border"
+                android:background="@drawable/live_product_detail_grey_background"
                 android:gravity="top"
                 android:hint="Describe yourself"
                 android:paddingLeft="@dimen/_5sdp"
@@ -334,18 +407,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="Shipping/Pick-up Policy"
+                android:text="Shipping/Pick up Policy"
                 android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_13sdp" />
 
             <EditText
+                android:paddingTop="@dimen/_5sdp"
                 android:id="@+id/edt_pickup_policy"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_80sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/edit_text_border"
+                android:background="@drawable/live_product_detail_grey_background"
                 android:gravity="top"
                 android:hint="E.g. Preferred pick-up location"
                 android:paddingLeft="@dimen/_5sdp"
@@ -357,18 +431,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="Return policy"
+                android:text="Return Policy"
                 android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_13sdp" />
 
             <EditText
+                android:paddingTop="@dimen/_5sdp"
                 android:id="@+id/edt_return_policy"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_80sdp"
                 android:layout_marginLeft="@dimen/_10sdp"
                 android:layout_marginRight="@dimen/_10sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="@drawable/edit_text_border"
+                android:background="@drawable/live_product_detail_grey_background"
                 android:gravity="top"
                 android:hint="E.g Returns accepted  within 7 days of delivery"
                 android:paddingLeft="@dimen/_5sdp"
@@ -395,8 +470,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_10sdp"
-                    android:text="Manage/Block Users"
-                    android:textColor="@color/colorBlack"
+                    android:text="Manage Block Users"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_13sdp" />
 
                 <TextView
@@ -425,7 +500,7 @@
                     android:layout_marginLeft="@dimen/_10sdp"
 
                     android:text="Password"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_13sdp" />
 
                 <TextView
@@ -454,7 +529,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:text="Delete Account"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_13sdp" />
 
                 <TextView

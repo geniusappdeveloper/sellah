@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cd_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="visible"
-    app:cardCornerRadius="@dimen/_6sdp"
-    app:cardElevation="5dp"
-    app:cardBackgroundColor="@color/colorTrans"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    android:orientation="vertical">
 
     <ProgressBar
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/pb_root"
@@ -22,30 +19,45 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:id="@+id/sv_root"
-        android:visibility="gone"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <LinearLayout
+            android:background="@drawable/round_border_testemonialheader"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ffffff"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
+                android:background="@drawable/round_border_testemonialheader"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@color/colorRed"
-                android:gravity="center">
+                android:layout_height="@dimen/_40sdp"
+                android:elevation="@dimen/_5sdp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/_12sdp"
+                    android:text="Choose Your Promotion Plan"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/_14sdp"
+                    />
 
                 <ImageView
-                    android:layout_width="@dimen/_160sdp"
-                    android:layout_height="@dimen/_160sdp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:layout_marginBottom="@dimen/_10sdp"
-                    android:background="@drawable/logo_welcome" />
-            </LinearLayout>
+                    android:id="@+id/btn_promote_cancel"
+                    android:tint="#c0c0c0"
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="9dp"
+                    android:padding="@dimen/_3sdp"
+                    android:src="@drawable/cross_icon"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
+
 
 
             <TextView
@@ -56,10 +68,10 @@
                 android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginBottom="@dimen/_3sdp"
                 android:paddingLeft="@dimen/_10sdp"
-                android:text="Choose Your Promotion Plan"
-                android:textColor="@color/colorBlack"
+                android:text="Advantages of choosing a promotion plan:"
+                android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_13sdp"
-                android:textStyle="bold" />
+                />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -85,9 +97,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/img_tick_1"
-                    android:text="Get your product featured on top"
-                    android:textColor="#000"
-                    android:textStyle="italic"
+                    android:text="Get your product featured on top of search result"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_12sdp" />
             </RelativeLayout>
             <LinearLayout
@@ -113,8 +124,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="Your product will get sold faster"
-                    android:textColor="#000"
-                    android:textStyle="italic"
+                    android:textColor="@color/colorGrey"
                     android:textSize="@dimen/_12sdp" />
             </LinearLayout>
            <!-- <LinearLayout
@@ -139,48 +149,6 @@
                     android:textStyle="italic"
                     android:textSize="@dimen/_12sdp" />
             </LinearLayout>-->
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_marginRight="@dimen/_8sdp"
-                android:layout_marginLeft="@dimen/_8sdp"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:padding="@dimen/_3sdp">
-
-                <TextView
-                    android:padding="@dimen/_3sdp"
-                    android:id="@+id/txt_offer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="6dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Packages"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="@dimen/_12sdp" />
-
-                <TextView
-                    android:id="@+id/txt_offer_price"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="No. of clicks"
-                    android:textColor="#000"
-                    android:textSize="@dimen/_12sdp" />
-
-                <TextView
-                    android:id="@+id/txt_offer_duration"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Validity"
-                    android:textColor="#000"
-                    android:textSize="@dimen/_12sdp" />
-            </LinearLayout>
             <!--<LinearLayout
                 android:layout_marginTop="@dimen/_35sdp"
                 android:padding="@dimen/_3sdp"
@@ -239,17 +207,45 @@
     -->
 
             <android.support.v7.widget.RecyclerView
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_12sdp"
+                android:layout_marginRight="@dimen/_12sdp"
                 android:id="@+id/rv_offer_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
-                android:layout_marginBottom="@dimen/_25sdp" />
+                 />
 
-            <RelativeLayout
+
+
+            <Button
+                android:id="@+id/promote_btn"
+                android:layout_marginLeft="@dimen/_12sdp"
+                android:layout_marginRight="@dimen/_12sdp"
+                android:textSize="@dimen/_13sdp"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:text="Choose this plan"
+                android:background="@drawable/live_btn_bg"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-            </RelativeLayout>
+            <Button
+                android:id="@+id/promote_laterbtn"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_7sdp"
+                android:layout_marginLeft="@dimen/_12sdp"
+                android:layout_marginRight="@dimen/_12sdp"
+                android:textSize="@dimen/_13sdp"
+                android:textAllCaps="false"
+                android:textColor="@color/colorRed"
+                android:text="Maybe Later "
+                android:background="@drawable/edit_profile_red_background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+
         </LinearLayout>
     </ScrollView>
-</android.support.v7.widget.CardView>
+</LinearLayout>

@@ -469,8 +469,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
     }
 
     private void StripConnect(MakeOfferViewHolder holder, int position) {
-        StripeAppmApp = new StripeApp(context, "geniusAppDeveloper", "ca_9bmLYpWBQDumLtFp2KZ7bE90kHjXS5le",
-                "sk_test_QW9KCbQ08S6BSGogNk3XKDTa", "https://developer.android.com", "read_write");
+        StripeAppmApp = new StripeApp(context, "geniusAppDeveloper", "ca_EWK1BYRqruSX1X92DbtLY8UiV46ADGoC",
+                "sk_test_HDkDbhty58uz3aaJi2TDllrR", "https://developer.android.com", "read_write");
 //        mStripeButton = (StripeButton) findViewById(R.id.btnStripeConnect);
         StripeButton btnStripeConnect = new StripeButton(context);
         btnStripeConnect.setStripeApp(StripeAppmApp);

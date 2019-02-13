@@ -91,9 +91,10 @@ public class MakeOfferDialog extends Dialog {
         getWindow().setGravity(Gravity.BOTTOM);
         setContentView(R.layout.layout_chat_order_dialog);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         webService = Global.WebServiceConstants.getRetrofitinstance();
         dialog = S_Dialogs.getLoadingDialog(context);
-        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         ButterKnife.bind(this);
         getForsaleList(otherUserId);
 

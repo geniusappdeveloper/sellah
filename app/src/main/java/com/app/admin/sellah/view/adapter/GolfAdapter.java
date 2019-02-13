@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.app.admin.sellah.controller.utils.Prodctfragment_click;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.app.admin.sellah.R;
@@ -22,9 +23,11 @@ public class GolfAdapter  extends PagerAdapter {
     private ArrayList<String> images;
     private LayoutInflater inflater;
     private Context context;
-    public GolfAdapter(Context context, ArrayList<String> images) {
+    Prodctfragment_click click;
+    public GolfAdapter(Context context, ArrayList<String> images,Prodctfragment_click click) {
         this.context = context;
         this.images=images;
+        this.click = click;
         inflater = LayoutInflater.from(context);
     }
     @Override
@@ -40,6 +43,8 @@ public class GolfAdapter  extends PagerAdapter {
         View myImageLayout = inflater.inflate(R.layout.product_detail_adapter_view, view, false);
         ImageView myImage = (ImageView) myImageLayout
                 .findViewById(R.id.image12);
+        ImageView playimg = (ImageView) myImageLayout
+                .findViewById(R.id.playimg);
         Log.e("image_array", "MyGolfAdapter: "+images);
        /* RequestOptions requestOptions = new RequestOptions();
         requestOptions.transform(new CircleCrop());
@@ -47,12 +52,23 @@ public class GolfAdapter  extends PagerAdapter {
         requestOptions.centerInside();
         requestOptions.placeholder(R.drawable.glide_error);
         requestOptions.error(R.drawable.glide_error);*/
+
+
+
+       if (images.get(position).contains("android.resource://com.app.admin.sellah/2131230895"))
+       {
+           playimg.setVisibility(View.VISIBLE);
+       }
+       else
+       {
+           playimg.setVisibility(View.GONE);
+       }
+        playimg.setOnClickListener(view1 -> click.onclick(true));
         RequestOptions requestOptions=Global.getGlideOptions();
         Glide.with(context)
                 .load(images.get(position))
                 .apply(requestOptions)
                 .into(myImage);
-
 //        myImage.setBackgroundResource(images.get(position).t);
         view.addView(myImageLayout);
         myImage.setOnClickListener(new View.OnClickListener() {

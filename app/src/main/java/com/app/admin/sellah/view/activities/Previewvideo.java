@@ -69,8 +69,7 @@ public class Previewvideo extends AppCompatActivity {
                 File file = new File(Global.videopath);
                 boolean deleted = file.delete();
                 Log.e( "onClick: ",""+deleted );
-                Intent intent = new Intent(Previewvideo.this,MainActivity.class);
-                startActivity(intent);
+                Global.videopath = "no_image";
                 finish();
 
             }

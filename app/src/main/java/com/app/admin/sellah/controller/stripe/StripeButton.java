@@ -77,6 +77,22 @@ public class StripeButton extends android.support.v7.widget.AppCompatTextView {
 				}
 				
 				if(mStripeApp.isConnected()) {
+
+
+                    if(mConnectMode == StripeApp.CONNECT_MODE.DIALOG) {
+                        mStripeApp.displayDialog();
+                    }
+                    else {
+                        Activity parent = (Activity) mContext;
+                        Intent i = new Intent(getContext(), StripeActivity.class);
+                        i.putExtra("url", mStripeApp.getAuthUrl());
+                        i.putExtra("callbackUrl", mStripeApp.getCallbackUrl());
+                        i.putExtra("tokenUrl", mStripeApp.getTokenUrl());
+                        i.putExtra("secretKey", mStripeApp.getSecretKey());
+                        i.putExtra("accountName", mStripeApp.getAccountName());
+                        parent.startActivityForResult(i, StripeApp.STRIPE_CONNECT_REQUEST_CODE);
+                    }
+
 					/*final AlertDialog.Builder builder = new AlertDialog.Builder(
 							mContext);
 					builder.setMessage(

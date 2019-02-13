@@ -104,9 +104,12 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardDe
                 holder.cardImage.setImageResource(R.drawable.credit_card_default);
                 break;
         }
-
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
     @Override
     public int getItemCount() {

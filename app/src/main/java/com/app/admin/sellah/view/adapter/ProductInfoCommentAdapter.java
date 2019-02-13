@@ -57,16 +57,17 @@ public class ProductInfoCommentAdapter extends RecyclerView.Adapter<ProductInfoC
     List<Result> list= new ArrayList<>();
 
 
-    public ProductInfoCommentAdapter(Context con,TextView seeall, CommentModel items, FragmentManager manager, String productId, CommentCallbacks callbacks) {
+    public ProductInfoCommentAdapter(Context con,TextView seealll, CommentModel items, FragmentManager manager, String productId, CommentCallbacks callbacks) {
         this.model = items;
         context = con;
         this.manager = manager;
         this.productId = productId;
         this.callbacks = callbacks;
-        this.seeall =seeall;
+        this.seeall =seealll;
 
         if (items.getResult().size()<2){
            this.items =model;
+
 
         }
 

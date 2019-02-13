@@ -199,40 +199,7 @@ public class AddCardDetails extends Fragment {
                             }
                         }
                         lastInput = edtCardExp.getText().toString();}
-            /*        Pattern pattern = Pattern.compile(EXP_DATE_REGAX);
-                    Matcher matcher = pattern.matcher(edtCardExp.getText().toString());
-                    String str_expiry_date;
-                    if(!matcher.find()){
-                        edtCardExp.setError("Invalid Expiry Date");
-                    }else{
-                        Calendar c = Calendar.getInstance();
 
-                        int year = c.get(Calendar.YEAR) % 100;
-                        int month = c.get(Calendar.MONTH)+1;
-
-                        if(Integer.parseInt((edtCardExp.getText().toString().substring(2)))>=year){
-
-                            if(Integer.parseInt((edtCardExp.getText().toString().substring(2)))==year){
-                                if(Integer.parseInt((edtCardExp.getText().toString().substring(0,2)))>=month){
-                                    str_expiry_date = edtCardExp.getText().toString();
-
-                                }else{
-                                    edtCardExp.setError("Invalid Expiry Date");
-                                }
-                            }else{
-                                str_expiry_date = edtCardExp.getText().toString();
-
-                            }
-
-
-                        }else{
-                            edtCardExp.setError("Invalid Expiry Date");
-                        }
-
-                        // dialog.dismiss();
-
-                    }*/
-//                    edtCardExp.setText(editable.toString());
                     callBack.oncardExpChangeListner(s.toString());
                 }
             };

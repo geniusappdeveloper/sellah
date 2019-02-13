@@ -1,6 +1,5 @@
 package com.app.admin.sellah.view.fragments;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,17 +9,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -31,21 +26,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.ImageUploadHelper;
 import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import com.app.admin.sellah.model.extra.EditProfileModel;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.app.admin.sellah.R;
 import com.app.admin.sellah.model.extra.ProfileModel.ProfileModel;
-import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,7 +55,6 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
 import static android.app.Activity.RESULT_OK;
-import static android.os.Build.VERSION_CODES.M;
 import static com.app.admin.sellah.controller.utils.Global.rotateImage;
 import static com.app.admin.sellah.controller.utils.ImageUploadHelper.REQUEST_CAPTURE_IMAGE;
 import static com.app.admin.sellah.controller.utils.ImageUploadHelper.createImageFile;
@@ -68,7 +63,7 @@ import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PROFILE_EDI
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
-public class MyAccountFragment extends Fragment{
+public class MyAccountFragment extends Fragment {
 
 
     ViewPager vpPager;
@@ -86,27 +81,33 @@ public class MyAccountFragment extends Fragment{
 
     @BindView(R.id.img_user_profile)
     ImageView img_user_profile;
+    @BindView(R.id.edtprofile_back)
+    ImageView edtprofileBack;
+    @BindView(R.id.txt_displatpicture)
+    TextView txtDisplatpicture;
+    @BindView(R.id.rl_displaypicture)
+    RelativeLayout rlDisplaypicture;
 
 
-    private int CAMERA_PIC_REQUEST=1213;
-    private int GALLERY=1214;
+    private int CAMERA_PIC_REQUEST = 1213;
+    private int GALLERY = 1214;
 
     public static String profileImagePathEdit;
 
     ProfileModel profileData;
     private WebService service;
-    private String cameraImageFilepath="";
+    private String cameraImageFilepath = "";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.my_account_fragment_details, container, false);
-        unbinder=ButterKnife.bind(this,view);
+        unbinder = ButterKnife.bind(this, view);
 
-        profileData=getArguments().containsKey(PROFILE_DATA)?getArguments().getParcelable(PROFILE_DATA):null;
-        service=Global.WebServiceConstants.getRetrofitinstance();
+        profileData = getArguments().containsKey(PROFILE_DATA) ? getArguments().getParcelable(PROFILE_DATA) : null;
+        service = Global.WebServiceConstants.getRetrofitinstance();
 
-        if(profileData!=null){
+        if (profileData != null) {
             setProfileData(profileData);
         }
 
@@ -128,20 +129,22 @@ public class MyAccountFragment extends Fragment{
         requestOptions.centerInside();
         requestOptions.placeholder(R.drawable.glide_error);
         requestOptions.error(R.drawable.glide_error);*/
-        RequestOptions requestOptions=Global.getGlideOptions();
+        RequestOptions requestOptions = Global.getGlideOptions();
 //        requestOptions.override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL);
+
+        Log.e("my prosetProfileData: ", profileData.getResult().getImage());
         try {
             Glide.with(getActivity())
                     .load(profileData.getResult().getImage())
                     .apply(requestOptions)
                     .into(img_user_profile);
-        }catch (Exception e){
-            Log.e("Exception", "setProfileData: "+e.getMessage() );
+        } catch (Exception e) {
+            Log.e("Exception", "setProfileData: " + e.getMessage());
         }
     }
 
     @OnClick(R.id.txt_change_profile_pic)
-    public void onPicChange(){
+    public void onPicChange() {
 
         PermissionCheckUtil.create(getActivity(), new PermissionCheckUtil.onPermissionCheckCallback() {
             @Override
@@ -189,18 +192,45 @@ public class MyAccountFragment extends Fragment{
 
     private void createViewPager(ViewPager viewPager) {
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
-        adapter.addFrag(new AccountTabFragment(profileData),"Account");
+        adapter.addFrag(new AccountTabFragment(profileData), "Account");
         adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Payment");
         adapter.addFrag(new SocialFragment(), "Social");
         viewPager.setAdapter(adapter);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if (position == 0) {
+
+                    txtDisplatpicture.setVisibility(View.VISIBLE);
+                    rlDisplaypicture.setVisibility(View.VISIBLE);
+
+                } else {
+                    txtDisplatpicture.setVisibility(View.GONE);
+                    rlDisplaypicture.setVisibility(View.GONE);
+
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
+
+
     public void hideSearch() {
 
         ((MainActivity) getActivity()).rel_search.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
-        ((MainActivity) getActivity()).text_sell.setText("My Account Details");
-        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).relativeLayout.setVisibility(View.GONE);
+
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).title_account.setVisibility(View.VISIBLE);
@@ -279,8 +309,8 @@ public class MyAccountFragment extends Fragment{
             //Create a file to store the image
             try {
                 photoFile = createImageFile(getActivity());
-                cameraImageFilepath=photoFile.getAbsolutePath();
-                Log.e("ImageUrl", "takePhotoFromCamera: "+cameraImageFilepath);
+                cameraImageFilepath = photoFile.getAbsolutePath();
+                Log.e("ImageUrl", "takePhotoFromCamera: " + cameraImageFilepath);
             } catch (IOException ex) {
                 // Error occurred while creating the File
 
@@ -301,9 +331,10 @@ public class MyAccountFragment extends Fragment{
             }
         }
     }
+
     private void choosePhotoFromGallary() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
         startActivityForResult(galleryIntent, GALLERY);
     }
@@ -346,16 +377,17 @@ public class MyAccountFragment extends Fragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        ((MainActivity) getActivity()).relativeLayout.setVisibility(View.GONE);
         if (requestCode == GALLERY) {
             if (data != null) {
                 Uri pickedImage = data.getData();
                 // Let's read picked image path using content resolver
-                String[] filePath = { MediaStore.Images.Media.DATA };
+                String[] filePath = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getActivity().getContentResolver().query(pickedImage, filePath, null, null, null);
                 cursor.moveToFirst();
                 String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
 
-                profileImagePathEdit=imagePath;
+                profileImagePathEdit = imagePath;
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
@@ -369,7 +401,7 @@ public class MyAccountFragment extends Fragment{
                 int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                         ExifInterface.ORIENTATION_UNDEFINED);
                 Bitmap rotatedBitmap;
-                switch(orientation) {
+                /*switch (orientation) {
 
                     case ExifInterface.ORIENTATION_ROTATE_90:
                         rotatedBitmap = rotateImage(bitmap, 90);
@@ -386,11 +418,12 @@ public class MyAccountFragment extends Fragment{
                     case ExifInterface.ORIENTATION_NORMAL:
                     default:
                         rotatedBitmap = bitmap;
-                }
-
+                }*/
+                Log.e( "onActivityResult: ",""+bitmap);
+                img_user_profile.setImageBitmap(bitmap);
                 updateProfile();
 
-                img_user_profile.setImageBitmap(rotatedBitmap);
+
                 // Do something with the bitmap
 
 
@@ -416,7 +449,7 @@ public class MyAccountFragment extends Fragment{
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             Uri tempUri = getImageUri(this.getActivity(), imageBitmap);
 
-            profileImagePathEdit=getRealPathFromURI(tempUri);
+            profileImagePathEdit = getRealPathFromURI(tempUri);
             ExifInterface ei = null;
             try {
                 ei = new ExifInterface(getRealPathFromURI(tempUri));
@@ -429,7 +462,7 @@ public class MyAccountFragment extends Fragment{
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap bitmap = BitmapFactory.decodeFile(getRealPathFromURI(tempUri), options);
             Bitmap rotatedBitmap;
-            switch(orientation) {
+            switch (orientation) {
 
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     rotatedBitmap = rotateImage(bitmap, 90);
@@ -459,7 +492,7 @@ public class MyAccountFragment extends Fragment{
             Uri tempUri = getImageUri(this.getActivity(), imageBitmap);
 
             profileImagePathEdit=getRealPathFromURI(tempUri);*/
-            profileImagePathEdit=cameraImageFilepath;
+            profileImagePathEdit = cameraImageFilepath;
       /*      ExifInterface ei = null;
             try {
                 ei = new ExifInterface(cameraImageFilepath);
@@ -497,13 +530,14 @@ public class MyAccountFragment extends Fragment{
 //            Toast.makeText(getActivity(), "Here " + getRealPathFromURI(tempUri), Toast.LENGTH_LONG).show();
         }
     }
+
     private void updateProfile() {
         EditProfileModel model = new EditProfileModel();
         model.setUser_id(RequestBody.create(MediaType.parse("text/plain"), String.valueOf(HelperPreferences.get(getActivity()).getString(UID))));
         model.setUsername(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setDescription(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setCountry_code(RequestBody.create(MediaType.parse("text/plain"), ""));
-        model.setPhone_number(RequestBody.create(MediaType.parse("text/plain"),""));
+        model.setPhone_number(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setAbout(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setShipping_policy(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setReturn_policy(RequestBody.create(MediaType.parse("text/plain"), ""));
@@ -515,15 +549,16 @@ public class MyAccountFragment extends Fragment{
         model.setAddress_city(RequestBody.create(MediaType.parse("text/plain"), ""));
         model.setEdit_mode(RequestBody.create(MediaType.parse("text/plain"), PROFILE_EDIT_MODE_IMAGE));
         if (!TextUtils.isEmpty(profileImagePathEdit)) {
-            Log.e("ImageUrl", "updateProfile: "+profileImagePathEdit);
+            Log.e("ImageUrl", "updateProfile: " + profileImagePathEdit);
             model.setImage(ImageUploadHelper.convertImageTomultipart(profileImagePathEdit, "image"));
         }
         new ApisHelper().updateProfileApi(model, getActivity(), new ApisHelper.UpdateProfileCallback() {
             @Override
             public void onProfileUpdateSuccess(String msg) {
-                Snackbar.make(li_myAccountRoot,"Profile picture updated.", Snackbar.LENGTH_SHORT)
+                Snackbar.make(li_myAccountRoot, "Profile picture updated.", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
             }
+
             @Override
             public void onProfileUpdateFailure() {
                 Snackbar.make(li_myAccountRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
@@ -531,6 +566,29 @@ public class MyAccountFragment extends Fragment{
             }
         });
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).relativeLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((MainActivity) getActivity()).relativeLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).relativeLayout.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.edtprofile_back)
+    public void onViewClicked() {
+        getActivity().onBackPressed();
     }
 }
 

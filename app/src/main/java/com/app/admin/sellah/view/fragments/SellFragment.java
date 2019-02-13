@@ -80,7 +80,6 @@ public class SellFragment extends Fragment {
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
-
         ((MainActivity) getActivity()).changeOptionColor(2);
     }
 

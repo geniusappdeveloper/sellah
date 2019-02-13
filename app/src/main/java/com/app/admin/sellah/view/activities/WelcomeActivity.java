@@ -49,11 +49,11 @@ public class WelcomeActivity extends AppCompatActivity {
         setContentView(R.layout.welcome_layout);
         ButterKnife.bind(this);
 
-        viewImagesArray.add(R.drawable.carlogo);
-        viewImagesArray.add(R.drawable.carlogo);
-        viewImagesArray.add(R.drawable.carlogo);
-        viewImagesArray.add(R.drawable.carlogo);
-        viewImagesArray.add(R.drawable.carlogo);
+        viewImagesArray.add(R.drawable.welcome1);
+        viewImagesArray.add(R.drawable.welcome2);
+        viewImagesArray.add(R.drawable.welcome3);
+        viewImagesArray.add(R.drawable.welcome4);
+        viewImagesArray.add(R.drawable.welcome5);
         init();
 
 

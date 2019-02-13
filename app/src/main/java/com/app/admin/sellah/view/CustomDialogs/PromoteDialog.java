@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -70,7 +71,7 @@ public class PromoteDialog extends AlertDialog {
     @BindView(R.id.sv_root)
     ScrollView svRoot;
     @BindView(R.id.cd_root)
-    CardView cdRoot;
+    LinearLayout cdRoot;
     private BottomSheetDialog bottomSheetDialog;
     WebService webService;
     private Dialog dialog;
@@ -268,7 +269,7 @@ public class PromoteDialog extends AlertDialog {
                     }).show();
                 });
 
-                LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+                LinearLayoutManager horizontalLayoutManager1 = new GridLayoutManager(context,2);
                 rvOfferList.setLayoutManager(horizontalLayoutManager1);
                 rvOfferList.setAdapter(adapter);
                 Global.getTotalHeightofLinearRecyclerView(context, rvOfferList, R.layout.layout_promote_offer_list_design, 0);

@@ -55,7 +55,7 @@ public class WelcomAdapter extends PagerAdapter {
 
         TextView text_sellah = (TextView) view.findViewById(R.id.txt_sellah);
         TextView text_sellah_main = (TextView) view.findViewById(R.id.txt_sellah_main);
-        imageView.setImageResource(viewImagesArray.get(0));
+        imageView.setImageResource(viewImagesArray.get(position));
         if (position==0)
         {
             text_sellah.setTextColor(Color.parseColor("#aaaaaa"));

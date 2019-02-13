@@ -9,7 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -115,14 +117,15 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
     RelativeLayout relAccountRoot;
     @BindView(R.id.img_edit)
     ImageView imgEdit;
-    @BindView(R.id.img_mandate_name)
-    ImageView imgMandateName;
-    @BindView(R.id.img_mandate_desc)
-    ImageView imgMandateDesc;
-    @BindView(R.id.img_mandate_address)
-    ImageView imgMandateAddress;
-    @BindView(R.id.img_mandate_phone)
-    ImageView imgMandatePhone;
+
+    @BindView(R.id.edt_profile_newaddress)
+    EditText edtProfileNewaddress;
+    @BindView(R.id.about_wordcount)
+    TextView aboutWordcount;
+    @BindView(R.id.online_wordcount)
+    TextView onlineWordcount;
+    @BindView(R.id.totoal)
+    TextView totoal;
     private Animation myAnim;
     private ArrayList<EditText> allAddressFields;
     private ArrayList<NoChangingBackgroundTextInputLayout> allAddressInputLayouts;
@@ -167,37 +170,48 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
         setUpCodepicker();
         rootview = ((MainActivity) getActivity()).relRoot;
         validateData();
+        focuslisteneres();
         return view;
 
     }
 
-    private void validateData(){
-        if (TextUtils.isEmpty(Global.getText(edtName))) {
-           imgMandateName.setVisibility(View.VISIBLE);
-        } else{
-            imgMandateName.setVisibility(View.GONE);
+    private void validateData() {
+        if (!TextUtils.isEmpty(edtDescription.getText().toString())) {
+            edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
         }
-        if (TextUtils.isEmpty(Global.getText(edtProfileDescription))) {
-           imgMandateDesc.setVisibility(View.VISIBLE);
-        } else {
-            imgMandateDesc.setVisibility(View.GONE);
+
+        if (!TextUtils.isEmpty(edtName.getText().toString())) {
+            edtName.setBackgroundResource(R.drawable.live_product_detail_background);
         }
-        if (TextUtils.isEmpty(addressName)) {
-           imgMandateAddress.setVisibility(View.VISIBLE);
-        }else{
-            imgMandateAddress.setVisibility(View.GONE);
+
+        if (!TextUtils.isEmpty(edtProfileDescription.getText().toString())) {
+            edtProfileDescription.setBackgroundResource(R.drawable.live_product_detail_background);
         }
-        if (TextUtils.isEmpty(Global.getText(etPhoneNum))) {
-           imgMandatePhone.setVisibility(View.VISIBLE);
-        }else{
-            imgMandatePhone.setVisibility(View.GONE);
+
+        if (!TextUtils.isEmpty(edtProfileNewaddress.getText().toString())) {
+            edtProfileNewaddress.setBackgroundResource(R.drawable.live_product_detail_background);
+        }
+        if (!TextUtils.isEmpty(etPhoneNum.getText().toString())) {
+            etPhoneNum.setBackgroundResource(R.drawable.live_product_detail_background);
+        }
+        if (!TextUtils.isEmpty(edtDescription.getText().toString())) {
+            edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+        }
+        if (!TextUtils.isEmpty(edtReturnPolicy.getText().toString())) {
+            edtReturnPolicy.setBackgroundResource(R.drawable.live_product_detail_background);
+        }
+
+        if (!TextUtils.isEmpty(edtPickupPolicy.getText().toString())) {
+            edtPickupPolicy.setBackgroundResource(R.drawable.live_product_detail_background);
         }
     }
+
 
     private void setdata(ProfileModel profileData) {
 
         edtName.setText(profileData.getResult().getUsername());
         edtProfileDescription.setText(profileData.getResult().getDescription());
+        edtProfileNewaddress.setText(profileData.getResult().getAddressName());
         if (!TextUtils.isEmpty(profileData.getResult().getAddressName())) {
             addressName = (profileData.getResult().getAddressName());
             addressline1 = (profileData.getResult().getAddress1());
@@ -223,7 +237,10 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
         edtDescription.setText(profileData.getResult().getAbout());
         edtPickupPolicy.setText(profileData.getResult().getShippingPolicy());
         edtReturnPolicy.setText(profileData.getResult().getReturnPolicy());
+        onlineWordcount.setText(String.valueOf(profileData.getResult().getDescription().length()));
+        aboutWordcount.setText(String.valueOf(profileData.getResult().getAbout().length()));
     }
+    
 
     private void setUpCodepicker() {
         ccp.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
@@ -240,9 +257,9 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
 
     private void setAddress() {
         if (!TextUtils.isEmpty(addressName)) {
-            currentDeliveryEdit.setText("EDIT");
-            relCurrentAddress.setVisibility(View.VISIBLE);
-            currentDeliveryName.setText(addressName + ",");
+
+            relCurrentAddress.setVisibility(View.GONE);
+            edtProfileNewaddress.setText(addressName);
             currentDeliveryAddressLine1.setText(addressline1 + ", ");
             currentDeliveryAddressLine2.setText(addressline2 + ", ");
             currentDeliveryState.setText(addressState);
@@ -477,17 +494,17 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
             }
         });
         dialog.show();*/
-       new ApisHelper().sendOtpChangePassApi(getActivity(), new ApisHelper.OTPSentCallBack() {
-           @Override
-           public void onOTPSentSuccess(ResendCode body) {
-               ChangePassDialog.create(getActivity(),body.getResult().getVerificationCode()).show();
-           }
+        new ApisHelper().sendOtpChangePassApi(getActivity(), new ApisHelper.OTPSentCallBack() {
+            @Override
+            public void onOTPSentSuccess(ResendCode body) {
+                ChangePassDialog.create(getActivity(), body.getResult().getVerificationCode()).show();
+            }
 
-           @Override
-           public void onOTPSentFailure() {
+            @Override
+            public void onOTPSentFailure() {
 
-           }
-       });
+            }
+        });
 //        ChangePassDialog.create(getActivity()).show();
 
     }
@@ -598,7 +615,7 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
             Snackbar.make(rootview, "Please enter one line description.", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
             Global.requestFocus(getActivity(), edtProfileDescription);
-        } else if (TextUtils.isEmpty(addressName)) {
+        } else if (TextUtils.isEmpty(edtProfileNewaddress.getText().toString())) {
             Snackbar.make(rootview, "Please add address.", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
             Global.requestFocus(getActivity(), edtProfileDescription);
@@ -633,7 +650,7 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
             model.setAbout(RequestBody.create(MediaType.parse("text/plain"), Global.getText(edtDescription)));
             model.setShipping_policy(RequestBody.create(MediaType.parse("text/plain"), Global.getText(edtPickupPolicy)));
             model.setReturn_policy(RequestBody.create(MediaType.parse("text/plain"), Global.getText(edtReturnPolicy)));
-            model.setAddress_name(RequestBody.create(MediaType.parse("text/plain"), addressName));
+            model.setAddress_name(RequestBody.create(MediaType.parse("text/plain"), edtProfileNewaddress.getText().toString()));
             model.setAddress_1(RequestBody.create(MediaType.parse("text/plain"), addressline1));
             model.setAddress_2(RequestBody.create(MediaType.parse("text/plain"), addressline2));
             model.setPostal_code(RequestBody.create(MediaType.parse("text/plain"), addresspostalCode));
@@ -722,12 +739,12 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
 
     @OnClick(R.id.img_edit)
     public void onEditPhoneNumberClicked() {
-        String actualPhoneNo= ccp.getFullNumberWithPlus().substring(ccp.getSelectedCountryCodeWithPlus().length());
-        Log.e("ccp_number", "signupClick: "+actualPhoneNo);
+        String actualPhoneNo = ccp.getFullNumberWithPlus().substring(ccp.getSelectedCountryCodeWithPlus().length());
+        Log.e("ccp_number", "signupClick: " + actualPhoneNo);
 
-        if(ccp.isValidFullNumber()){
+        if (ccp.isValidFullNumber()) {
             updatePhoneApi(actualPhoneNo, ccp.getSelectedCountryCodeWithPlus());
-        }else{
+        } else {
             Snackbar.make(rootview, "Invalid phone number.", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
         }
@@ -806,13 +823,193 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
         });
     }
 
+    private void focuslisteneres() {
 
-    /*private void setUpPinView() {
-        otpView.setPinViewEventListener((pinView, fromUser) -> {
-            Global.hideKeyboard(getActivity().getWindow().getDecorView(), getActivity());
-            String enteredPin = pinView.getValue();
-            mEnteredOTP = Integer.valueOf(enteredPin);
+        edtName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (b) {
+                    edtName.setBackgroundResource(R.drawable.live_product_detail_red_background);
+                } else {
+                    if (edtName != null)
+                        edtName.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
         });
-    }*/
+
+
+        edtProfileDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (b) {
+                    edtProfileDescription.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    if (edtProfileDescription != null)
+                        edtProfileDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+        edtProfileNewaddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (b) {
+                    edtProfileNewaddress.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+                } else {
+                    if (edtProfileNewaddress != null)
+                        edtProfileNewaddress.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+        etPhoneNum.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+
+                if (b) {
+                    etPhoneNum.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    if (etPhoneNum != null)
+                        etPhoneNum.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+
+        edtDescription.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+
+                if (b) {
+                    edtDescription.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    if (edtDescription != null)
+                        edtDescription.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+        edtPickupPolicy.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (b) {
+                    edtPickupPolicy.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    if (edtPickupPolicy != null)
+
+                        edtPickupPolicy.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+
+        edtReturnPolicy.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+
+                if (b) {
+                    edtReturnPolicy.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    if (edtPickupPolicy != null)
+                        edtReturnPolicy.setBackgroundResource(R.drawable.live_product_detail_background);
+
+                }
+            }
+        });
+
+        edtProfileDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                onlineWordcount.setText(String.valueOf(charSequence.length()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        edtDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                aboutWordcount.setText(String.valueOf(charSequence.length()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+
+    }
+
+
+    public void check() {
+
+        if (TextUtils.isEmpty(edtDescription.getText().toString())) {
+            edtDescription.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtName.getText().toString())) {
+            edtName.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtProfileDescription.getText().toString())) {
+            edtProfileDescription.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtProfileNewaddress.getText().toString())) {
+            edtProfileNewaddress.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+        if (TextUtils.isEmpty(etPhoneNum.getText().toString())) {
+            etPhoneNum.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+        if (TextUtils.isEmpty(edtDescription.getText().toString())) {
+            edtDescription.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+
+        if (TextUtils.isEmpty(edtPickupPolicy.getText().toString())) {
+            edtPickupPolicy.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+        if (TextUtils.isEmpty(edtReturnPolicy.getText().toString())) {
+            edtReturnPolicy.setBackgroundResource(R.drawable.live_product_detail_grey_background);
+        }
+    }
+
+
 }
 

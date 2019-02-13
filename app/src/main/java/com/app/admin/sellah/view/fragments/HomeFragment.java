@@ -172,6 +172,7 @@ public class HomeFragment extends Fragment {
     NotificationListModel notificationListModel;
     Call<GetProductList> addCommentCall;
     Call<GetProductList> getProductsCall;
+    Call<NotificationListModel> notificationListCall;
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -222,7 +223,6 @@ public class HomeFragment extends Fragment {
         ((MainActivity) getActivity()).notificationRelativelayout.findViewById(R.id.notification_relativelayout).setOnClickListener(view1 -> {
 
             if (isLogined(getActivity())) {
-
 
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(SAConstants.Keys.NOTI_KEY, notificationListModel);
@@ -947,7 +947,7 @@ public class HomeFragment extends Fragment {
 
     private void getNotificationList() {
 
-        Call<NotificationListModel> notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
+         notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
         notificationListCall.enqueue(new Callback<NotificationListModel>() {
             @Override
             public void onResponse(Call<NotificationListModel> call, Response<NotificationListModel> response) {
@@ -991,8 +991,12 @@ public class HomeFragment extends Fragment {
         if (getProductsCall!=null)
         {getProductsCall.cancel();}
         new ApisHelper().cancel_banner_request();
+        if (notificationListCall!=null)
+            notificationListCall.cancel();
 
     }
+
+
 
 
 

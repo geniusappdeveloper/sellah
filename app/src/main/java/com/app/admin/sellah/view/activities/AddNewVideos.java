@@ -1,6 +1,7 @@
 package com.app.admin.sellah.view.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,6 +42,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import droidninja.filepicker.FilePickerActivity;
+import droidninja.filepicker.FilePickerBuilder;
+import droidninja.filepicker.FilePickerConst;
 
 import static android.os.Build.VERSION_CODES.M;
 import static com.app.admin.sellah.controller.utils.Global.StatusBarLightMode;
@@ -77,6 +81,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
     List<String> imageList = new ArrayList<>();
     NewProductAddvideo_Adapter newProductAdapter;
     Add_Product_Cars_Adapter add_product_cars_adapter;
+    ArrayList<String> filepaths;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,9 +144,19 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
                 break;
             case R.id.addnewvideo_btn_nxt:
                 AddProductDatabase.imageListG.clear();
-                AddProductDatabase.imageListG.addAll(imageList);
-                Intent intent = new Intent(AddNewVideos.this, AddNewInfo.class);
-                startActivity(intent);
+                AddProductDatabase.imageListG.addAll(filepaths);
+                if (filepaths.isEmpty())
+                {
+                    Toast.makeText(this, "Please select atleast one image!", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Intent intent = new Intent(AddNewVideos.this, AddNewInfo.class);
+                    startActivity(intent
+
+                    );
+                }
+
                 break;
         }
 
@@ -149,7 +164,15 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
     }
 
     private void showPictureDialog() {
-        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
+
+
+       new FilePickerBuilder().getInstance().setMaxCount(5)
+                .setSelectedFiles(filepaths)
+                .setActivityTheme(R.style.LibAppTheme)
+                .pickPhoto(this);
+
+
+     /*   AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
         pictureDialog.setTitle("Select Action");
         String[] pictureDialogItems = {
                 "Add from your gallery",
@@ -170,7 +193,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
                     }
 
                 });
-        pictureDialog.show();
+        pictureDialog.show();*/
     }
 
     private void takePhotoFromCamera() {
@@ -182,6 +205,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
     private void choosePhotoFromGallary() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
 
         startActivityForResult(galleryIntent, GALLERY);
     }
@@ -202,6 +226,21 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+
+        switch (requestCode) {
+            case FilePickerConst.REQUEST_CODE_PHOTO:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    filepaths = new ArrayList<>();
+                    filepaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
+
+                    add_product_cars_adapter = new Add_Product_Cars_Adapter(this, filepaths, this);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                    recycler.setLayoutManager(layoutManager);
+                    recycler.setAdapter(add_product_cars_adapter);
+                    add_product_cars_adapter.notifyDataSetChanged();
+                }
+                break;
+        }
         if (requestCode == GALLERY) {
             if (data != null) {
                 Uri contentURI = data.getData();
@@ -211,11 +250,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 //                    Toast.makeText(getActivity(), "Image Saved!", Toast.LENGTH_SHORT).show();
 
                     imageList.add(getRealPathFromURI(tempUri));
-                    add_product_cars_adapter = new Add_Product_Cars_Adapter(this, imageList, this);
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-                    recycler.setLayoutManager(layoutManager);
-                    recycler.setAdapter(add_product_cars_adapter);
-                    add_product_cars_adapter.notifyDataSetChanged();
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -260,6 +295,9 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 
         Intent intent = new Intent(AddNewVideos.this, Video_capture_activity.class);
         startActivity(intent);
+
+
+
     }
 
     @Override

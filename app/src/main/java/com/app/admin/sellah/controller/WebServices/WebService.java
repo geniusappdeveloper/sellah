@@ -409,6 +409,11 @@ public interface WebService {
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("get_product_detail")
+    Call<JsonObject> getProductDetail1(@Field("user_id") String userId, @Field("product_id") String productId);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("live_video_filter")
     Call<LiveVideoModel> getliveVideoFilter(@Field("cat_id") String catId);
 

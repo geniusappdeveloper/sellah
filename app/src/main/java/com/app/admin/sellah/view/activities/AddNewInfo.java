@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +32,7 @@ import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SellProductInterface;
+import com.app.admin.sellah.controller.utils.Validations;
 import com.app.admin.sellah.model.AddProductDatabase;
 import com.app.admin.sellah.model.extra.Categories.GetCategoriesModel;
 import com.app.admin.sellah.view.CustomDialogs.Add_New_Product_tutorial_secondDialog;
@@ -124,7 +127,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
     ArrayList<String> tagList = new ArrayList<>();
     AddProductTagsAdapter addProductTagsAdapter;
 
-
+    TextWatcher priceTextWacher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,6 +138,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
         spinneradapters();
         focuslisteneres();
+        setTextWacher();
         setUpTagLayoutAdapter();
             getdata();
 
@@ -369,16 +373,21 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
                 break;
             case R.id.add_info_post:
+                adddata();
+                boolean validations = new Validations().productinfo_validate(AddNewInfo.this,edtProductName.getText().toString(),spinnerCatagory.getSelectedItem().toString(),spinnerSubCatagory.getSelectedItem().toString(),edtPrice.getText().toString(),spinFixedPrice.getSelectedItem().toString(),spinCondition.getSelectedItem().toString(),edtQuantity.getText().toString());
+                if (validations) {
 
-                 adddata();
-                Intent intent = new Intent(AddNewInfo.this, AddNewTransaction.class);
-                startActivity(intent);
+
+                    Intent intent = new Intent(AddNewInfo.this, AddNewTransaction.class);
+                    startActivity(intent);
+
+                }
+
                 break;
         }
     }
 
     private void setUpTagLayoutAdapter() {
-
 
         //tags set Adapter
         addProductTagsAdapter = new AddProductTagsAdapter(tagList, this, this);
@@ -591,6 +600,72 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
 
     }
+
+    private void setTextWacher() {
+
+        edtPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String str = edtPrice.getText().toString();
+                if (str.isEmpty()) return;
+                String str2 = PerfectDecimal(str, 3, 2);
+
+                if (!str2.equals(str)) {
+                    edtPrice.setText(str2);
+                    int pos = edtPrice.getText().length();
+                    edtPrice.setSelection(pos);
+                }
+
+            }
+        });
+
+
+           /* checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        isPromotingProduct = "Y";
+                    } else {
+                        isPromotingProduct = "N";
+                    }
+                }
+            });*/
+    }
+
+    public String PerfectDecimal(String str, int MAX_BEFORE_POINT, int MAX_DECIMAL){
+        if(str.charAt(0) == '.') str = "0"+str;
+        int max = str.length();
+
+        String rFinal = "";
+        boolean after = false;
+        int i = 0, up = 0, decimal = 0; char t;
+        while(i < max){
+            t = str.charAt(i);
+            if(t != '.' && after == false){
+                up++;
+                if(up > MAX_BEFORE_POINT) return rFinal;
+            }else if(t == '.'){
+                after = true;
+            }else{
+                decimal++;
+                if(decimal > MAX_DECIMAL)
+                    return rFinal;
+            }
+            rFinal = rFinal + t;
+            i++;
+        }return rFinal;
+    }
+
 
 
 }

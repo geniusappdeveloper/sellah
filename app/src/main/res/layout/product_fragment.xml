@@ -117,6 +117,7 @@
                             />
 
                         <TextView
+                            android:id="@+id/edit_quanitity"
                             android:padding="@dimen/_3sdp"
                             android:background="@color/colorRed"
                             android:layout_marginTop="@dimen/_10sdp"
@@ -142,6 +143,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:padding="@dimen/_2sdp"
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -824,14 +826,5 @@
         android:layout_height="@dimen/_40sdp" />
 
     <!--do after thumbnail -->
-    <ImageView
-        android:visibility="gone"
-        android:layout_marginRight="@dimen/_8sdp"
-        android:layout_alignParentRight="true"
-        android:id="@+id/isvideo_icon"
-        android:tint="@color/colorRed"
-        android:src="@drawable/video_indicator_icon"
-        android:layout_width="40dp"
-        android:layout_height="@dimen/_20sdp" />
 
 </RelativeLayout>

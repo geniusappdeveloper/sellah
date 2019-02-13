@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
     <SurfaceView
         android:id="@+id/surface_camera"
@@ -25,15 +26,33 @@
         android:progressDrawable="@drawable/circular_back" />
 
 
-    <Button
-        android:background="@drawable/rec"
+    <RelativeLayout
         android:layout_marginBottom="13dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/video"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_gravity="center" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:background="@drawable/recording_button_stroke"
+            android:id="@+id/video"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/anim_ciricleimage"
+            android:src="@drawable/rec"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="60dp" />
+
+
+
+
+    </RelativeLayout>
 
 
 

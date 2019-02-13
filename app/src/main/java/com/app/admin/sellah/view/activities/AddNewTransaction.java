@@ -348,7 +348,6 @@ public class AddNewTransaction extends AppCompatActivity {
                 break;
             case R.id.add_product_post:
 
-
                 Global.hideKeyboard(rootTag, this);
                 imageList.addAll(AddProductDatabase.imageListG);
                 if (imageList.size() == 0) {
@@ -556,10 +555,11 @@ public class AddNewTransaction extends AppCompatActivity {
 
                                         Toast.makeText(AddNewTransaction.this, "Product promoted successfully.", Toast.LENGTH_SHORT).show();
                                         getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
-
+                                        Log.e( "onPaymentSuccess: ",response.body().getResult().get(0).getId() );
                                         Intent intent = new Intent(AddNewTransaction.this,MainActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0));
+                                        intent.putExtra("id",response.body().getResult().get(0).getId());
+                                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0).getId());
 
                                         startActivity(intent);
 

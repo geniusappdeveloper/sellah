@@ -4,14 +4,11 @@ import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,8 +23,9 @@ import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
-import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.controller.utils.OnSwipeTouchListener;
+import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.Record;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
 import com.app.admin.sellah.model.extra.SwipeHelper;
@@ -38,7 +36,10 @@ import com.app.admin.sellah.view.adapter.MessageListAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_ACCEPT_REJECT;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_CHAT;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_COMMENT_ADDED;
@@ -54,11 +55,14 @@ public class MessageFragment extends Fragment {
     //Mess recycler
     TextView txtNewMessage, txtMessage;
 
-    RecyclerView messRecycler,ongoingrecycler;
+    RecyclerView messRecycler, ongoingrecycler;
 
     //New Mess Recycler
     RecyclerView newMessRecycler;
     TextWatcher searchWatcher;
+    @BindView(R.id.rel_root_noti)
+    RelativeLayout relRootNoti;
+    Unbinder unbinder;
     private View view;
     private MessageListAdapter oldMsgAdapter;
     private MessageListAdapter newMsgAdapter;
@@ -66,6 +70,7 @@ public class MessageFragment extends Fragment {
     private ChattedListModel oldMsgList;
     private String TAG = MessageFragment.class.getSimpleName();
     CardView actionButton;
+
     public MessageFragment() {
         // Required empty public constructor
     }
@@ -80,6 +85,7 @@ public class MessageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_message, container, false);
+        unbinder = ButterKnife.bind(this, view);
         messRecycler = view.findViewById(R.id.message_recycler);
         messRecycler = view.findViewById(R.id.message_recycler);
         newMessRecycler = view.findViewById(R.id.new_message_recycler);
@@ -150,17 +156,23 @@ public class MessageFragment extends Fragment {
             }
         };
 
+       /* actionButton.setOnTouchListener(new OnSwipeTouchListener(getActivity())
+        {
+            @Override
+            public void onSwipeLeft() {
+                super.onSwipeLeft();
+                Log.e( "onSwipeLeft: ","w" );
+                getActivity().onBackPressed();
+            }
+        });*/
 
 
-
-
-        ongoingadapter = new MessageListAdapter( getActivity(),3);
+        ongoingadapter = new MessageListAdapter(getActivity(), 3);
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         ongoingrecycler.setLayoutManager(horizontalLayoutManager);
         ongoingrecycler.setAdapter(ongoingadapter);
 
         getChatedListApi();
-
 
 
 
@@ -173,7 +185,7 @@ public class MessageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(getUserVisibleHint()){
+        if (getUserVisibleHint()) {
             getChatedListApi();
         }
     }
@@ -209,7 +221,7 @@ public class MessageFragment extends Fragment {
         List<Record> filteredList = new ArrayList<>();
         for (Record row : oldMsgList.getRecord()) {
             // name match condition. this might differ depending on your requirement
-            if (row.getFriendName().toLowerCase().contains(text.toLowerCase())&&!row.getIsRead().equalsIgnoreCase("Y")) {
+            if (row.getFriendName().toLowerCase().contains(text.toLowerCase()) && !row.getIsRead().equalsIgnoreCase("Y")) {
                 filteredList.add(row);
                 Log.e(TAG, "filterMessages: found");
             } else {
@@ -239,9 +251,11 @@ public class MessageFragment extends Fragment {
         //calling a method of the adapter class and passing the filtered list
         if (newMsgAdapter.getItemCount() != 0) {
             txtNewMessage.setVisibility(View.VISIBLE);
+            ((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
             return false;
         } else {
             txtNewMessage.setVisibility(View.GONE);
+            ((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
             return true;
         }
         //new array list that will hold the filtered data
@@ -264,13 +278,14 @@ public class MessageFragment extends Fragment {
         }*/
 //       return false;
     }
+
     private boolean filterMessages(String text) {
 
         ChattedListModel filterModel = new ChattedListModel();
         List<Record> filteredList = new ArrayList<>();
         for (Record row : oldMsgList.getRecord()) {
             // name match condition. this might differ depending on your requirement
-            if (row.getFriendName().toLowerCase().contains(text.toLowerCase())&&row.getIsRead().equalsIgnoreCase("Y")) {
+            if (row.getFriendName().toLowerCase().contains(text.toLowerCase()) && row.getIsRead().equalsIgnoreCase("Y")) {
                 filteredList.add(row);
                 Log.e(TAG, "filterMessages: found");
             } else {
@@ -331,6 +346,7 @@ public class MessageFragment extends Fragment {
         super.onDestroyView();
        /* ((MainActivity) getActivity()).searchEditText.removeTextChangedListener(searchWatcher);
         ((MainActivity) getActivity()).searchEditText.setText("");*/
+        unbinder.unbind();
     }
 
     @Override
@@ -363,7 +379,8 @@ public class MessageFragment extends Fragment {
     }
 
     private void onCickListners() {
-        actionButton.setOnClickListener(view1 -> {getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new StreamedVideosFragment()).addToBackStack(null).commit();
+        actionButton.setOnClickListener(view1 -> {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new StreamedVideosFragment()).addToBackStack(null).commit();
         });
     }
 
@@ -402,6 +419,7 @@ public class MessageFragment extends Fragment {
             }
         }
     };
+
     private void getChatedListApi() {
         new ApisHelper().getChattedUsersListApi(getActivity(), new ApisHelper.OnGetChatedListDataListners() {
             @Override
@@ -420,11 +438,11 @@ public class MessageFragment extends Fragment {
         });
     }
 
-    private void setupOldMessageList(ChattedListModel body) throws Exception{
+    private void setupOldMessageList(ChattedListModel body) throws Exception {
 
         oldMsgList = body;
-        List<Record> oldMsgList1=new ArrayList<>();
-        List<Record> newMsgList=new ArrayList<>();
+        List<Record> oldMsgList1 = new ArrayList<>();
+        List<Record> newMsgList = new ArrayList<>();
         for (Record row : body.getRecord()) {
             // name match condition. this might differ depending on your requirement
             if (row.getIsRead().equalsIgnoreCase("Y")) {
@@ -435,17 +453,17 @@ public class MessageFragment extends Fragment {
                 Log.e(TAG, "filterMessages: Not old");
             }
         }
-        if(newMsgList!=null&&newMsgList.size()>0){
-            ((NotificationFragment)getParentFragment()).messageImage.setVisibility(View.VISIBLE);
-        }else{
-            ((NotificationFragment)getParentFragment()).messageImage.setVisibility(View.GONE);
+        if (newMsgList != null && newMsgList.size() > 0) {
+            ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.VISIBLE);
+        } else {
+            ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.GONE);
         }
-        if(oldMsgList1!=null&&oldMsgList1.size()>0){
+        if (oldMsgList1 != null && oldMsgList1.size() > 0) {
             txtMessage.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             txtMessage.setVisibility(View.GONE);
         }
-        oldMsgAdapter = new MessageListAdapter(oldMsgList1, getActivity(), 0,getActivity().getSupportFragmentManager());
+        oldMsgAdapter = new MessageListAdapter(oldMsgList1, getActivity(), 0, getActivity().getSupportFragmentManager());
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         messRecycler.setLayoutManager(horizontalLayoutManager);
         messRecycler.setAdapter(oldMsgAdapter);
@@ -453,23 +471,23 @@ public class MessageFragment extends Fragment {
         new SwipeHelper(getActivity(), messRecycler) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                underlayButtons.add(new UnderlayButton(
                         "Delete",
                         0,
                         Color.parseColor("#666666"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
+                        new UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                Log.e(TAG, "onClick: Delete" );
+                                Log.e(TAG, "onClick: Delete");
                             }
                         }
                 ));
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                underlayButtons.add(new UnderlayButton(
                         "Report",
                         0,
                         Color.parseColor("#ffc53e"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
+                        new UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
@@ -494,26 +512,28 @@ public class MessageFragment extends Fragment {
             }
         };
 
-        newMsgAdapter = new MessageListAdapter(newMsgList, getActivity(), 0,getActivity().getSupportFragmentManager());
+        newMsgAdapter = new MessageListAdapter(newMsgList, getActivity(), 0, getActivity().getSupportFragmentManager());
 //        notificationMessAdapter = new NotificationActivityAdapter(notificationMessList, getActivity(), 0);
         LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         newMessRecycler.setLayoutManager(horizontalLayoutManager1);
         newMessRecycler.setAdapter(newMsgAdapter);
         Global.getTotalHeightofLinearRecyclerView(getActivity(), newMessRecycler, R.layout.notification_mess_adapter, 0);
-        if(newMsgList!=null&&newMsgList.size()>0){
+        if (newMsgList != null && newMsgList.size() > 0) {
             txtNewMessage.setVisibility(View.VISIBLE);
-        }else{
+            ((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
+        } else {
             Global.getTotalHeightofLinearRecyclerView(getActivity(), newMessRecycler, R.layout.notification_mess_adapter, 0);
             txtNewMessage.setVisibility(View.GONE);
+            ((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
         }
         new SwipeHelper(getActivity(), newMessRecycler) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                underlayButtons.add(new UnderlayButton(
                         "Delete",
                         0,
                         Color.parseColor("#E35252"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
+                        new UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
@@ -521,11 +541,11 @@ public class MessageFragment extends Fragment {
                             }
                         }
                 ));
-                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                underlayButtons.add(new UnderlayButton(
                         "Report",
                         0,
                         Color.parseColor("#EEC12D"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
+                        new UnderlayButtonClickListener() {
                             @Override
                             public void onClick(int pos) {
                                 Log.e(TAG, "onClick: Report");

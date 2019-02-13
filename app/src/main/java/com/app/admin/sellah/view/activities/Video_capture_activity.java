@@ -19,7 +19,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -30,20 +33,32 @@ import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import java.io.File;
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
 
 public class Video_capture_activity extends AppCompatActivity implements SurfaceHolder.Callback {
+    @BindView(R.id.surface_camera)
+    SurfaceView surfaceCamera;
+    @BindView(R.id.progressbar)
+    ProgressBar progressbar;
+
+    @BindView(R.id.anim_ciricleimage)
+    ImageView animCiricleimage;
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
     public MediaRecorder mrec = new MediaRecorder();
     Button mbutton;
     ProgressBar mProgressBar;
     CountDownTimer mCountDownTimer;
-    int i=0;
+    int i = 0;
     File video;
     private Camera mCamera;
-    boolean isActionDown,isstopped;
-    private int mOrientation=0;
+    boolean isActionDown, isstopped;
+    private int mOrientation = 0;
 
 
     @Override
@@ -52,9 +67,10 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
         makeTransperantStatusBar(this, true);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_videocapture);
-
-        mbutton = (Button)findViewById(R.id.video);
-        mProgressBar=(ProgressBar)findViewById(R.id.progressbar);
+        ButterKnife.bind(this);
+        final Animation anim = AnimationUtils.loadAnimation(this, R.anim.grow);
+        mbutton = (Button) findViewById(R.id.video);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar);
         mProgressBar.setProgress(i);
 
         PermissionCheckUtil.create(this, new PermissionCheckUtil.onPermissionCheckCallback() {
@@ -73,7 +89,7 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
                         break;
                     }
                 }
-                setCameraDisplayOrientation(Video_capture_activity.this,cameraId,mCamera);
+                setCameraDisplayOrientation(Video_capture_activity.this, cameraId, mCamera);
                 surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
                 surfaceHolder = surfaceView.getHolder();
 
@@ -96,31 +112,34 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
                 try {
 
                     isActionDown = true;
+                    animCiricleimage.setVisibility(View.VISIBLE);
+                    animCiricleimage.setAnimation(anim);
                     startRecording();
                 } catch (Exception e) {
                     String message = e.getMessage();
                     Log.i(null, "Problem Start" + message);
                     mrec.release();
                 }
-                mCountDownTimer=new CountDownTimer(10000,1000) {
+                mCountDownTimer = new CountDownTimer(10000, 1000) {
 
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        Log.v("Log_tag", "Tick of Progress"+ i+ millisUntilFinished);
-                        isstopped=false;
+                        Log.v("Log_tag", "Tick of Progress" + i + millisUntilFinished);
+                        isstopped = false;
                         i++;
-                        mProgressBar.setProgress((int)i*50/(10000/1000));
-                        Log.v("Log_tag", ""+ (int)i*50/(10000/1000));
+                        mProgressBar.setProgress((int) i * 50 / (10000 / 1000));
+                        Log.v("Log_tag", "" + (int) i * 50 / (10000 / 1000));
                     }
+
                     @Override
                     public void onFinish() {
                         //Do what you want
                         isActionDown = false;
                         i++;
                         mProgressBar.setProgress(100);
-                        if (!isstopped){
+                        if (!isstopped) {
                             stopRecording();
-                            isstopped=true;
+                            isstopped = true;
                         }
 
                         Log.v("Log_tag", "stop");
@@ -139,12 +158,13 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
 
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_UP:
-                        if (isActionDown)
-                        {;
+                        if (isActionDown) {
+                            ;
+
                             mCountDownTimer.cancel();
-                            if (!isstopped){
+                            if (!isstopped) {
                                 stopRecording();
-                                isstopped=true;
+                                isstopped = true;
                             }
 
                         }
@@ -154,7 +174,6 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
                 return false;
             }
         });
-
 
 
     }
@@ -204,11 +223,11 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
 
         mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
-        Global.videopath = Environment.getExternalStorageDirectory().getPath().concat("/"+String.valueOf(System.currentTimeMillis())+".3gp");
+        Global.videopath = Environment.getExternalStorageDirectory().getPath().concat("/" + String.valueOf(System.currentTimeMillis()) + ".3gp");
         mrec.setOutputFile(Global.videopath);
 
-       // mrec.setOutputFile("/sdcard/zzzz.3gp");
-        Log.e( "startRecording: ",Global.videopath);
+        // mrec.setOutputFile("/sdcard/zzzz.3gp");
+        Log.e("startRecording: ", Global.videopath);
         mrec.prepare();
         mrec.start();
 
@@ -218,7 +237,7 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
         mrec.stop();
         mrec.release();
         mCamera.release();
-        Intent intent = new Intent(this,Previewvideo.class);
+        Intent intent = new Intent(this, Previewvideo.class);
         startActivity(intent);
         finish();
 
@@ -270,17 +289,15 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
                mCamera.release();*/
 
 
-
-
     }
 
     public void setCameraDisplayOrientation(Activity activity,
-                                            int cameraId, android.hardware.Camera camera) {
+                                            int cameraId, Camera camera) {
 
-        android.hardware.Camera.CameraInfo info =
-                new android.hardware.Camera.CameraInfo();
+        Camera.CameraInfo info =
+                new Camera.CameraInfo();
 
-        android.hardware.Camera.getCameraInfo(cameraId, info);
+        Camera.getCameraInfo(cameraId, info);
 
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
@@ -308,12 +325,16 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
             result = (info.orientation - degrees + 360) % 360;
         }
         camera.setDisplayOrientation(result);
-        mOrientation=result;
+        mOrientation = result;
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Global.videopath = "no_image" ;
+        Global.videopath = "no_image";
+    }
+
+    @OnClick(R.id.anim_ciricleimage)
+    public void onViewClicked() {
     }
 }

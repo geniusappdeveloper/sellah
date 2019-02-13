@@ -121,7 +121,10 @@
                 <data android:host="www.sellahapp.com" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activities.WelcomeActivity"></activity>
+        <activity android:name=".view.activities.WelcomeActivity">
+
+
+        </activity>
         <activity
             android:name=".view.activities.SignupActivity"
             android:screenOrientation="portrait"
@@ -169,6 +172,11 @@
 
         <activity
             android:name=".view.activities.AddNewTransaction"
+            android:label="@string/title_activity_add_new_videos"
+            android:theme="@style/AppTheme"></activity>
+
+        <activity
+            android:name=".view.fragments.ShowCreditCardDetailFragment"
             android:label="@string/title_activity_add_new_videos"
             android:theme="@style/AppTheme"></activity>
     </application>

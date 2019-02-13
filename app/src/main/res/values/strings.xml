@@ -246,7 +246,6 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
     <string-array name="add_product_fixed">
         <item>Select Type</item>
         <item>Fixed Price</item>
-        <item>Yes</item>
         <item>Price Negotiable</item>
 
     </string-array>

@@ -2,7 +2,6 @@ package com.app.admin.sellah.view.fragments;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
@@ -38,7 +36,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -54,6 +51,7 @@ import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.ImageUploadHelper;
+import com.app.admin.sellah.controller.utils.Prodctfragment_click;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.GolfModel;
 import com.app.admin.sellah.model.extra.LikeModel.LikeModel;
@@ -79,6 +77,11 @@ import com.app.admin.sellah.view.adapter.PromotePackagesAdapter;
 import com.app.admin.sellah.view.adapter.SimpleTagAdapter;
 import com.app.admin.sellah.view.adapter.SuggestedPostAdapter;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -101,10 +104,8 @@ import static android.app.Activity.RESULT_OK;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.ADDPRODUCTTAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.HOMETAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
-import static com.app.admin.sellah.controller.utils.Global.MIUISetStatusBarLightMode;
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
-import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.MAKE_OFFER_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -118,7 +119,7 @@ import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PAYMENT;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PRODUCT_ADDED;
 
-public class ProductFrgament extends Fragment implements View.OnClickListener {
+public class ProductFrgament extends Fragment implements View.OnClickListener, Prodctfragment_click {
 
 
     ViewPager mPager;
@@ -214,14 +215,15 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     TextView txtOfferDuration;
     @BindView(R.id.card_promote_detail)
     CardView cardPromoteDetail;
-    @BindView(R.id.isvideo_icon)
-    ImageView isvideoIcon;
+
     @BindView(R.id.txt_negotiable_product)
     TextView txtNegotiableProduct;
     @BindView(R.id.txt_sellall_product)
     TextView txtSellallProduct;
     @BindView(R.id.productback)
     ImageView productback;
+    @BindView(R.id.edit_quanitity)
+    TextView editQuanitity;
     private RecyclerView tagRcView;
     ArrayList<String> tagList;
     Button btn_makeOffer;
@@ -244,9 +246,14 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         service = Global.WebServiceConstants.getRetrofitinstance();
         productDetial = getArguments().getParcelable(SAConstants.Keys.PRODUCT_DETAIL);
         dialog = S_Dialogs.getLoadingDialog(getActivity());
+
         initViews(view);
+        Log.e("onPaymentSuccess:1 ", productDetial.getId());
+
+
         if (productDetial != null) {
             getProductDetailsApi(productDetial.getId());
+            //  dummcheck(productDetial.getId());
 //            setUpData(productDetial);
         } else {
             getActivity().onBackPressed();
@@ -273,7 +280,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
 
         listeners();
-        txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
+        txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         getSuggestedPostList();
         productback.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,19 +327,14 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
     private void setUpData(com.app.admin.sellah.model.extra.ProductDetails.Result productDetial1) {
 
+
         if (productDetial1 != null) {
             try {
-                getCommentApi(productDetial1.getId());
+
                 setTitle(productDetial1.getName());
                 txtProductName.setText(productDetial1.getName());
-//        txtProductLocation.setText(productDetial.get);
+                //        txtProductLocation.setText(productDetial.get);
 
-                if (productDetial1.getProductVideo().equals("") || productDetial1.getProductVideo() == null) {
-                    isvideoIcon.setVisibility(View.GONE);
-                } else {
-                    isvideoIcon.setVisibility(View.VISIBLE);
-                    videourl = productDetial1.getProductVideo();
-                }
 
                 if (!productDetial1.getFixedPrice().equalsIgnoreCase("N")) {
                     txtNegotiableProduct.setText("Negotiable");
@@ -345,7 +347,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                     tvStatus.setText("Online");
                     imgOnline.setVisibility(View.VISIBLE);
                 } else {
-                    tvStatus.setText("Last seen at : " + Global.getTimeAgo(Global.convertUTCToLocal(productDetial.getLastSeenTime())));
+                    tvStatus.setText("Last seen at : " + Global.getTimeAgo(Global.convertUTCToLocal(productDetial1.getLastSeenTime())));
                     imgOnline.setVisibility(View.GONE);
                 }
 
@@ -354,7 +356,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                 } else {
                     txtProductCondition.setText("New");
                 }
-
+                 editQuanitity.setText(productDetial1.getQuantity()+" in stock only");
                 txtProductDescription.setText(productDetial1.getDescription());
 
 
@@ -384,10 +386,20 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                 }
                 countTv.setText(productDetial1.getLikeCount().toString());
 //                Global.convertUTCToLocal(productDetial.getCreatedAt());
-                txtProductPostTime.setText("Posted " + getTimeAgo(Global.convertUTCToLocal(productDetial.getCreatedAt())));
+                txtProductPostTime.setText("Posted " + getTimeAgo(Global.convertUTCToLocal(productDetial1.getCreatedAt())));
 //                txtProductPostTime.setText(getTimeAgo(productDetial.getCreatedAt()));
                 setTagAdapter(productDetial1.getTags());
                 setUpPackages(productDetial1.getUserId(), productDetial1.getPromotes(), productDetial1.getPromoteProduct());
+
+                if (productDetial1.getProductVideo().equals("") || productDetial1.getProductVideo() == null) {
+
+                } else {
+
+                    videourl = productDetial1.getProductVideo();
+                    viewImagesArray.add(getURLForResource(R.drawable.default_image));
+                }
+
+
                 initViewPagger(productDetial1.getProductImages());
                 if (productDetial1.getPromotes() != null && productDetial1.getPromotes().size() > 0) {
                     setupPromoteOptions(productDetial1.getId(), productDetial1.getPromotes().get(0).getId());
@@ -400,7 +412,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                         .apply(Global.getGlideOptions())
                         .into(imgUserProfile);
                 txtOtheruserName.setText(!TextUtils.isEmpty(productDetial1.getUsername()) ? productDetial1.getUsername() : "Sellah! user");
+
+                getCommentApi(productDetial1.getId());
+
             } catch (Exception e) {
+
+                e.printStackTrace();
             }
         }
 
@@ -466,20 +483,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         rateImage.setOnClickListener(this);
         btn_makeOffer.setOnClickListener(this);
         user_profile.setOnClickListener(this);
-        isvideoIcon.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-
-            case R.id.isvideo_icon:
-
-                Intent previewintent = new Intent(getActivity(), Previewvideo.class);
-                previewintent.putExtra("video", videourl);
-                startActivity(previewintent);
-
-                break;
 
 
             case R.id.img_send_camera:
@@ -603,11 +612,13 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
     public void initViewPagger(List<ProductImage> productImages) {
 
+
         for (int i = 0; i < productImages.size(); i++)
+
             viewImagesArray.add(productImages.get(i).getImage());
 
         mPager = (ViewPager) view.findViewById(R.id.pager);
-        mPager.setAdapter(new GolfAdapter(getActivity(), viewImagesArray));
+        mPager.setAdapter(new GolfAdapter(getActivity(), viewImagesArray, this));
 
         CircleIndicator indicator = (CircleIndicator) view.findViewById(R.id.indicator);
         indicator.setViewPager(mPager);
@@ -636,7 +647,6 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
         ((MainActivity) getActivity()).rlBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
 
             }
@@ -1242,6 +1252,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                         dialog.dismiss();
                     }
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
+
+                        if (response.body().getResult().size() < 2 || response.body().getResult().isEmpty()) {
+                            txtSellallProduct.setVisibility(View.GONE);
+                        } else {
+                            txtSellallProduct.setVisibility(View.VISIBLE);
+                        }
                         setCommentData(response.body());
 /*
                         Snackbar.make(productDetailRoot, response.body().getMessage(), Snackbar.LENGTH_SHORT)
@@ -1249,6 +1265,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                     }
 
                 } else {
+
+                    txtSellallProduct.setVisibility(View.GONE);
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
@@ -1266,6 +1284,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
             public void onFailure(Call<CommentModel> call, Throwable t) {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
+                    txtSellallProduct.setVisibility(View.GONE);
                 }
                 Snackbar.make(productDetailRoot, "Please try again later.", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
@@ -1544,6 +1563,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
     }
 */
 
+
+
     public void getProductDetailsApi(String productId) {
 
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
@@ -1561,7 +1582,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 //                        Snackbar.make(productDetailRoot, response.body().getMessage(), Snackbar.LENGTH_SHORT)
 //                                .setAction("", null).show();
 //                        if (productDetial != null) {
-
+                        // com.app.admin.sellah.model.extra.ProductDetails.Result prductdetail1= response.body().getResult();
                         setUpData(response.body().getResult());
 //                        } else {
 //                            getActivity().onBackPressed();
@@ -1608,6 +1629,16 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
 
     }
 
+    public String getURLForResource(int resourceId) {
+        return Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + resourceId).toString();
+    }
+
+    @Override
+    public void onclick(boolean visible) {
+        Intent previewintent = new Intent(getActivity(), Previewvideo.class);
+        previewintent.putExtra("video", videourl);
+        startActivity(previewintent);
+    }
 }
 
 

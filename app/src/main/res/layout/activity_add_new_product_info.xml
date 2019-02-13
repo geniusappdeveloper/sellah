@@ -280,6 +280,7 @@
                     android:layout_centerVertical="true"
                     android:gravity="center|left"
                     android:hint="Price (S$)"
+                    android:inputType="number"
                     android:textColorHint="@color/light_grey"
                     android:background="@drawable/live_product_detail_grey_background"
                     android:singleLine="true"
@@ -458,7 +459,8 @@
                             android:layout_margin="@dimen/_2sdp"
                             android:background="@drawable/round_red_border"
                             android:padding="@dimen/_8sdp"
-                            android:src="@drawable/add_plus_button" />
+                            android:rotation="45"
+                            android:src="@drawable/add_product_white_cross" />
 
 
 

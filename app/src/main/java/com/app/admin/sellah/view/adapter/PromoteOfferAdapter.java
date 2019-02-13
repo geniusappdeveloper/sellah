@@ -4,9 +4,11 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
@@ -22,6 +24,7 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
     View view;
     List<PackagesList> packagesList;
     OfferCallBack callBack;
+    int pos;
 
     public PromoteOfferAdapter(Context context, List<PackagesList> packagesList, OfferCallBack callBack) {
        mInflater=LayoutInflater.from(context);
@@ -38,25 +41,48 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
         return new PromoteOfferAdapter.ViewHolder(view);
     }
 
-
     @Override
     public void onBindViewHolder(@NonNull PromoteOfferAdapter.ViewHolder holder, int position) {
 
-        holder.txtOffer.setText("S$ "+packagesList.get(position).getAmount());
+
+
+        if (packagesList.get(position).getAmount().contains("00"))
+        {
+            holder.txtOffer.setText("S$ "+"0");
+        }
+        else
+        {
+            holder.txtOffer.setText("S$ "+packagesList.get(position).getAmount());
+        }
+        if (pos==position)
+        {
+            holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
+        }
+        else
+        {
+            holder.cardView.setBackgroundResource(0);
+        }
+
+
         holder.txtOfferPrice.setText(packagesList.get(position).getClicks()+" clicks");
         holder.txtDuration.setText(packagesList.get(position).getValidity()+" days");
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pos = holder.getAdapterPosition();
+
+                notifyDataSetChanged();
                 callBack.onOfferSelect(packagesList.get(position).getId());
             }
         });
-        if (position==packagesList.size()-1){
-            holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorRed));
+
+
+       /* if (position==packagesList.size()-1){
+            holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
             holder.txtOffer.setTextColor(context.getResources().getColor(R.color.colorWhite));
             holder.txtOfferPrice.setTextColor(context.getResources().getColor(R.color.colorWhite));
             holder.txtDuration.setTextColor(context.getResources().getColor(R.color.colorWhite));
-        }
+        }*/
     }
 
 
@@ -74,7 +100,7 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        CardView cardView;
+        LinearLayout cardView;
         TextView txtOffer,txtOfferPrice,txtDuration;
         public ViewHolder(View v) {
             super(v);
