@@ -159,6 +159,7 @@
 
 
                         <ImageView
+                            android:id="@+id/img_product_image1"
                             android:src="@drawable/image"
                             android:scaleType="fitCenter"
                             android:layout_width="match_parent"
@@ -175,7 +176,6 @@
 
 
         <LinearLayout
-
             android:layout_marginLeft="@dimen/_23sdp"
             android:layout_marginRight="@dimen/_50sdp"
             android:id="@+id/beforeacpt__offer__layout"
@@ -235,6 +235,7 @@
 
 
                             <ImageView
+                                android:id="@+id/img_product_image"
                                 android:src="@drawable/image"
                                 android:scaleType="fitCenter"
                                 android:layout_width="match_parent"

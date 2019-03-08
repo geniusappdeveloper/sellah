@@ -21,12 +21,37 @@ public class Result {
     @SerializedName("is_verified")
     @Expose
     private String isVerified;
+
     @SerializedName("is_deleted")
     @Expose
     private String isDeleted;
 
+    @SerializedName("stripe_id")
+    @Expose
+    private String stripe_id;
+
+    @SerializedName("stripe_verified")
+    @Expose
+    private String stripe_verified;
+
+    public String getStripe_verified() {
+        return stripe_verified;
+    }
+
+    public void setStripe_verified(String stripe_verified) {
+        this.stripe_verified = stripe_verified;
+    }
+
     public String getIsProfileCompleted() {
         return isProfileCompleted;
+    }
+
+    public String getStripe_id() {
+        return stripe_id;
+    }
+
+    public void setStripe_id(String stripe_id) {
+        this.stripe_id = stripe_id;
     }
 
     public void setIsProfileCompleted(String isProfileCompleted) {

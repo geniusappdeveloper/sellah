@@ -107,10 +107,17 @@
             android:visibility="visible">
 
            <RelativeLayout
-               android:gravity="center_vertical"
-               android:background="#604d9c"
+               android:background="@color/blue_color"
                android:layout_width="match_parent"
                android:layout_height="@dimen/_150sdp">
+
+               <RelativeLayout
+                   android:gravity="center_vertical"
+                   android:background="@drawable/credit_card_back"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent">
+
+
 
 
                <TextView
@@ -156,7 +163,7 @@
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content" />
 
-
+               </RelativeLayout>
 
            </RelativeLayout>
 

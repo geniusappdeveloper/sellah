@@ -407,4 +407,10 @@ public class SplashScreen extends AppCompatActivity {
 
         }, SPLASH_TIME_OUT);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        new ApisHelper().getcategoriesmodel1_cancel();
+    }
 }

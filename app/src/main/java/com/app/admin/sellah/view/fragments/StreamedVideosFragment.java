@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -23,7 +24,6 @@ import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.StreamedVideoAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -42,6 +42,8 @@ public class StreamedVideosFragment extends Fragment {
     TextView txtNoMoreItem;
     @BindView(R.id.touch_scrollview)
     TouchDetectableScrollView touchScrollview;
+    @BindView(R.id.nolivevideo_text)
+    LinearLayout nolivevideoText;
     private View view;
     private Unbinder unbinder;
     List<VideoList> videoLists = new ArrayList<>();
@@ -58,7 +60,7 @@ public class StreamedVideosFragment extends Fragment {
     private int currentPage = PAGE_START;
     private int previousPage = 0;
     private boolean isFeedsFetchInProgress = false;
-    private String TAG=StreamedVideosFragment.class.getSimpleName();
+    private String TAG = StreamedVideosFragment.class.getSimpleName();
 
     public StreamedVideosFragment() {
         // Required empty public constructor
@@ -102,7 +104,6 @@ public class StreamedVideosFragment extends Fragment {
     }
 
     public void hideView() {
-        ((MainActivity) getActivity()).view.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
@@ -120,14 +121,22 @@ public class StreamedVideosFragment extends Fragment {
         new ApisHelper().getStreamedVideoData(getActivity(), String.valueOf(currentPage), new ApisHelper.GetLiveVideoCallback() {
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel msg) {
-                Log.e(TAG, "onGetLiveVideoSuccess: Total_page"+msg.getTotalPages());
-                if(TOTAL_PAGES==0) {
+                Log.e(TAG, "onGetLiveVideoSuccess: Total_page" + msg.getTotalPages());
+                if (TOTAL_PAGES == 0) {
                     TOTAL_PAGES = Integer.parseInt(msg.getTotalPages());
+                }
+                if (msg.getList().isEmpty()) {
+                    nolivevideoText.setVisibility(View.VISIBLE);
+                    rvOtherVideos.setVisibility(View.GONE);
+
+                } else {
+                    nolivevideoText.setVisibility(View.GONE);
+                    rvOtherVideos.setVisibility(View.VISIBLE);
                 }
 //                Collections.reverse(videoLists);
                 videoLists.addAll(msg.getList());
 //                Collections.reverse(videoLists);
-                isFeedsFetchInProgress=false;
+                isFeedsFetchInProgress = false;
                 pbHome.setVisibility(View.GONE);
                 streamedVideoAdapter.notifyItemRangeInserted(videoLists.size() > 0 ? videoLists.size() - 1 : 0, videoLists.size());
 //                streamedVideoAdapter.notifyDataSetChanged();
@@ -142,6 +151,7 @@ public class StreamedVideosFragment extends Fragment {
             }
         });
     }
+
     private void pagginationCode() {
 
         touchScrollview.setMyScrollChangeListener(new TouchDetectableScrollView.OnMyScrollChangeListener() {
@@ -169,7 +179,7 @@ public class StreamedVideosFragment extends Fragment {
                     pbHome.setVisibility(View.VISIBLE);
                     return;
                 }
-                Log.e(TAG, "onBottomReached: total_page"+TOTAL_PAGES);
+                Log.e(TAG, "onBottomReached: total_page" + TOTAL_PAGES);
                 if (TOTAL_PAGES > 1) {
                     previousPage = currentPage;
                     currentPage++;
@@ -193,5 +203,11 @@ public class StreamedVideosFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        new ApisHelper().streameedvideolist_cancel();
     }
 }

@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.app.admin.sellah.model.wishllist_model.Wishlist;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.app.admin.sellah.R;
@@ -20,10 +21,10 @@ import static com.app.admin.sellah.controller.utils.Global.convertUTCToLocal;
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 
 public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.WishHolder> {
-    private GetProductList recordList;
+    private Wishlist recordList;
     Context context;
 
-    public WishRecordAdapter(GetProductList sublist, Context context) {
+    public WishRecordAdapter(Wishlist sublist, Context context) {
         this.recordList = sublist;
         this.context = context;
     }
@@ -54,9 +55,8 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
         Glide.with(context)
                 .load(imageUrl).apply(requestOptions)
                 .into(holder.profileImg);
-        holder.BirthText.setText(recordList.getResult().get(position).getName());
+        holder.BirthText.setText(recordList.getResult().get(position).getProductName());
         holder.costText.setText("S$ "+recordList.getResult().get(position).getPrice());
-        holder.timeText.setText(getTimeAgo(convertUTCToLocal(recordList.getResult().get(position).getCreatedAt())));
 
 
     }
@@ -68,7 +68,7 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
 
     public class WishHolder extends RecyclerView.ViewHolder {
         ImageView profileImg;
-        TextView BirthText,costText,timeText;
+        TextView BirthText,costText;
 
 
 
@@ -78,7 +78,6 @@ public class WishRecordAdapter  extends RecyclerView.Adapter<WishRecordAdapter.W
             profileImg = view.findViewById(R.id.img_product);
             BirthText = view.findViewById(R.id.text_birthday);
             costText = view.findViewById(R.id.cake_cost);
-            timeText = view.findViewById(R.id.text_time);
         }
 
 

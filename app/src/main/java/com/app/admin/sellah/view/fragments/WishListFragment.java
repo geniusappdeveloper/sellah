@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,7 +51,12 @@ public class WishListFragment extends Fragment {
     @BindView(R.id.rv_suggested_post)
     RecyclerView rvSuggestedPost;
     private SuggestedPostAdapter suggestedPostAdapter;
-    Call<GetProductList> addCommentCall;
+    Call<GetProductList> addCommentCall;;
+    @BindView(R.id.ll_no_product)
+    LinearLayout llNoProduct;
+    @BindView(R.id.ll_no_network)
+    LinearLayout llNoNetwork;
+    Call<GetProductList> wishlistrCall;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.wish_list_fragment, container, false);
@@ -59,8 +65,17 @@ public class WishListFragment extends Fragment {
         service = Global.WebServiceConstants.getRetrofitinstance();
 
         unbinder = ButterKnife.bind(this, view);
-        getWishListData();
-        getSuggestedPostList();
+
+
+        if (Global.NetworStatus.isOnline(getActivity())) {
+            getWishListData();
+            getSuggestedPostList();
+        } else {
+            wishlistRoot.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
         return view;
     }
 
@@ -68,7 +83,7 @@ public class WishListFragment extends Fragment {
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
 
-        Call<GetProductList> wishlistrCall = service.getWishListApi(HelperPreferences.get(getActivity()).getString(UID));
+         wishlistrCall = service.getWishListApi(HelperPreferences.get(getActivity()).getString(UID));
         wishlistrCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -116,6 +131,12 @@ public class WishListFragment extends Fragment {
         wishRecyler.setLayoutManager(birthHorizontalManager);
         wishRecyler.setAdapter(wishListAdapterBirth);
         wishListAdapterBirth.notifyDataSetChanged();
+
+        if (wishListModel.getResult().size()>0)
+               hideErrorMsg();
+            else
+               showErrorMsg();
+
 
     }
 
@@ -195,5 +216,39 @@ public class WishListFragment extends Fragment {
         super.onStop();
         if (addCommentCall!=null)
         {addCommentCall.cancel();}
+        if (wishlistrCall!=null)
+        {wishlistrCall.cancel();}
     }
+
+    public void showErrorMsg() {
+        if (view != null) {
+            wishlistRoot.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.GONE);
+            llNoProduct.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void hideErrorMsg() {
+        if (view != null) {
+            wishlistRoot.setVisibility(View.VISIBLE);
+            llNoNetwork.setVisibility(View.GONE);
+            llNoProduct.setVisibility(View.GONE);
+
+        }
+    }
+
+    @OnClick(R.id.ll_no_network)
+    public void onViewClicked() {
+
+        if (Global.NetworStatus.isOnline(getActivity())) {
+            getWishListData();
+            getSuggestedPostList();
+        } else {
+            wishlistRoot.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
+    }
+
 }

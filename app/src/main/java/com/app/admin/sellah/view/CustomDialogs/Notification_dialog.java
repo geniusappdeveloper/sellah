@@ -2,7 +2,7 @@ package com.app.admin.sellah.view.CustomDialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -18,12 +18,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.NotificationList.ArrFollow;
 import com.app.admin.sellah.model.extra.NotificationList.NotificationListModel;
+import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.NewnotificationAdapter;
 
@@ -59,6 +61,8 @@ public class Notification_dialog extends DialogFragment {
     Unbinder unbinder;
     Dialog dialog;
     NewnotificationAdapter notificationFollowListAdapter;
+    @BindView(R.id.ll_no_product)
+    LinearLayout llNoProduct;
 
     @Nullable
     @Override
@@ -75,22 +79,58 @@ public class Notification_dialog extends DialogFragment {
         unbinder = ButterKnife.bind(this, view);
 
         Bundle bundle = this.getArguments();
-        if (bundle!=null)
-        {
+        if (bundle != null) {
+
             notificationListModel = bundle.getParcelable(SAConstants.Keys.NOTI_KEY);
-            global_newwmesslist = notificationListModel.getArrFollow();
-             notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist,notificationListModel, getActivity() );
+
+
+
+          if (notificationListModel.getArrFollow()!=null)
+          {
+              global_newwmesslist = notificationListModel.getArrFollow();
+              if (global_newwmesslist.size()==0)
+              {
+                  llNoProduct.setVisibility(View.VISIBLE);
+                  notificationRv.setVisibility(View.GONE);
+              }
+              else
+              {
+                  llNoProduct.setVisibility(View.GONE);
+                  notificationRv.setVisibility(View.VISIBLE);
+              }
+
+          }
+          else
+          {
+              getNotificationList();
+          }
+
+            notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist, notificationListModel, getActivity());
             LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
             notificationRv.setLayoutManager(horizontalLayoutManager1);
             notificationRv.setAdapter(notificationFollowListAdapter);
-        }
+        } else {
 
-        else
-        {
             getNotificationList();
         }
 
+        readNotificationApi(getActivity());
 
+
+/*
+        new ApisHelper().readNotificationApi(getActivity(), "sss","all", new ApisHelper.ReadNotificationCallback() {
+            @Override
+            public void onReadNotificationSuccess(String msg) {
+
+
+            }
+
+            @Override
+            public void onReadNotificationFailure() {
+
+            }
+        });
+*/
 
 
 
@@ -107,8 +147,8 @@ public class Notification_dialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-       // dialog = S_Dialogs.getLoadingDialog(getActivity());
-      //  dialog.show();
+        // dialog = S_Dialogs.getLoadingDialog(getActivity());
+        //  dialog.show();
     }
 
     @OnClick(R.id.notifcation_cancel)
@@ -132,22 +172,36 @@ public class Notification_dialog extends DialogFragment {
 
                     newMessList = notificationListModel1.getArrFollow();
                     global_newwmesslist.addAll(notificationListModel1.getArrFollow());
-                    notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist,notificationListModel1, getActivity() );
-                    LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                    notificationRv.setLayoutManager(horizontalLayoutManager1);
-                    notificationRv.setAdapter(notificationFollowListAdapter);
-                    if (notificationListModel.getListReadStatus().equals("0"))
+
+                    Log.e("Vefdvcefdvc",global_newwmesslist.size()+"  gg");
+                    if (global_newwmesslist.size()==0)
                     {
-                        ((MainActivity)getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                        llNoProduct.setVisibility(View.VISIBLE);
+                        notificationRv.setVisibility(View.GONE);
                     }
                     else
                     {
-                        ((MainActivity)getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                        llNoProduct.setVisibility(View.GONE);
+                        notificationRv.setVisibility(View.VISIBLE);
                     }
 
 
 
+
+                    notificationFollowListAdapter = new NewnotificationAdapter(global_newwmesslist, notificationListModel1, getActivity());
+                    LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+                    notificationRv.setLayoutManager(horizontalLayoutManager1);
+                    notificationRv.setAdapter(notificationFollowListAdapter);
+                    if (notificationListModel.getListReadStatus().equals("0")) {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                    } else {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                    }
+
+
                 } else {
+                    llNoProduct.setVisibility(View.VISIBLE);
+                    notificationRv.setVisibility(View.GONE);
                     try {
                         Log.e("GetNotificationList", "onResponse: errorBody" + response.errorBody().string());
                     } catch (IOException e) {
@@ -161,9 +215,39 @@ public class Notification_dialog extends DialogFragment {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
+                llNoProduct.setVisibility(View.VISIBLE);
+                notificationRv.setVisibility(View.GONE);
                 Log.e("GetNotificationList", "onFailure: " + t.getMessage());
             }
         });
     }
+
+
+    public void readNotificationApi(Context context) {
+
+        Call<Common> readNotificationApiCall = service.readNotificationApi(HelperPreferences.get(context).getString(UID), "fhf", "1","all");
+        readNotificationApiCall.enqueue(new Callback<Common>() {
+            @Override
+            public void onResponse(Call<Common> call, Response<Common> response) {
+                if (response.isSuccessful()) {
+                    Log.e("ReadNotification", "" + response.body().getMessage().toString());
+                } else {
+
+                    try {
+                        Log.e("ReadNotification", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Common> call, Throwable t) {
+
+
+            }
+        });
+    }
+
 
 }

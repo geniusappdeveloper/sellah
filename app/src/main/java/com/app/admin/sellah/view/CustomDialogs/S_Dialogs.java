@@ -211,6 +211,16 @@ public class S_Dialogs {
         return dialog;
     }
 
+    public static MaterialDialog promote_dialog(Context context, MaterialDialog.SingleButtonCallback positivCallback) {
+        return new MaterialDialog.Builder(context)
+                .title("Promote")
+                .content("Top-up promotion")
+                .positiveText(context.getString(R.string.dialog_action_yes))
+                .negativeText(context.getString(R.string.dialog_action_no))
+                .onPositive(positivCallback)
+                .onNegative((dialog, which) -> dialog.dismiss()).build();
+    }
+
 
     public static MaterialDialog getRemoveItemDialog(Context context, MaterialDialog.SingleButtonCallback positivCallback) {
         return new MaterialDialog.Builder(context)

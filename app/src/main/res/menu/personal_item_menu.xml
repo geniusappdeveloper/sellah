@@ -5,7 +5,7 @@
         android:title="Promote product"/>
     <item
         android:id="@+id/menu_update_promote"
-        android:title="Update promotion"/>
+        android:title="Top-up promotion"/>
     <item
         android:id="@+id/menu_cancel_promote"
         android:title="Cancel promotion"/>

@@ -89,7 +89,7 @@
                     android:layout_height="@dimen/_22sdp"
                     android:layout_gravity="center"
                     android:padding="@dimen/_5sdp"
-                    android:src="@drawable/share_live_caht"
+                    android:src="@drawable/option_icon"
                     android:tint="#fff" />
 
                 <ImageView

@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 public class BannerModel {
 
     @SerializedName("status")
@@ -13,9 +14,15 @@ public class BannerModel {
     @SerializedName("message")
     @Expose
     private String message;
-    @SerializedName("record")
+    @SerializedName("homebanners")
     @Expose
-    private List<String> record = null;
+    private List<Homebanner> homebanners = null;
+    @SerializedName("categorybanners")
+    @Expose
+    private List<Categorybanner> categorybanners = null;
+    @SerializedName("subcategorybanners")
+    @Expose
+    private List<Subcategorybanner> subcategorybanners = null;
 
     public String getStatus() {
         return status;
@@ -33,12 +40,30 @@ public class BannerModel {
         this.message = message;
     }
 
-    public List<String> getRecord() {
-        return record;
+    public List<Homebanner> getHomebanners() {
+        return homebanners;
     }
 
-    public void setRecord(List<String> record) {
-        this.record = record;
+    public void setHomebanners(List<Homebanner> homebanners) {
+        this.homebanners = homebanners;
+    }
+
+    public List<Categorybanner> getCategorybanners() {
+        return categorybanners;
+    }
+
+    public void setCategorybanners(List<Categorybanner> categorybanners) {
+        this.categorybanners = categorybanners;
+    }
+
+    public List<Subcategorybanner> getSubcategorybanners() {
+        return subcategorybanners;
+    }
+
+    public void setSubcategorybanners(List<Subcategorybanner> subcategorybanners) {
+        this.subcategorybanners = subcategorybanners;
     }
 
 }
+
+

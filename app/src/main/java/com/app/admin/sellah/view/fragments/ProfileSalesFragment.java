@@ -10,8 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +52,12 @@ public class ProfileSalesFragment extends Fragment {
     @BindView(R.id.img_no_data)
     ImageView imgNoData;
     Unbinder unbinder;
+    @BindView(R.id.ll_no_product)
+    LinearLayout llNoProduct;
+    @BindView(R.id.reload)
+    Button reload;
+    @BindView(R.id.ll_no_network)
+    LinearLayout llNoNetwork;
 
     public void onAttachToParentFragment(Fragment fragment) {
         try {
@@ -73,14 +81,25 @@ public class ProfileSalesFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         saleRecycler = view.findViewById(R.id.salesRecycler);
         service = Global.WebServiceConstants.getRetrofitinstance();
-        getSaledata();
+
+        if (Global.NetworStatus.isOnline(getActivity()))
+        {
+            getSaledata();
+        }
+        else
+        {
+            saleRecycler.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
 //        saleList();
         return view;
     }
 
     private void setSalesData(GetProductList list) {
         salesAdapter = new SalesAdapter(list, getActivity(), true, (productid, pos) -> {
-            S_Dialogs.getConfirmation(getActivity(), getActivity().getResources().getString(R.string.dialog_title_mark_as_sold), ((dialog1, which) -> {
+            S_Dialogs.getConfirmation(getActivity(),getActivity().getResources().getString(R.string.dialog_title_mark_as_sold), ((dialog1, which) -> {
                 removeSaledata(productid, pos);
             })).show();
         }, (productid, pos) -> {
@@ -106,10 +125,12 @@ public class ProfileSalesFragment extends Fragment {
             return 0;
         }
     }
+
     Call<GetProductList> recordsCall;
+
     private void getSaledata() {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
-         recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
+        recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -130,10 +151,12 @@ public class ProfileSalesFragment extends Fragment {
             }
         });
     }
+
     Call<Common> markAsSoldCall;
+
     private void removeSaledata(String productId, int pos) {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
-         markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
+        markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
         markAsSoldCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
@@ -195,29 +218,51 @@ public class ProfileSalesFragment extends Fragment {
 
     public void showErrorMsg() {
         if (view != null) {
-            imgNoData.setVisibility(View.VISIBLE);
+            saleRecycler.setVisibility(View.GONE);
+           llNoNetwork.setVisibility(View.GONE);
+           llNoProduct.setVisibility(View.VISIBLE);
         }
     }
 
     public void hideErrorMsg() {
         if (view != null) {
-            imgNoData.setVisibility(View.GONE);
+            saleRecycler.setVisibility(View.VISIBLE);
+            llNoNetwork.setVisibility(View.GONE);
+            llNoProduct.setVisibility(View.GONE);
 
-            }
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (recordsCall!=null)
-        {recordsCall.cancel();}
-        if (markAsSoldCall!=null)
-        {markAsSoldCall.cancel();}
+        if (recordsCall != null) {
+            recordsCall.cancel();
+        }
+        if (markAsSoldCall != null) {
+            markAsSoldCall.cancel();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick(R.id.ll_no_network)
+    public void onViewClicked() {
+
+        if (Global.NetworStatus.isOnline(getActivity()))
+        {
+            getSaledata();
+        }
+        else
+        {
+            saleRecycler.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
     }
 }

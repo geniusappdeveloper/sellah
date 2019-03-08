@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_gravity="right"
+    android:gravity="right"
+    android:paddingBottom="@dimen/_5sdp"
+    android:paddingRight="@dimen/_3sdp">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -70,4 +80,25 @@
         android:id="@+id/img_user"
         android:layout_marginTop="@dimen/_4sdp"
         android:layout_marginLeft="@dimen/_3sdp"/>
+</LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_toLeftOf="@+id/sender_tick"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorGrey"
+            android:text="Read"
+            android:textSize="@dimen/_8sdp"/>
+        <ImageView
+            android:src="@drawable/grey_tick"
+            android:id="@+id/sender_tick"
+            android:layout_alignParentRight="true"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_10sdp" />
+
+
+    </RelativeLayout>
 </LinearLayout>

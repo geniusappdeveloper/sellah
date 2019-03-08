@@ -40,7 +40,7 @@
                 android:layout_gravity="left"
                 android:scaleType="centerCrop"
                 android:src="@drawable/featured_png"
-                android:visibility="gone"/>
+                />
         </android.support.v7.widget.CardView>
 
         <RelativeLayout

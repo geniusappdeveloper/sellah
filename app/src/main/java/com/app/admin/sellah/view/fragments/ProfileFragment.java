@@ -30,6 +30,8 @@ import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
 import com.app.admin.sellah.view.adapter.SalesAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
@@ -42,12 +44,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.admin.sellah.controller.stripe.StripeSession.USERCITY;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
 
-public class ProfileFragment extends Fragment implements SalesAdapter.TabTextController {
+public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextController {
 
     @BindView(R.id.li_profile_root)
     LinearLayout liProfileRoot;
@@ -110,7 +113,7 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
                     HelperPreferences.get(getActivity()).saveString(USER_PROFILE_PIC, response.body().getResult().getImage());
                     HelperPreferences.get(getActivity()).saveString(USER_EMAIL, response.body().getResult().getEmail());
                     profileData = response.body();
-                    Log.e("profile_success", response.body().getMessage());
+
                     setProfileData(response.body());
                 } else {
                     dismissDialog(dialog);
@@ -137,7 +140,8 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
 
         if (body != null) {
             try {
-                tvLocation.setText("Singapore");
+                txtRationg.setText(body.getResult().getRating());
+                tvLocation.setText((HelperPreferences.get(getActivity()).getString(USERCITY)));
                 if (!TextUtils.isEmpty(body.getResult().getUsername())) {
                     tvProfileName.setText(body.getResult().getUsername());
                 } else {
@@ -180,7 +184,6 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).profile.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).changeOptionColor(4);
     }
 

@@ -156,10 +156,10 @@ public class MakeOfferDialog extends Dialog {
         void onErrorSelection();
 
     }
-
+    Call<GetProductList> recordsCall;
     private void getForsaleList(String otherUserId) {
         dialog.show();
-        Call<GetProductList> recordsCall = webService.getForSalelistApi(otherUserId);
+         recordsCall = webService.getForSalelistApi(otherUserId);
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -195,11 +195,11 @@ public class MakeOfferDialog extends Dialog {
             }
         });
     }
-
+    Call<MakeOfferModel> makeOfferCall;
     private void makeOfferApi(String productId, String price, String name, String tt) {
         Dialog dialog1 = S_Dialogs.getLoadingDialog(context);
         dialog1.show();
-        Call<MakeOfferModel> makeOfferCall = Global.WebServiceConstants.getRetrofitinstance().makeOfferApi(HelperPreferences.get(context).getString(UID), productId, otherUserId, price, "P", name, itemQuantity);
+        makeOfferCall = Global.WebServiceConstants.getRetrofitinstance().makeOfferApi(HelperPreferences.get(context).getString(UID), productId, otherUserId, price, "P", name, itemQuantity);
         makeOfferCall.enqueue(new Callback<MakeOfferModel>() {
             @Override
             public void onResponse(Call<MakeOfferModel> call, Response<MakeOfferModel> response) {
@@ -230,5 +230,12 @@ public class MakeOfferDialog extends Dialog {
                 Log.e("MakeOfferApi", "onFailure: " + t.getMessage());
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        recordsCall.cancel();
+        makeOfferCall.cancel();
     }
 }

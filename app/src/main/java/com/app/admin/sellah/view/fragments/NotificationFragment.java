@@ -218,7 +218,7 @@ public class NotificationFragment extends Fragment {
 
         //             Vishal changes
 
-        ((MainActivity) getActivity()).view.setVisibility(View.GONE);
+
         ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).findViewById(R.id.rl_chat).setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);

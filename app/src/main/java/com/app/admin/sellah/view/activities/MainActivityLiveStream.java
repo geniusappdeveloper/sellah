@@ -285,7 +285,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         sellerId = intent.hasExtra("seller_id") ? intent.getStringExtra("seller_id") : "";
         videoStartTime = intent.hasExtra("start_time") ? intent.getStringExtra("start_time") : "";
         videoViews = intent.hasExtra("views") ? intent.getStringExtra("views") : "";
-        Log.e("Vsdcrfdvcd", showPublishPlay + ":" + streamId);
+        Log.e("Vsdcrfdvcd", showPublishPlay + ":" + groupId);
 
         handler = new Handler();
         try {
@@ -474,6 +474,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
 
     @Override
     public void onPublishFinished() {
+
+
         dismissDialog();
         closeGroup();
         disconnectSocket();
@@ -526,7 +528,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e("mainactivityLive", "onStop: ");
+
+
         if (!isFetchingimage) {
 //            closeGroup();
             dismissDialog();
@@ -815,6 +818,20 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
             mSocket.on(EVENT_CLOSE_GROUP, onCloseGroup);
             mSocket.on(EVENT_JOIN, join);
             mSocket.connect();
+
+            // increment count views
+
+            if (!TextUtils.isEmpty(groupId)) {
+                JSONObject jsonObject1 = new JSONObject();
+                try {
+                    jsonObject1.put("group_id", groupId);
+                    jsonObject1.put("isJoined", "Y");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mSocket.emit(EVENT_COUNTVIEWS, jsonObject1);
+            }
+
         }
     }
     /* private void ConnectToSocketToJoin() {
@@ -850,6 +867,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
   */
     public void disconnectSocket() {
 //        try {
+
+
         if (mSocket.connected()) {
             //  mSocket.off(EVENT_CREATEROOM, onRoomCreation);
             mSocket.off(Socket.EVENT_CONNECT, onConnect);
@@ -868,6 +887,9 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     }
 
     public void closeGroup() {
+
+
+
 
         JSONObject jsonObject = new JSONObject();
         try {
@@ -932,15 +954,6 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
                             Log.e("JoinGroup_params", jsonObject.toString());
 //
                             mSocket.emit(EVENT_JOIN, jsonObject);
-                        }
-                        if (!TextUtils.isEmpty(groupId)) {
-                            JSONObject jsonObject1 = new JSONObject();
-                            try {
-                                jsonObject1.put("group_id", groupId);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            mSocket.emit(EVENT_COUNTVIEWS, jsonObject1);
                         }
 
                         Log.e("Connection", "connected");
@@ -2142,6 +2155,18 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
             }).show();
         } else {
             S_Dialogs.getLiveConfirmationVideo(MainActivityLiveStream.this, "Are you sure you want to leave from this live session.", (dialog, which) -> {
+
+                // socket to remove views
+                if (!TextUtils.isEmpty(groupId)) {
+                    JSONObject jsonObject1 = new JSONObject();
+                    try {
+                        jsonObject1.put("group_id", groupId);
+                        jsonObject1.put("isJoined", "N");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mSocket.emit(EVENT_COUNTVIEWS, jsonObject1);
+                }
                 if (webRTCClient != null) {
                     webRTCClient.stopStream();
                 }

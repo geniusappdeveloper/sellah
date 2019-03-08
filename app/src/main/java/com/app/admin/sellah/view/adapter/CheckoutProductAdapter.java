@@ -106,6 +106,8 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
 
         if (pos ==position)
         {
+            actionCallback.onCheckclicked(recordList.get(pos).getName(), recordList.get(pos).getId(), recordList.get(position).getPrice(),recordList.get(position).getQuantity());
+
             holder.checkout.setBackgroundColor(Color.parseColor("#dbdbdb"));
 
 

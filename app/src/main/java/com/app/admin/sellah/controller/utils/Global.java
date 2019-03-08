@@ -73,6 +73,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.Fabric;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -86,7 +87,10 @@ public class Global extends MultiDexApplication {
     public static final String KEY_IMAGE_URL = "image.resource";
     public static final String KEY_IMAGE = "image.string";
     private FirebaseAnalytics mFirebaseAnalytics;
+    public static String HITCARD = "no_hit_card";
     private static Global mInstance;
+    public static boolean from_register = false;
+    public static boolean deleted_account = false;
     private Socket mSocket;
 
     {
@@ -566,22 +570,35 @@ public class Global extends MultiDexApplication {
         public static String NOTIFICATIONETAG = "sa.noti.frag.tag";
         public static String ADDPRODUCTTAG = "sa.sell.frag.tag";
         public static String LIVETAG = "sa.live.frag.tag";
+
     }
 
     public static class WebServiceConstants {
         public static WebService getRetrofitinstance() {
+
+            final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .readTimeout(3, TimeUnit.MINUTES)
+                    .connectTimeout(3, TimeUnit.MINUTES)
+                    .writeTimeout(3,TimeUnit.MINUTES)
+                    .build();
 
             Gson gson = new GsonBuilder()
                     .setLenient()
                     .create();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASEURL)
+                    .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
             return retrofit.create(WebService.class);
         }
 
         public static Retrofit getRetrofit() {
+            final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .readTimeout(3, TimeUnit.MINUTES)
+                    .connectTimeout(3, TimeUnit.MINUTES)
+                    .writeTimeout(3,TimeUnit.MINUTES)
+                    .build();
 
             Gson gson = new GsonBuilder()
                     .setLenient()
@@ -589,6 +606,7 @@ public class Global extends MultiDexApplication {
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASEURL)
+                    .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
 

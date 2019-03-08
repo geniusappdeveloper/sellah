@@ -28,6 +28,7 @@ import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import com.app.admin.sellah.model.extra.RegisterPojo.RegisterResult;
 import com.app.admin.sellah.view.CustomDialogs.OTPVerificationDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.hbb20.CountryCodePicker;
 
 import java.io.IOException;
@@ -73,6 +74,8 @@ public class SignupActivity extends AppCompatActivity {
     TextView txtSignIn;
     @BindView(R.id.text)
     TextView text;
+    @BindView(R.id.ccp1)
+    CountryCodePicker ccp1;
     private String TAG = SignupActivity.class.getSimpleName();
     //    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
@@ -98,6 +101,7 @@ public class SignupActivity extends AppCompatActivity {
     @BindView(R.id.ccp)
     CountryCodePicker ccp;
     private int phoneLength = 8;
+    String country="";
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -105,7 +109,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_signup_new);
 //        StatusBarLightMode(this);
-        setStatusBarColor(this,R.color.colorFormBg);
+        setStatusBarColor(this, R.color.colorFormBg);
         ButterKnife.bind(SignupActivity.this);
         webService = Global.WebServiceConstants.getRetrofitinstance();
 
@@ -125,20 +129,31 @@ public class SignupActivity extends AppCompatActivity {
                 }
             }
         });
+
+        ccp1.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {
+            @Override
+            public void onCountrySelected() {
+                country = ccp1.getSelectedCountryNameCode();
+
+            }
+        });
+
+
+
         txtSignIn.setLinkTextColor(Color.BLACK); // default link color for clickable span, we can also set it in xml by android:textColorLink=""
         ClickableSpan normalLinkClickSpan = new ClickableSpan() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(SignupActivity.this,LoginActivity.class);
+                Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
 //                Toast.makeText(getActivity(), "Normal Link", Toast.LENGTH_SHORT).show();
             }
 
         };
-        makeLinks(txtSignIn, new String[] {
+        makeLinks(txtSignIn, new String[]{
                 "Sign In"
-        }, new ClickableSpan[] {
+        }, new ClickableSpan[]{
                 normalLinkClickSpan
         });
 
@@ -156,7 +171,12 @@ public class SignupActivity extends AppCompatActivity {
         if (getText(email).equalsIgnoreCase("")) {
             Snackbar.make(rel_root, "Please enter E-mail ", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
-        } else if (getText(pass).equalsIgnoreCase("")) {
+        }
+        else if (country.equalsIgnoreCase(""))
+        {
+            country = ccp.getDefaultCountryNameCode();
+        }
+        else if (getText(pass).equalsIgnoreCase("")) {
             Snackbar.make(rel_root, "Please enter password ", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
         } else if (getText(confirmPass).equalsIgnoreCase("")) {
@@ -203,7 +223,8 @@ public class SignupActivity extends AppCompatActivity {
             Log.e("Ccp_number", ccp.getFullNumber());
             Log.e("Ccp_number", ccp.getFullNumberWithPlus());
             Log.e("Ccp_number", getText(phoneNum));
-            Call<RegisterResult> registerCall = webService.registrationApi(getText(email), getText(pass), getText(confirmPass), actualPhoneNo, ccp.getSelectedCountryCodeWithPlus(), "");
+            Log.e("Ccp_number", country);
+            Call<RegisterResult> registerCall = webService.registrationApi(getText(email), getText(pass), getText(confirmPass), actualPhoneNo, ccp.getSelectedCountryCodeWithPlus(), "",country);
             registerCall.enqueue(new Callback<RegisterResult>() {
                 @Override
                 public void onResponse(Call<RegisterResult> call, Response<RegisterResult> response) {
@@ -268,9 +289,11 @@ public class SignupActivity extends AppCompatActivity {
                                             Global.ProfileStatusCheck.checkProfileStatus(SignupActivity.this, new Global.ProfileStatusCheck.ProfileStatusCallback() {
                                                 @Override
                                                 public void onIfProfileUpdated() {
+                                                    Global.from_register = true;
                                                     new DeviceRegistaration().registerDevice(SignupActivity.this, registerResult.getResult().getId());
                                                     Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                                                     startActivity(intent);
+
                                                     finishAffinity();
                                                 }
 
@@ -292,9 +315,11 @@ public class SignupActivity extends AppCompatActivity {
 
                                                         }
                                                     });*/
+                                                    Global.from_register = true;
                                                     Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                                                     intent.putExtra(PROFILESTATUS, "abc");
                                                     startActivity(intent);
+
                                                     finish();
                                                 }
                                             });
@@ -420,7 +445,7 @@ public class SignupActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        setStatusBarColor(this,R.color.colorWhite);
+        setStatusBarColor(this, R.color.colorWhite);
     }
 }
 

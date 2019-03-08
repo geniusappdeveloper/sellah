@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,8 +27,10 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -46,6 +49,7 @@ import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.CenterZoomLayoutManager;
 import com.app.admin.sellah.controller.utils.ChatActivityController;
+import com.app.admin.sellah.controller.utils.DetectSwipeGestureListener;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.RecyclerViewClickListener;
@@ -173,7 +177,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     boolean isBlocked;
     private PagerContainer mContainer;
     private ViewPager pager;
-
+    private GestureDetectorCompat gestureDetectorCompat = null;
     public ChatActivity() {
 
     }
@@ -195,7 +199,21 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         chatedListRecord = new ArrayList<>();
         setUpchatHeaderList();
         getChatListApi();
+
+        DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
+
+        gestureListener.setActivity(this);
+
+
+        gestureDetectorCompat = new GestureDetectorCompat(this, gestureListener);
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetectorCompat.onTouchEvent(event);
+        return true;
+    }
+
 
     private void getIntentData() {
         Intent in = getIntent();
@@ -377,6 +395,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     @Override
     protected void onStop() {
         super.onStop();
+        new ApisHelper().cancel_chatlist();
         Log.e("chatActivity", "onStop: ");
         SCREEN_STATUS = "";
     }
@@ -503,11 +522,14 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                 otherUserName = chatedListRecord.get(position).getFriendName();
                 otherUserId = chatedListRecord.get(position).getFriendId();
 
-                if (!TextUtils.isEmpty(chatedListRecord.get(position).getOnlineStatus()) && chatedListRecord.get(position).getOnlineStatus().equalsIgnoreCase("Y")) {
+                if (!TextUtils.isEmpty(chatedListRecord.get(position).getOnlineStatus()) && chatedListRecord.get(position).getOnlineStatus().equalsIgnoreCase("ON")) {
                     imgOnline.setVisibility(View.VISIBLE);
-                    txtLastSeen.setVisibility(View.GONE);
+                    imgOnline.setBackgroundResource(R.drawable.dot_online);
+                    txtLastSeen.setVisibility(View.VISIBLE);
+                    txtLastSeen.setText("Online");
                 } else {
-                    imgOnline.setVisibility(View.INVISIBLE);
+                    imgOnline.setVisibility(View.VISIBLE);
+                   imgOnline.setBackgroundResource(R.drawable.red_dot_icon);
                     txtLastSeen.setVisibility(View.VISIBLE);
                     if (!TextUtils.isEmpty(chatedListRecord.get(position).getLastSeenTime()))
                         txtLastSeen.setText("Last seen " + ": " + Global.getTimeAgo(Global.convertUTCToLocal(chatedListRecord.get(position).getLastSeenTime())));

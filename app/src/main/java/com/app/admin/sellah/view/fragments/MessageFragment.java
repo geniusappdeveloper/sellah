@@ -18,13 +18,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.utils.Global;
-import com.app.admin.sellah.controller.utils.OnSwipeTouchListener;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.Record;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
@@ -63,6 +63,9 @@ public class MessageFragment extends Fragment {
     @BindView(R.id.rel_root_noti)
     RelativeLayout relRootNoti;
     Unbinder unbinder;
+    @BindView(R.id.ll_nochat)
+    LinearLayout llNochat;
+
     private View view;
     private MessageListAdapter oldMsgAdapter;
     private MessageListAdapter newMsgAdapter;
@@ -93,6 +96,7 @@ public class MessageFragment extends Fragment {
         txtMessage = view.findViewById(R.id.txt_message);
         txtNewMessage = view.findViewById(R.id.txt_new_message);
         actionButton = view.findViewById(R.id.floating_action_button);
+        ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         onCickListners();
         //Notification New Message List
        /* notificationNewMessList();
@@ -175,7 +179,6 @@ public class MessageFragment extends Fragment {
         getChatedListApi();
 
 
-
         return view;
     }
 
@@ -251,11 +254,11 @@ public class MessageFragment extends Fragment {
         //calling a method of the adapter class and passing the filtered list
         if (newMsgAdapter.getItemCount() != 0) {
             txtNewMessage.setVisibility(View.VISIBLE);
-            ((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
+            ((MainActivity) getActivity()).notificationImg.setVisibility(View.VISIBLE);
             return false;
         } else {
             txtNewMessage.setVisibility(View.GONE);
-            ((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
+            ((MainActivity) getActivity()).notificationImg.setVisibility(View.GONE);
             return true;
         }
         //new array list that will hold the filtered data
@@ -425,8 +428,20 @@ public class MessageFragment extends Fragment {
             @Override
             public void onGetChattedListSuccess(ChattedListModel body, Dialog dialog) {
                 try {
-                    setupOldMessageList(body);
+                    if (body.getStatus().equals("1")) {
+                        relRootNoti.setVisibility(View.VISIBLE);
+                        llNochat.setVisibility(View.GONE);
+                        setupOldMessageList(body);
+                    } else {
+                        relRootNoti.setVisibility(View.GONE);
+                        llNochat.setVisibility(View.VISIBLE);
+                    }
+
                 } catch (Exception e) {
+                     if (relRootNoti!=null)
+                    relRootNoti.setVisibility(View.GONE);
+                    if (llNochat!=null)
+                    llNochat.setVisibility(View.VISIBLE);
                     e.printStackTrace();
                 }
             }
@@ -520,11 +535,11 @@ public class MessageFragment extends Fragment {
         Global.getTotalHeightofLinearRecyclerView(getActivity(), newMessRecycler, R.layout.notification_mess_adapter, 0);
         if (newMsgList != null && newMsgList.size() > 0) {
             txtNewMessage.setVisibility(View.VISIBLE);
-            ((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
+            ((MainActivity) getActivity()).notificationImg.setVisibility(View.VISIBLE);
         } else {
             Global.getTotalHeightofLinearRecyclerView(getActivity(), newMessRecycler, R.layout.notification_mess_adapter, 0);
             txtNewMessage.setVisibility(View.GONE);
-            ((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
+            ((MainActivity) getActivity()).notificationImg.setVisibility(View.GONE);
         }
         new SwipeHelper(getActivity(), newMessRecycler) {
             @Override
@@ -568,5 +583,11 @@ public class MessageFragment extends Fragment {
 
             }
         };
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        new ApisHelper().cancel_chatlist();
     }
 }

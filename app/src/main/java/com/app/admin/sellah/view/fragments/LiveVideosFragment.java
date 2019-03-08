@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,9 +21,7 @@ import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
-import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SubCategoryController;
-import com.app.admin.sellah.model.extra.BannerModel.BannerModel;
 import com.app.admin.sellah.model.extra.Categories.GetCategoriesModel;
 import com.app.admin.sellah.model.extra.LiveVideoModel.LiveVideoModel;
 import com.app.admin.sellah.model.extra.LiveVideoModel.VideoList;
@@ -45,8 +41,6 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
 public class LiveVideosFragment extends Fragment implements SubCategoryController {
 
@@ -69,6 +63,10 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
     LinearLayout SliderDots;
     @BindView(R.id.recycler_spin_cat)
     RecyclerView spinCategory;
+    @BindView(R.id.ll_no_product)
+    LinearLayout llNoProduct;
+    @BindView(R.id.ll_no_network)
+    LinearLayout llNoNetwork;
 
     private VideoCategoriesAdptTwo videoCategoriesAdptTwo;
     List<VideoList> videoLists = new ArrayList<>();
@@ -103,7 +101,17 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
         unbinder = ButterKnife.bind(this, view);
         //  getVideoList();
         setUpLiveVideoOther();
-        getVideoListOther("");
+
+
+
+        if (Global.NetworStatus.isOnline(getActivity())) {
+            getVideoListOther("");
+        } else {
+            rvOtherVideos.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
         pagginationCode();
 
         setupBannerAdds();
@@ -228,7 +236,7 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
                                         viewPager.setCurrentItem(0);
 //                            Log.e("pagger","pos"+vPBannerAdd.getCurrentItem());
                                     } else {
-                                        viewPager.setCurrentItem((viewPager.getCurrentItem()+1));
+                                        viewPager.setCurrentItem((viewPager.getCurrentItem() + 1));
 //                            Log.e("pagger_else","pos"+vPBannerAdd.getCurrentItem());
                                     }
                                 }
@@ -342,7 +350,7 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
     }
 
     public void getVideoListOther(String cat) {
-        new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage),ExpandableListData.getCatId(cat), new ApisHelper.GetLiveVideoCallback() {
+        new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage), ExpandableListData.getCatId(cat), new ApisHelper.GetLiveVideoCallback() {
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel msg) {
                 if (TOTAL_PAGES == 0) {
@@ -353,10 +361,20 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
                 videoLists.addAll(msg.getList());
 
                 Log.e("csdvcsd", list.size() + "");
-                 if(pbHome.getVisibility()==View.VISIBLE)
-                 {
-                     pbHome.setVisibility(View.GONE);
-                 }
+                if (pbHome!=null) {
+                    pbHome.setVisibility(View.GONE);
+                }
+
+                if (videoLists.size() == 0) {
+                    llNoProduct.setVisibility(View.VISIBLE);
+                    rvOtherVideos.setVisibility(View.GONE);
+                    llNoNetwork.setVisibility(View.GONE);
+                } else {
+                    llNoNetwork.setVisibility(View.GONE);
+                    llNoProduct.setVisibility(View.GONE);
+                    rvOtherVideos.setVisibility(View.VISIBLE);
+                }
+
 
 //                Collections.reverse(videoLists);
                 isFeedsFetchInProgress = false;
@@ -372,6 +390,11 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
         });
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        new ApisHelper().getvideodata_cancel();
+    }
 
     @Override
     public void onDestroyView() {
@@ -453,7 +476,7 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
         //sub Category recycler set Adapter
 //        forSaleList();
         if (list != null) {
-            subCategoryAdapter = new SubCategoryLive1Adapter(list, getActivity(),this);
+            subCategoryAdapter = new SubCategoryLive1Adapter(list, getActivity(), this);
 
             LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
             spinCategory.setLayoutManager(horizontalLayoutManager1);
@@ -469,7 +492,15 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
         videoLists.clear();
         videoCategoriesAdptNew.notifyDataSetChanged();
         currentPage = 1;
-        getVideoListOther(subCatId);
+
+        if (Global.NetworStatus.isOnline(getActivity())) {
+            getVideoListOther(subCatId);
+        } else {
+            rvOtherVideos.setVisibility(View.GONE);
+            llNoNetwork.setVisibility(View.VISIBLE);
+            llNoProduct.setVisibility(View.GONE);
+        }
+
 
     }
 

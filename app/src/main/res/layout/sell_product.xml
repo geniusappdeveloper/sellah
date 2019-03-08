@@ -104,7 +104,16 @@ to make their products look better by choosing the way they comfortable the most
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-
+    <com.app.admin.sellah.controller.stripe.StripeButton
+        android:id="@+id/btn_stripe_connect"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginRight="@dimen/_8sdp" />
 
 
 </RelativeLayout>

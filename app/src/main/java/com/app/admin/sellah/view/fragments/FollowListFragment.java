@@ -84,7 +84,6 @@ public class FollowListFragment extends Fragment {
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).profile.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).changeOptionColor(4);
 
     }

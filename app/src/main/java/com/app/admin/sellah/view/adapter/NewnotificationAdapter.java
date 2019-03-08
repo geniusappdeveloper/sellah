@@ -72,7 +72,7 @@ public class NewnotificationAdapter extends RecyclerView.Adapter<Newnotification
         holder.read.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ApisHelper().readNotificationApi(context, newMessList.get(position).getNotiId(), new ApisHelper.ReadNotificationCallback() {
+                new ApisHelper().readNotificationApi(context, newMessList.get(position).getNotiId(),"one", new ApisHelper.ReadNotificationCallback() {
                     @Override
                     public void onReadNotificationSuccess(String msg) {
                         notificationListModel.getArrFollow().get(position).setReadStatus("1");

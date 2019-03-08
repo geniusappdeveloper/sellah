@@ -136,7 +136,7 @@
         android:layout_marginBottom="@dimen/_2sdp"
         android:padding="@dimen/_2sdp"
 
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/img_like"

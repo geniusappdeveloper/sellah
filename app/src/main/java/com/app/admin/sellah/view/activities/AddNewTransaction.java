@@ -1,12 +1,21 @@
 package com.app.admin.sellah.view.activities;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,7 +45,10 @@ import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.adapter.SpinnerStateAdapter;
 import com.app.admin.sellah.view.fragments.HomeFragment;
 import com.app.admin.sellah.view.fragments.ProductFrgament;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +58,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -103,22 +116,29 @@ public class AddNewTransaction extends AppCompatActivity {
     private String paymentType = "";
     private String deliveryType = "";
     private Result productDetails;
-    List<String> imageList = new ArrayList<>();
+
     private boolean isEditing = false;
     boolean isPromotClicked = false;
     String isPromotingProduct = "N";
     private String promotepackageId = "NA";
+    byte[] byteArray;
+    GetProductList productList;
+    MultipartBody.Part multipartimage;
+    MultipartBody.Part multipartimage1;
+    MultipartBody.Part multipartimage2;
+    MultipartBody.Part multipartimage3;
+    MultipartBody.Part multipartimage4;
+    MultipartBody.Part multipartimage5;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StatusBarLightMode(this);
         setContentView(R.layout.activity_add_new_transaction);
+        LocalBroadcastManager.getInstance(this).registerReceiver(br, new IntentFilter("data"));
         ButterKnife.bind(this);
         setUpPaymentOptions();
         setUpDeliveryOptions();
         getdata();
-
-
     }
 
 
@@ -153,8 +173,8 @@ public class AddNewTransaction extends AppCompatActivity {
                     rl3.setBackgroundResource(R.drawable.live_product_detail_background);
 
                 } else {
-                    paymentType = "Payment Method";
-                    txtPaymentType.setTextColor(getResources().getColor(R.color.light_grey));
+                    paymentType = "Credit Card";
+                    txtPaymentType.setTextColor(getResources().getColor(R.color.colorBlack));
                 }
 
 
@@ -335,13 +355,13 @@ public class AddNewTransaction extends AppCompatActivity {
                 onBackPressed();
                 break;
             case R.id.rl3:
-                spinnerPaymentMode.performClick();
+              //  spinnerPaymentMode.performClick();
                 break;
             case R.id.delivery_rl:
                 spinnerModeOfDelivery.performClick();
                 break;
             case R.id.currency_rl:
-                spinSellInternationally.performClick();
+              //  spinSellInternationally.performClick();
                 break;
             case R.id.feature_rl:
                 featuredSp.performClick();
@@ -349,8 +369,8 @@ public class AddNewTransaction extends AppCompatActivity {
             case R.id.add_product_post:
 
                 Global.hideKeyboard(rootTag, this);
-                imageList.addAll(AddProductDatabase.imageListG);
-                if (imageList.size() == 0) {
+
+                if (AddProductDatabase.imageListG.size() == 0) {
                     Snackbar.make(rootTag, "Please add at-least one image for product", Snackbar.LENGTH_SHORT)
                             .setAction("", null).show();
                 } else if (AddProductDatabase.name.equalsIgnoreCase("")) {
@@ -418,29 +438,48 @@ public class AddNewTransaction extends AppCompatActivity {
                     model.setBudget(RequestBody.create(MediaType.parse("text/plain"), Global.getText(edtBudget).replace("S$", "")));
                     model.setNo_of_clicks(RequestBody.create(MediaType.parse("text/plain"), "0"));
 
-                    for (int i = 0; i < imageList.size(); i++) {
+                    for (int i = 0; i < AddProductDatabase.imageListG.size(); i++) {
 
                         if (i == 0) {
-                            model.setImage1(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image1"));
+
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(0)));
+                            multipartimage1 = MultipartBody.Part.createFormData("image1", "imageA.jpeg", image);
+
+                          //  model.setImage1(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image1"));
                             Log.e("image1", model.getImage1() + "");
                         } else if (i == 1) {
-                            model.setImage2(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image2"));
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(1)));
+                            multipartimage2 = MultipartBody.Part.createFormData("image2", "imageB.jpeg", image);
+                           // model.setImage2(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image2"));
                         } else if (i == 2) {
-                            model.setImage3(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image3"));
+
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(2)));
+                            multipartimage3 = MultipartBody.Part.createFormData("image3", "imageC.jpeg", image);
+                           // model.setImage3(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image3"));
                         } else if (i == 3) {
-                            model.setImage4(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image4"));
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(3)));
+                            multipartimage4 = MultipartBody.Part.createFormData("image4", "imageD.jpeg", image);
+                           // model.setImage4(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image4"));
                         } else if (i == 4) {
-                            model.setImage5(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image5"));
-                        } else if (i == 5) {
-                            model.setImage6(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image6"));
-                        } else if (i == 6) {
-                            model.setImage7(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image7"));
-                        } else if (i == 7) {
-                            model.setImage8(ImageUploadHelper.convertImageTomultipart(imageList.get(i), "image8"));
+
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(4)));
+                            multipartimage5 = MultipartBody.Part.createFormData("image5", "imageE.jpeg", image);
+                            //model.setImage5(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image5"));
                         }
                         if (Global.videopath.equals("no_image")) {
 
                         } else {
+                            Bitmap thumb = ThumbnailUtils.createVideoThumbnail(Global.videopath, MediaStore.Images.Thumbnails.MICRO_KIND);
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            thumb.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                            byteArray = stream.toByteArray();
+                            if (byteArray!=null)
+                            {
+
+                                RequestBody image = RequestBody.create(MediaType.parse("image/*"), byteArray);
+                                multipartimage = MultipartBody.Part.createFormData("product_video_thumbnail", "thumb.jpeg", image);
+                            }
+
                             model.setProductVideo(ImageUploadHelper.convertImageTomultipart(Global.videopath, "product_video"));
                         }
                     }
@@ -476,8 +515,13 @@ public class AddNewTransaction extends AppCompatActivity {
                                     model.setPackageId(RequestBody.create(MediaType.parse("text/plain"), ""));
                                 }
                                 model.setPromote_product(RequestBody.create(MediaType.parse("text/plain"), isPromotingProduct));
+
+
+                                Gson gson = new GsonBuilder().create();
+                                Log.e( "onViewClicked: ",""+AddProductDatabase.imageListG );
+                                Log.e("addProduct", "allDone" + gson.toJson(model));
                                 addProduct(model);
-                                Log.e("addProduct", "allDone");
+
                             }
                         }).show();
                     }
@@ -525,6 +569,7 @@ public class AddNewTransaction extends AppCompatActivity {
 
     public void addProduct(AddProductModel addProductModel) {
 
+
         WebService service = Global.WebServiceConstants.getRetrofitinstance();
         Dialog dialog = S_Dialogs.getLoadingDialog(AddNewTransaction.this);
         dialog.show();
@@ -532,20 +577,24 @@ public class AddNewTransaction extends AppCompatActivity {
                 , addProductModel.getPayment_mode(), addProductModel.getDelivery(), addProductModel.getSell_internationally(), addProductModel.getPrice()
                 , addProductModel.getFixed_price(), addProductModel.getProduct_type(), addProductModel.getQuantity(), addProductModel.getDescription()
                 , addProductModel.getPromote_product(), addProductModel.getNo_of_clicks(), addProductModel.getBudget(), addProductModel.getTags()
-                , addProductModel.getImage1(), addProductModel.getImage2(), addProductModel.getImage3(), addProductModel.getImage4(), addProductModel.getImage5(), addProductModel.getImage6()
-                , addProductModel.getImage7(), addProductModel.getImage8(), addProductModel.getPackageId(), addProductModel.getProductVideo());
+                , multipartimage1, multipartimage2, multipartimage3, multipartimage4, multipartimage5, addProductModel.getPackageId(), addProductModel.getProductVideo(),multipartimage);
         addProductCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
                 if (response.isSuccessful()) {
+                    removedata();
+                    Global.videopath="no_image";
+                    AddProductDatabase.imageListG.clear();
+                    AddProductDatabase.tagListG.clear();
 
+                   productList = response.body();
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         Snackbar.make(rootTag, response.body().getMessage(), Snackbar.LENGTH_SHORT)
                                 .setAction("", null).show();
-                        Global.videopath="no_image";
+
 
                         if (isPromotingProduct.equalsIgnoreCase("Y")) {
                             try {
@@ -554,13 +603,10 @@ public class AddNewTransaction extends AppCompatActivity {
                                     public void onPaymentSuccess() {
 
                                         Toast.makeText(AddNewTransaction.this, "Product promoted successfully.", Toast.LENGTH_SHORT).show();
-                                        getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                                         Log.e( "onPaymentSuccess: ",response.body().getResult().get(0).getId() );
                                         Intent intent = new Intent(AddNewTransaction.this,MainActivity.class);
+                                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0));
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        intent.putExtra("id",response.body().getResult().get(0).getId());
-                                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0).getId());
-
                                         startActivity(intent);
 
                                     }
@@ -632,6 +678,7 @@ public class AddNewTransaction extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+
                     Snackbar.make(rootTag, "Something went wrong", Snackbar.LENGTH_SHORT)
                             .setAction("", null).show();
                 }
@@ -650,6 +697,71 @@ public class AddNewTransaction extends AppCompatActivity {
         });
     }
 
+  public byte[] bytes(String path)
+  {
 
+      BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+      Bitmap bitmap = BitmapFactory.decodeFile(path,bmOptions);
+      ByteArrayOutputStream stream = new ByteArrayOutputStream();
+      bitmap.compress(Bitmap.CompressFormat.JPEG, 30, stream);
+      byte[] by= stream.toByteArray();
+      return by;
+  }
+
+             private void removedata() {
+
+             AddProductDatabase.name = "";
+             AddProductDatabase.category=0;
+             AddProductDatabase.sub_category=0;
+             AddProductDatabase.price="";
+             AddProductDatabase.type=0;
+             AddProductDatabase.condition=0;
+             AddProductDatabase.quantity="";
+             AddProductDatabase.tags="";
+             AddProductDatabase.description="";
+
+
+    }
+
+    private BroadcastReceiver br = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                PaymentDialog.create(AddNewTransaction.this, "", HelperPreferences.get(AddNewTransaction.this).getString(UID), productList.getResult().get(0).getId(), productList.getPackage_id(), productList.getPromote_id(), new PaymentDialog.PaymentCallBack() {
+                    @Override
+                    public void onPaymentSuccess() {
+
+                        Toast.makeText(AddNewTransaction.this, "Product promoted successfully.", Toast.LENGTH_SHORT).show();
+                        Log.e( "onPaymentSuccess: ",productList.getResult().get(0).getId() );
+                        Intent intent = new Intent(AddNewTransaction.this,MainActivity.class);
+                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, productList.getResult().get(0));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+
+                    }
+
+                    @Override
+                    public void onPaymentFail(String message) {
+                        Toast.makeText(AddNewTransaction.this, "Unable to promote product at the movement", Toast.LENGTH_SHORT).show();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
+
+                    }
+
+                    @Override
+                    public void onCancelDialog() {
+                        Intent intent = new Intent(AddNewTransaction.this,MainActivity.class);
+                        intent.putExtra(SAConstants.Keys.PRODUCT_DETAIL, productList.getResult().get(0));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                }).show();
+
+            } catch (Exception e) {
+
+            }
+
+
+        }
+    };
 
 }

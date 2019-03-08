@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -25,6 +26,7 @@ import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.commonResults.Common;
+import com.app.admin.sellah.view.CustomDialogs.PaymentDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 
 import java.text.ParseException;
@@ -282,22 +284,38 @@ public class AddCreditCardDetailFragment extends AppCompatActivity {
         updateCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
-                if (response.isSuccessful()) {
-                    if (response.body().getStatus().equalsIgnoreCase("1")) {
-                        Toast.makeText(AddCreditCardDetailFragment.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                        onBackPressed();
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                try
+                {
+                    Log.e( "onResponse: ", response.body().toString());
+                    if (response.isSuccessful()) {
+                        if (response.body().getStatus().equalsIgnoreCase("1")) {
+                            Toast.makeText(AddCreditCardDetailFragment.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            Intent bi = new Intent("data");
+                            bi.putExtra("dd","dd");
+                            LocalBroadcastManager.getInstance(AddCreditCardDetailFragment.this).sendBroadcast(bi);
+                            onBackPressed();
+
+
+                            Global.HITCARD  = "hit_card";
                         /*
                         Snackbar.make(liBottomRoot, response.body().getMessage(), Snackbar.LENGTH_SHORT)
                                 .setAction("", null).show();*/
 //                        new On.Handle(
-                    } else {
-                        Snackbar.make(liBottomRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
-                                .setAction("", null).show();
+                        } else {
+                            Snackbar.make(liBottomRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
+                                    .setAction("", null).show();
+                        }
+
                     }
-                    if (dialog != null && dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
-                }
+                }catch (Exception e){
+                    Log.e( "onResponse: ",""+ e.getLocalizedMessage());
+                    e.printStackTrace();}
+
+
+
             }
 
             @Override

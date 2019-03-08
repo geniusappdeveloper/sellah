@@ -27,6 +27,7 @@ import com.app.admin.sellah.model.extra.LoginPojo.LoginResult;
 import com.app.admin.sellah.model.extra.ResendCode.ResendCode;
 import com.app.admin.sellah.view.CustomDialogs.OTPVerificationDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 
 import java.io.IOException;
 
@@ -37,6 +38,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
+import static com.app.admin.sellah.controller.utils.Global.deleted_account;
 import static com.app.admin.sellah.controller.utils.Global.makeLinks;
 import static com.app.admin.sellah.controller.utils.Global.setStatusBarColor;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PROFILESTATUS;
@@ -171,91 +175,35 @@ public class LoginActivity extends AppCompatActivity {
                     LoginResult loginResult = response.body();
                     if (response.isSuccessful()) {
 
+
                         if (loginResult.getStatus().equalsIgnoreCase("1")) {
                             Snackbar.make(rel_root, loginResult.getMessage(), Snackbar.LENGTH_SHORT)
                                     .setAction("", null).show();
 
-                            if (loginResult.getResult().getIsVerified().equalsIgnoreCase("N")) {
+
+                            if (loginResult.getResult().getIsDeleted().equalsIgnoreCase("Y"))
+                            {
+
+                                S_Dialogs.getLiveVideoStopedDialog(LoginActivity.this, "You have deleted your account. \n" +
+                                        "To recover your account. \n" +
+                                        "Please verify your phone number.", ((dialog, which) -> {
+                                    //--------------openHere-----------------
+
+                                    otpsendapi(loginResult);
+                                    deleted_account = true;
+
+                                })).show();
+
+                            }
+
+                           else if (loginResult.getResult().getIsVerified().equalsIgnoreCase("N")) {
 
                                 /**
                                  * Api to complete OTP verification Process if OTP is not verified.
                                  * */
-                                Call<ResendCode> recendCodeCall = webService.reSendOTPApi(loginResult.getResult().getUserId(), "");
-                                recendCodeCall.enqueue(new Callback<ResendCode>() {
-                                    @Override
-                                    public void onResponse(Call<ResendCode> call, Response<ResendCode> response) {
-                                        Log.e("ResendCode_response", response.isSuccessful() + "");
 
-                                        if (response.isSuccessful()) {
-                                            ResendCode resendCode = response.body();
-                                            if (resendCode.getStatus().equalsIgnoreCase("1")) {
-                                                Log.e("ResendCode_response", resendCode.getResult().getVerificationCode() + "");
-                                                Toast.makeText(LoginActivity.this, resendCode.getMessage(), Toast.LENGTH_SHORT).show();
-
-                                                /**
-                                                 * OTPVerificationDialog
-                                                 * By: Raghubeer singh Virk
-                                                 * To: verify otp from api and entered otp from user.
-                                                 * Provide: user interface to show resend otp options,timer, Pin view to enter otp.
-                                                 * */
-                                                OTPVerificationDialog.create(LoginActivity.this, loginResult.getResult().getUserId(), loginResult.getResult().getCountryCode(), "", loginResult.getResult().getPhoneNumber(), resendCode.getResult().getVerificationCode(),
-                                                        new OTPVerificationDialog.OTPVerificationListener() {
-                                                            @Override
-                                                            public void onOTPVerified() {
-
-                                                                /*
-                                                                 * OTP verification success listener
-                                                                 * */
-                                                                HelperPreferences.get(LoginActivity.this).saveString(UID, resendCode.getResult().getUserId());
-                                                                HelperPreferences.get(LoginActivity.this).saveString(PROFILESTATUS, loginResult.getResult().getIsProfileCompleted());
-                                                                onBackPressed();
-                                                                new DeviceRegistaration().registerDevice(LoginActivity.this, resendCode.getResult().getUserId());
-
-                                                                /*Global.ProfileStatusCheck.checkProfileStatus(LoginActivity.this, new Global.ProfileStatusCheck.ProfileStatusCallback() {
-                                                                    @Override
-                                                                    public void onIfProfileUpdated() {
-                                                                        onBackPressed();
-                                                                        new DeviceRegistaration().registerDevice(LoginActivity.this, resendCode.getResult().getUserId());
-                                                                    }
-
-                                                                    @Override
-                                                                    public void onIfProfileNotUpdated() {
-                                                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                                        intent.putExtra(PROFILESTATUS,"abc");
-                                                                        startActivity(intent);
-                                                                        finish();
-                                                                        Log.e(TAG, "onIfProfileNotUpdated:Profile not updated");
-
-                                                                    }
-                                                                });*/
-                                                            }
-
-                                                            @Override
-                                                            public void onOTPNotVerified() {
-
-                                                            }
-                                                        }
-                                                        /*() -> {
-                                                         *//* Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                                            startActivity(intent);
-                                                            finishAffinity();*//*
-                                                            onBackPressed();
-                                                            new DeviceRegistaration().registerDevice(LoginActivity.this,resendCode.getResult().getUserId());
-                                                            HelperPreferences.get(LoginActivity.this).saveString(UID, resendCode.getResult().getUserId());
-                                                        }*/).show();
-                                            } else {
-                                                Toast.makeText(LoginActivity.this, resendCode.getMessage(), Toast.LENGTH_SHORT).show();
-                                            }
-                                        } else {
-                                            Toast.makeText(LoginActivity.this, "Something went's wrong", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResendCode> call, Throwable t) {
-                                        Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                otpsendapi(loginResult);
+                                deleted_account = false;
 
 
                             } else {
@@ -272,9 +220,11 @@ public class LoginActivity extends AppCompatActivity {
                                         /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
                                         finishAffinity();*/
-
                                         HelperPreferences.get(LoginActivity.this).saveString(UID, loginResult.getResult().getUserId());
                                         HelperPreferences.get(LoginActivity.this).saveString(PROFILESTATUS, loginResult.getResult().getIsProfileCompleted());
+                                        HelperPreferences.get(LoginActivity.this).saveString(API_ACCESS_TOKEN, loginResult.getResult().getStripe_id());
+                                        HelperPreferences.get(LoginActivity.this).saveString(STRIPE_VERIFIED, loginResult.getResult().getStripe_verified());
+
                                         Global.ProfileStatusCheck.checkProfileStatus(LoginActivity.this, new Global.ProfileStatusCheck.ProfileStatusCallback() {
                                             @Override
                                             public void onIfProfileUpdated() {
@@ -385,6 +335,91 @@ public class LoginActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         this.finish();
+    }
+
+    public void otpsendapi(LoginResult loginResult)
+    {
+        Call<ResendCode> recendCodeCall = webService.reSendOTPApi(loginResult.getResult().getUserId(), "");
+        recendCodeCall.enqueue(new Callback<ResendCode>() {
+            @Override
+            public void onResponse(Call<ResendCode> call, Response<ResendCode> response) {
+                Log.e("ResendCode_response", response.isSuccessful() + "");
+
+                if (response.isSuccessful()) {
+                    ResendCode resendCode = response.body();
+                    if (resendCode.getStatus().equalsIgnoreCase("1")) {
+                        Log.e("ResendCode_response", resendCode.getResult().getVerificationCode() + "");
+                        Toast.makeText(LoginActivity.this, resendCode.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        /**
+                         * OTPVerificationDialog
+                         * By: Raghubeer singh Virk
+                         * To: verify otp from api and entered otp from user.
+                         * Provide: user interface to show resend otp options,timer, Pin view to enter otp.
+                         * */
+                        OTPVerificationDialog.create(LoginActivity.this, loginResult.getResult().getUserId(), loginResult.getResult().getCountryCode(), "", loginResult.getResult().getPhoneNumber(), resendCode.getResult().getVerificationCode(),
+                                new OTPVerificationDialog.OTPVerificationListener() {
+                                    @Override
+                                    public void onOTPVerified() {
+
+                                        /*
+                                         * OTP verification success listener
+                                         * */
+                                        HelperPreferences.get(LoginActivity.this).saveString(STRIPE_VERIFIED, loginResult.getResult().getStripe_verified());
+                                        HelperPreferences.get(LoginActivity.this).saveString(API_ACCESS_TOKEN, loginResult.getResult().getStripe_id());
+
+                                        HelperPreferences.get(LoginActivity.this).saveString(UID, resendCode.getResult().getUserId());
+                                        HelperPreferences.get(LoginActivity.this).saveString(PROFILESTATUS, loginResult.getResult().getIsProfileCompleted());
+                                        onBackPressed();
+                                        new DeviceRegistaration().registerDevice(LoginActivity.this, resendCode.getResult().getUserId());
+
+                                                                /*Global.ProfileStatusCheck.checkProfileStatus(LoginActivity.this, new Global.ProfileStatusCheck.ProfileStatusCallback() {
+                                                                    @Override
+                                                                    public void onIfProfileUpdated() {
+                                                                        onBackPressed();
+                                                                        new DeviceRegistaration().registerDevice(LoginActivity.this, resendCode.getResult().getUserId());
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onIfProfileNotUpdated() {
+                                                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                                        intent.putExtra(PROFILESTATUS,"abc");
+                                                                        startActivity(intent);
+                                                                        finish();
+                                                                        Log.e(TAG, "onIfProfileNotUpdated:Profile not updated");
+
+                                                                    }
+                                                                });*/
+                                    }
+
+                                    @Override
+                                    public void onOTPNotVerified() {
+
+                                    }
+                                }
+                                /*() -> {
+                                 *//* Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                            startActivity(intent);
+                                                            finishAffinity();*//*
+                                                            onBackPressed();
+                                                            new DeviceRegistaration().registerDevice(LoginActivity.this,resendCode.getResult().getUserId());
+                                                            HelperPreferences.get(LoginActivity.this).saveString(UID, resendCode.getResult().getUserId());
+                                                        }*/).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, resendCode.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Something went's wrong", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResendCode> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
    /* @OnClick(R.id.forgotPass)

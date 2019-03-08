@@ -25,7 +25,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:cardBackgroundColor="#ffffff"
                 app:cardCornerRadius="@dimen/_2sdp"
                 app:cardElevation="@dimen/_3sdp"
                 app:cardUseCompatPadding="true">
@@ -87,6 +86,7 @@
 
                         <ImageView
                             android:visibility="gone"
+                            android:layout_alignParentRight="true"
                             android:id="@+id/starImg"
                             android:layout_alignParentBottom="true"
                             android:layout_width="@dimen/_30sdp"
@@ -95,32 +95,29 @@
                             android:src="@drawable/heart" />
 
 
+
+
+
+
+
                         <ImageView
-                            android:id="@+id/starImg1"
-                            android:layout_alignParentBottom="true"
-                            android:layout_width="@dimen/_30sdp"
-                            android:layout_height="@dimen/_30sdp"
-                            android:padding="@dimen/_7sdp"
-                            android:src="@drawable/heart" />
+                            android:tint="@color/colorWhite"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:layout_marginRight="@dimen/_10sdp"
+                            android:rotation="90"
+                            android:id="@+id/sub_cat_option"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:layout_alignParentRight="true"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/option_icon" />
 
 
                         <TextView
-                            android:textColor="@color/colorWhite"
-                            android:paddingLeft="@dimen/_1sdp"
-                            android:gravity="center_vertical"
-                            android:text="20"
-                            android:layout_toRightOf="@+id/starImg1"
-                            android:id="@+id/dummylike"
-                            android:layout_alignParentBottom="true"
-                            android:layout_width="wrap_content"
-                            android:layout_height="@dimen/_30sdp"
-                            />
-
-                        <TextView
+                            android:layout_below="@+id/sub_cat_option"
                             android:id="@+id/edit_quanitity"
                             android:padding="@dimen/_3sdp"
                             android:background="@color/colorRed"
-                            android:layout_marginTop="@dimen/_10sdp"
                             android:layout_marginRight="@dimen/_10sdp"
                             android:layout_alignParentRight="true"
                             android:layout_width="wrap_content"
@@ -135,8 +132,8 @@
 
                         <me.relex.circleindicator.CircleIndicator
                             android:id="@+id/indicator"
+                            android:layout_centerHorizontal="true"
                             android:layout_marginRight="@dimen/_5sdp"
-                            android:layout_alignParentRight="true"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/_45sdp"
                             android:layout_alignParentBottom="true" />
@@ -147,19 +144,21 @@
                         android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
-                            android:layout_marginTop="@dimen/_8sdp"
+                            android:layout_centerVertical="true"
                             android:id="@+id/txt_product_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="@dimen/_10sdp"
                             android:text="Golf Plus 2005"
                             android:textColor="#123"
-                            android:textSize="@dimen/_17sdp" />
+                            android:textSize="@dimen/_14sdp" />
+
 
                         <RelativeLayout
+                            android:layout_alignParentRight="true"
                             android:layout_marginRight="@dimen/_12sdp"
-                             android:layout_alignParentRight="true"
                             android:layout_gravity="right"
                             android:layout_width="@dimen/_45sdp"
                             android:layout_height="@dimen/_40sdp"
@@ -192,6 +191,8 @@
                                 android:textSize="@dimen/_8sdp"
                                 tools:text="9" />
                         </RelativeLayout>
+
+
 
                     </RelativeLayout>
 
@@ -446,7 +447,6 @@
 
                <!-- current promote product no need now -->
             <android.support.v7.widget.CardView
-                android:visibility="gone"
                 android:id="@+id/card_promote_packages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -570,7 +570,7 @@
                             android:layout_height="@dimen/_8sdp"
                             android:layout_below="@+id/txt_otheruser_name"
                             android:layout_marginLeft="@dimen/_8sdp"
-                            android:layout_marginTop="@dimen/_9sdp"
+                            android:layout_marginTop="@dimen/_7sdp"
 
                             android:foregroundGravity="center_vertical"
                             android:src="@drawable/online_icon"
@@ -792,12 +792,12 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_8sdp"
             android:layout_weight="1"
-            android:background="@drawable/live_product_detail_red_background"
+            android:background="@drawable/make_offer_btn_bg"
             android:elevation="10dp"
             android:padding="3dp"
             android:text="Make Offer"
             android:textAllCaps="false"
-            android:textColor="@color/colorRed" />
+            android:textColor="@color/colorWhite" />
     </LinearLayout>
 
 

@@ -259,8 +259,18 @@ public class AddProductModel {
     MultipartBody.Part image4;
     MultipartBody.Part image5;
     MultipartBody.Part image6;
+
+    public MultipartBody.Part getThumbnail_image() {
+        return thumbnail_image;
+    }
+
+    public void setThumbnail_image(MultipartBody.Part thumbnail_image) {
+        this.thumbnail_image = thumbnail_image;
+    }
+
     MultipartBody.Part image7;
     MultipartBody.Part image8;
+    MultipartBody.Part thumbnail_image;
 
 
 }

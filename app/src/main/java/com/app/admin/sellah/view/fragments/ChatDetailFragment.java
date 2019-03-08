@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,37 +30,45 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.controller.utils.ChatActivityController;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.ImageUploadHelper;
-import com.app.admin.sellah.controller.utils.MessageToneManager;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.ChatModel.ChatMessageModel;
 import com.app.admin.sellah.model.extra.MakeOffer.MakeOfferModel;
 import com.app.admin.sellah.model.extra.MessagesModel.ChatListModel;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
-import com.app.admin.sellah.model.extra.RegisterPojo.Message;
 import com.app.admin.sellah.model.extra.UploadChatImage.UploadChatImageModel;
 import com.app.admin.sellah.view.CustomDialogs.AddTestoimonialDailog;
 import com.app.admin.sellah.view.CustomDialogs.MakeOfferDialog;
+import com.app.admin.sellah.view.CustomDialogs.PaymentDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.adapter.ChatAdapter;
+import com.app.admin.sellah.view.adapter.Pay_offer_adapter;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,7 +79,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,6 +93,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.Global.getBytesFromBitmap;
 import static com.app.admin.sellah.controller.utils.Global.playMessageTone;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.EVENT_CREATEROOM;
@@ -93,9 +102,8 @@ import static com.app.admin.sellah.controller.utils.SAConstants.Keys.EVENT_READM
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_DATA;
-import static org.webrtc.ContextUtils.getApplicationContext;
 
-public class ChatDetailFragment extends Fragment/* implements ChatFragmentController */ {
+public class ChatDetailFragment extends Fragment implements ChatActivityController {
 
     Unbinder unbinder;
     View view;
@@ -118,11 +126,29 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     CardView cardBottomView;
     @BindView(R.id.fr_root)
     FrameLayout frRoot;
+    @BindView(R.id.pay_recycler)
+    RecyclerView payRecycler;
+    @BindView(R.id.btn_collapsed_items)
+    Button btnCollapsedItems;
+    @BindView(R.id.pay_newbtn)
+    Button payNewbtn;
+    @BindView(R.id.pay_layout)
+    LinearLayout payLayout;
+    @BindView(R.id.mark_ascomplete_recycler)
+    RecyclerView markAscompleteRecycler;
+    @BindView(R.id.markas_complete_btn_collapsed_items)
+    Button markasCompleteBtnCollapsedItems;
+    @BindView(R.id.markascomplete)
+    Button markascomplete;
+    @BindView(R.id.accept_layout)
+    LinearLayout acceptLayout;
     private WebService service;
     private boolean isConnected;
     String otherUserId;
     private List<ChatMessageModel> models;
     private ChatAdapter adapter;
+    private Pay_offer_adapter payoffer_adapter;
+    private Pay_offer_adapter mark_adapter;
     private int GALLERY = 1213;
     private int CAMERA_PIC_REQUEST = 1212;
     String otherUserName = "";
@@ -131,9 +157,24 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     private MakeOfferModel makeOfferResult;
     private Global app;
     private boolean isOffer;
+    private boolean from_api;
     String roomName = "";
+    int message_count;
+    String rec_id = "";
     //private boolean ActivityPaused = false;
     Call<ChatListModel> chatListCall;
+    Call<JsonObject> chatoffercall;
+    ArrayList<Map<String, String>> list = new ArrayList<>();
+    ArrayList<Map<String, String>> main_offer_list = new ArrayList<>();
+
+    ArrayList<Map<String, String>> mark_list = new ArrayList<>();
+    ArrayList<Map<String, String>> mark_main_offer_list = new ArrayList<>();
+    LinearLayoutManager linearLayoutManager;
+    ArrayList<Map<String, String>> extra_list = new ArrayList<>();
+    Map<String, String> map;
+    Map<String, String> mark_map;
+    String latitudeList;
+
     public ChatDetailFragment() {
 
     }
@@ -164,10 +205,11 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
         isOffer = true;
         service = Global.WebServiceConstants.getRetrofitinstance();
 
+
         models = new ArrayList<>();
         setUpMessgae(models);
         setUpSendButton();
-
+        getofferlist(otherUserId);
         return view;
     }
 
@@ -193,10 +235,9 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (chatListCall!=null)
-        chatListCall.cancel();
+        if (chatListCall != null)
+            chatListCall.cancel();
     }
-
 
 
     private void ConnectToSocket() {
@@ -313,7 +354,50 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    JSONObject object = null;
+                    try {
+                        object = new JSONObject(args[0].toString());
+                        if (object.has("receiver_id"))
+                        {
+                            if (!object.getString("receiver_id").equalsIgnoreCase(HelperPreferences.get(getActivity()).getString(UID))) {
+
+
+                                if (from_api) {
+                                    Log.e("run: ", "loop");
+                                    for (int i = 0; i < models.size(); i++) {
+                                        models.get(i).setMessage_read_status("Y");
+
+                                    }
+                                    adapter.notifyDataSetChanged();
+                                    from_api = false;
+                                } else {
+
+
+                                    int pos = linearLayoutManager.findFirstVisibleItemPosition();
+                                    int pos1 = linearLayoutManager.findLastVisibleItemPosition();
+                                    for (int i= pos;i<=pos1;i++)
+                                    {
+                                        models.get(i).setMessage_read_status("Y");
+                                    }
+                                    Log.e("run: ", ""+pos  +
+
+                                            pos1);
+                                    //models.get(adapter.getItemCount() - 1).setMessage_read_status("Y");
+                                    adapter.notifyDataSetChanged();
+
+                                }
+
+                            }
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
                     Log.e("Event_ReadMessage", "run: created" + args[0].toString());
+
                 }
             });
         }
@@ -354,13 +438,20 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                         e.printStackTrace();
                     }
 
-                    mSocket.emit(EVENT_READMESSAGE, roomName);
+
                     String mJsonString = String.valueOf(args[0]);
                     JsonParser parser = new JsonParser();
                     JsonElement mJson = parser.parse(mJsonString);
                     Gson gson = new Gson();
+
                     ChatMessageModel object = gson.fromJson(mJson, ChatMessageModel.class);
-                    Log.e("messageModel", "run: " + object.getType());
+
+                    Log.e("runaaaa: ", args[0].toString());
+
+                    Log.e("run: ", object.getReceiverId());
+                    Log.e("run: ", object.getMsgId());
+                    Log.e("run: ", roomName);
+
 
                     if (object != null) {
                         models.add(object);
@@ -369,6 +460,29 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                     } else {
                         Log.e("msg_object", "Error");
                     }
+
+                    if (!object.getSenderId().equalsIgnoreCase(HelperPreferences.get(getActivity()).getString(UID))) {
+
+
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+
+                            jsonObject.put("receiver_id", object.getReceiverId());
+                            jsonObject.put("message_id", object.getMsgId());
+                            jsonObject.put("room_name", roomName);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        mSocket.emit(EVENT_READMESSAGE, jsonObject);
+
+                    }
+
+
+                    Log.e("messageModel", "run: " + object.getType());
+
                 }
             });
         }
@@ -401,12 +515,15 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
         }*//*
 
     }*/
+
+
     private void setUpMessgae(List<ChatMessageModel> models) {
 
         try {
 
-            adapter = new ChatAdapter(models, getActivity(),txtReview);
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
+
+            adapter = new ChatAdapter(models, getActivity(), txtReview, this);
+             linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
             recMessage.setLayoutManager(linearLayoutManager);
             recMessage.setItemAnimator(new DefaultItemAnimator());
             recMessage.setAdapter(adapter);
@@ -446,9 +563,11 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     }
 
     private void getChathistoryApi(String otherUserId) {
-      //  Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
+        //  Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
 //        dialog.show();
-       chatListCall = service.getChatDetailApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
+
+
+        chatListCall = service.getChatDetailApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
 
 
         chatListCall.enqueue(new Callback<ChatListModel>() {
@@ -457,19 +576,18 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                 if (response.isSuccessful()) {
 
 
+
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         models.clear();
 
-                         ChatMessageModel chatMessageModel ;
+                        ChatMessageModel chatMessageModel;
 
-                        for (int i=0;i<response.body().getRecord().size();i++)
-                        {
-                          chatMessageModel=  new ChatMessageModel();
+                        for (int i = 0; i < response.body().getRecord().size(); i++) {
+                            chatMessageModel = new ChatMessageModel();
                             java.text.DateFormat readFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            if (models.isEmpty())
-                            {
+                            if (models.isEmpty()) {
 
-                                Log.e("date1: ",response.body().getRecord().get(i).getCreatedAt() );
+                                Log.e("date1: ", response.body().getRecord().get(i).getCreatedAt());
                                 try {
                                     Date strDate = readFormat.parse(response.body().getRecord().get(i).getCreatedAt());
                                     chatMessageModel.setMessage("");
@@ -478,6 +596,8 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                                     chatMessageModel.setMsgId("1");
                                     chatMessageModel.setSenderId("");
                                     chatMessageModel.setReceiverId("");
+                                    chatMessageModel.setProduct_image("");
+                                    chatMessageModel.setMessage_read_status("");
                                     chatMessageModel.setType("");
                                     chatMessageModel.setToday_boolean(true);
                                     chatMessageModel.setToday(datefun(strDate));
@@ -488,45 +608,34 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                                 }
 
 
+                            } else {
 
-
-                            }
-                            else
-                            {
-
-                                try
-                                {
-                                    Date strDate = readFormat.parse(response.body().getRecord().get(i-1).getCreatedAt());
+                                try {
+                                    Date strDate = readFormat.parse(response.body().getRecord().get(i - 1).getCreatedAt());
                                     Date strDate2 = readFormat.parse(response.body().getRecord().get(i).getCreatedAt());
                                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                                     String dateString = formatter.format(new Date(strDate.getTime()));
                                     String dateString1 = formatter.format(new Date(strDate2.getTime()));
 
-                                    Log.e("date2: ",dateString);
 
-                                    if (!dateString1.equalsIgnoreCase(dateString))
-                                    {
+                                    if (!dateString1.equalsIgnoreCase(dateString)) {
                                         String monthName = new SimpleDateFormat("MMMM").format(strDate2.getTime());
                                         SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
                                         String goal = outFormat.format(strDate2);
 
-                                        Log.e("goal: ",datefun(strDate2));
-                                        Log.e("date: ",dateString1 );
+
                                         chatMessageModel.setMessage("");
                                         chatMessageModel.setStatus("");
                                         chatMessageModel.setMsgId("1");
                                         chatMessageModel.setSenderId("");
                                         chatMessageModel.setReceiverId("");
                                         chatMessageModel.setType("");
+                                        chatMessageModel.setProduct_image("");
+                                        chatMessageModel.setMessage_read_status("");
                                         chatMessageModel.setToday_boolean(true);
                                         chatMessageModel.setToday(datefun(strDate2));
                                         models.add(chatMessageModel);
                                     }
-
-
-
-
-
 
 
                                 } catch (ParseException e) {
@@ -535,16 +644,41 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
 
                             }
 
+                            Gson gson = new GsonBuilder().create();
+                            String payloadStr = gson.toJson(response.body().getRecord());
+
+                         //   Log.e("getChathistoryApi: ", payloadStr);
                             response.body().getRecord().get(i).setToday_boolean(false);
                             response.body().getRecord().get(i).setToday(response.body().getRecord().get(i).getCreatedAt());
                             models.add(response.body().getRecord().get(i));
 
 
-
-
                         }
-                       // models.addAll(response.body().getRecord());
-                        Log.e("Chat_detailApi", "onResponse: success"+response.body().toString() );
+
+                        if (!models.get(models.size() - 1).getSenderId().equalsIgnoreCase((HelperPreferences.get(getActivity()).getString(UID)))) {
+
+                            Log.e("onResponse: ", models.get(models.size() - 1).getReceiverId());
+                            Log.e("onResponse: ", models.get(models.size() - 1).getMsgId());
+                            // variable for first api loop
+                            from_api = true;
+                            JSONObject jsonObject = new JSONObject();
+                            try {
+
+                                jsonObject.put("receiver_id", models.get(models.size() - 1).getReceiverId());
+                                jsonObject.put("room_name", roomName);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
+                            mSocket.emit(EVENT_READMESSAGE, jsonObject);
+                        }
+
+
+                        // models.addAll(response.body().getRecord());
+
+                        Log.e("status", "onResponse: success" + response.body().getOnlineStatus());
 
                     /*    if(){
 
@@ -552,27 +686,32 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                        *//* adapter.notifyDataSetChanged();
 
                         recMessage.scrollToPosition(adapter.getItemCount() - 1);*/
-                        if (!TextUtils.isEmpty(response.body().getOnlineStatus()) && response.body().getOnlineStatus().equalsIgnoreCase("Y")) {
-                            ((ChatActivity)getActivity()).imgOnline.setVisibility(View.VISIBLE);
-                            ((ChatActivity)getActivity()).txtLastSeen.setVisibility(View.GONE);
+
+                        Log.e("online: ", response.body().getOnlineStatus());
+                        if (!TextUtils.isEmpty(response.body().getOnlineStatus()) && response.body().getOnlineStatus().equalsIgnoreCase("ON")) {
+                            ((ChatActivity) getActivity()).imgOnline.setVisibility(View.VISIBLE);
+                            ((ChatActivity) getActivity()).imgOnline.setBackgroundResource(R.drawable.dot_online);
+                            ((ChatActivity) getActivity()).txtLastSeen.setVisibility(View.VISIBLE);
+                            if (!TextUtils.isEmpty(response.body().getLastSeenTime()))
+                                ((ChatActivity) getActivity()).txtLastSeen.setText("Online");
                         } else {
 
-                             if (((ChatActivity)getActivity()).imgOnline.getVisibility()==View.VISIBLE)
-                             {
-                                 ((ChatActivity)getActivity()).imgOnline.setVisibility(View.INVISIBLE);
-                                 ((ChatActivity)getActivity()).txtLastSeen.setVisibility(View.VISIBLE);
-                             }
+
+                            ((ChatActivity) getActivity()).imgOnline.setVisibility(View.VISIBLE);
+                            ((ChatActivity) getActivity()).imgOnline.setBackgroundResource(R.drawable.red_dot_icon);
+                            ((ChatActivity) getActivity()).txtLastSeen.setVisibility(View.VISIBLE);
 
 
                             if (!TextUtils.isEmpty(response.body().getLastSeenTime()))
-                                ((ChatActivity)getActivity()).txtLastSeen.setText("Last seen " + ": " + Global.getTimeAgo(Global.convertUTCToLocal(response.body().getLastSeenTime())));
+                                if (!TextUtils.isEmpty(response.body().getLastSeenTime()))
+                                    ((ChatActivity) getActivity()).txtLastSeen.setText("Last seen " + ": " + Global.getTimeAgo(Global.convertUTCToLocal(response.body().getLastSeenTime())));
                         }
                         setUpMessgae(models);
-                        if(response.body().getIs_reviewed()!=null&&response.body().getIs_reviewed().equalsIgnoreCase("N")){
-                            txtReview.setVisibility(View.VISIBLE);
-                            Log.e("Review_pending", "onResponse: "+response.body().getIs_reviewed() );
-                        }else{
-                            Log.e("Review_pending", "onResponse: "+"Y");
+                        if (response.body().getIs_reviewed() != null && response.body().getIs_reviewed().equalsIgnoreCase("N")) {
+                          //  txtReview.setVisibility(View.VISIBLE);
+                            Log.e("Review_pending", "onResponse: " + response.body().getIs_reviewed());
+                        } else {
+                            Log.e("Review_pending", "onResponse: " + "Y");
                             txtReview.setVisibility(View.GONE);
                         }
                         if (makeOfferResult != null) {
@@ -581,9 +720,9 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
                         }
 
                     }
-                }else{
+                } else {
                     try {
-                        Log.e("Chat_detailApi", "onResponse: fail"+response.errorBody().string() );
+                        Log.e("Chat_detailApi", "onResponse: " + response.errorBody().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -593,7 +732,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             @Override
             public void onFailure(Call<ChatListModel> call, Throwable t) {
 
-                Log.e("Chat_detailApiFailure", "onFailure: "+t.getMessage() );
+                Log.e("Chat_detailApiFailure", "onFailure: " + t.getMessage());
             }
         });
     }
@@ -669,9 +808,9 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     public void onReviewClicked() {
         AddTestoimonialDailog dailog = new AddTestoimonialDailog();
         Bundle bundle = new Bundle();
-        bundle.putString("other_id",otherUserId);
+        bundle.putString("other_id", otherUserId);
         dailog.setArguments(bundle);
-        dailog.show(getActivity().getFragmentManager(),"testimonial");
+        dailog.show(getActivity().getFragmentManager(), "testimonial");
 
     }
 
@@ -724,9 +863,82 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
         });
     }
 
-    @OnClick({R.id.img_send_camera, R.id.img_send_gallery, R.id.btn_send})
+    @OnClick({R.id.markascomplete,R.id.pay_newbtn,R.id.img_send_camera, R.id.img_send_gallery, R.id.btn_send})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.markascomplete:
+
+                Log.e( "onViewClicked: ", "click");
+
+
+                if (markascomplete.getText().toString().equalsIgnoreCase("Mark as completed"))
+                {
+                    mark_complete(mark_main_offer_list.get(0).get("order_id"),"C");
+                }
+                if (markascomplete.getText().toString().equalsIgnoreCase("Review Pending"))
+                {
+
+                    AddTestoimonialDailog dailog = new AddTestoimonialDailog();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("other_id", otherUserId);
+                    bundle.putString("order_id", mark_main_offer_list.get(0).get("order_id"));
+                    dailog.setArguments(bundle);
+                    dailog.show(getActivity().getFragmentManager(), "testimonial");
+
+
+                    mark_main_offer_list.clear();
+                    if (mark_adapter!=null)
+                        mark_adapter.notifyDataSetChanged();
+                    acceptLayout.setVisibility(View.GONE);
+                }
+
+                break;
+            case R.id.pay_newbtn:
+                Log.e("onClick: ",latitudeList );
+                if (payNewbtn.getText().toString().equalsIgnoreCase("Pay Now"))
+                {
+                    PaymentDialog.create(getActivity(), latitudeList, otherUserId, "", "", "", new PaymentDialog.PaymentCallBack() {
+                        @Override
+                        public void onPaymentSuccess() {
+                            Log.e("chat_onPaymentSuccess: ","yes" );
+                            getofferlist(otherUserId);
+                        }
+                        @Override
+                        public void onPaymentFail(String message) {
+                            Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancelDialog() {
+
+                        }
+                    }).show();
+
+
+                }
+                if (payNewbtn.getText().toString().equalsIgnoreCase("Mark as completed"))
+                {
+                    mark_complete(extra_list.get(0).get("order_id"),"C");
+                }
+
+                if (payNewbtn.getText().toString().equalsIgnoreCase("Review Pending"))
+                {
+                    AddTestoimonialDailog dailog = new AddTestoimonialDailog();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("other_id", otherUserId);
+                    bundle.putString("order_id", extra_list.get(0).get("order_id"));
+                    dailog.setArguments(bundle);
+                    dailog.show(getActivity().getFragmentManager(), "testimonial");
+
+                    main_offer_list.clear();
+                    if (payoffer_adapter!=null)
+                        payoffer_adapter.notifyDataSetChanged();
+                    payLayout.setVisibility(View.GONE);
+
+                }
+
+
+                break;
             case R.id.img_send_camera:
                 takePhotoFromCamera();
                 break;
@@ -736,8 +948,32 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             case R.id.btn_send:
                 if (isOffer) {
 
-                    Log.e( "onViewClicked: ","dd" );
-                    setUpBottomView();
+                    Log.e("onViewClicked: ", "dd");
+                    if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
+                    {
+                        S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                            //--------------openHere-----------------
+
+                            Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                            stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                        })).show();
+                    }
+                    else if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                    {
+                        S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                            //--------------openHere-----------------
+
+                            Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                            stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                        })).show();
+                    }
+                    else
+                    {
+                        setUpBottomView();
+                    }
+
                 } else {
                     attemptSend();
                 }
@@ -927,7 +1163,7 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
             if(pos==ChatActivity.currentPage)
             disconnectSocket();
         }*/
-    private  BroadcastReceiver mMessageReceiver1 = new BroadcastReceiver() {
+    private BroadcastReceiver mMessageReceiver1 = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
@@ -935,27 +1171,47 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
 
 
                 NotificationModel message = intent.getParcelableExtra(NT_DATA);
-                Log.e("receiver", "Got message: ChatFragment" + message.getMessage() + ":" + message.getNotiType() + message.getMsgId());
+
+                Log.e( "onReceive: ", message.getNotiType());
+
+                if (message.getNotiType().equalsIgnoreCase("orderstatus")) {
+
+                    Log.e( "onReceive: ", "ssss");
+                    markascomplete.setText("Review Pending");
+                }
+                if (message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_ACCEPT_REJECT)){
+                    getofferlist(otherUserId);
+                }
+
                 if (message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_ACCEPT_REJECT) ||
                         message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_PAYMENT)) {
 
-                    Log.e("modelee" ,"s"+models.size());
+
                     for (int i = 0; i < models.size(); i++) {
-
-
                         ChatMessageModel model = models.get(i);
 
-                        Log.e("receiver", "onReceivemsg:" + message.getMsgId() + " : " + models.get(i).getMsgId());
                         if (model.getMsgId().equalsIgnoreCase(message.getMsgId())) {
                             Log.e("index", "onReceive: " + models.indexOf(model));
                             models.get(models.indexOf(model)).setStatus(message.getStatus());
-                            if(message.getStatus().equalsIgnoreCase("s")){
-                                txtReview.setVisibility(View.VISIBLE);
+                            if (message.getStatus().equalsIgnoreCase("s")) {
+                                //txtReview.setVisibility(View.VISIBLE);
                             }
                             adapter.notifyDataSetChanged();
                             recMessage.smoothScrollToPosition(models.indexOf(model));
                         }
+
                     }
+
+
+                    if (message.getNotiType().equalsIgnoreCase("payment"))
+                    {
+                        getofferlist(otherUserId);
+                    }
+                    if (message.getStatus().equalsIgnoreCase("a")) {
+
+
+                    }
+
                 }
 
             } catch (Exception e) {
@@ -986,19 +1242,371 @@ public class ChatDetailFragment extends Fragment/* implements ChatFragmentContro
     }
 
 
-
-
-    public String datefun(Date date)
-    {
+    public String datefun(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         String monthName = new SimpleDateFormat("MMMM").format(cal.getTime());
         SimpleDateFormat outFormat = new SimpleDateFormat("EEEE");
         String da = outFormat.format(cal.getTime());
-        int day   = cal.get(Calendar.DAY_OF_WEEK_IN_MONTH);
-        String overall  = da +", " +day+" "+monthName;
+        int day = cal.get(Calendar.DAY_OF_WEEK_IN_MONTH);
+        String overall = da + ", " + day + " " + monthName;
         return overall;
     }
+
+    private void setupoffer(ArrayList<Map<String, String>> list) {
+
+        try {
+            payoffer_adapter = new Pay_offer_adapter(getActivity(), list);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
+            payRecycler.setLayoutManager(linearLayoutManager);
+            payRecycler.setItemAnimator(new DefaultItemAnimator());
+            payRecycler.setAdapter(payoffer_adapter);
+
+        } catch (Exception e) {
+            Log.e("setup_error", "setUpMessgae: ");
+        }
+
+
+    }
+
+    private void setup_accepted(ArrayList<Map<String, String>> list) {
+
+        try {
+            mark_adapter = new Pay_offer_adapter(getActivity(), list);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
+            markAscompleteRecycler.setLayoutManager(linearLayoutManager);
+            markAscompleteRecycler.setItemAnimator(new DefaultItemAnimator());
+            markAscompleteRecycler.setAdapter(mark_adapter);
+
+        } catch (Exception e) {
+            Log.e("setup_error", "setUpMessgae: ");
+        }
+
+
+    }
+
+
+
+    private void getofferlist(String otherUserId) {
+
+        Log.e("getofferlist: ", "fff" + otherUserId);
+        chatoffercall = service.chat_offer_list(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
+
+
+        chatoffercall.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                try {
+                    main_offer_list.clear();
+                    list.clear();
+                    mark_main_offer_list.clear();
+                    mark_list.clear();
+                    Log.e("Chat_detailApi", "onResponse: fail" + response.body().toString());
+                    JSONObject object = new JSONObject(response.body().toString());
+                    String status = object.getString("status");
+                    if (status.equalsIgnoreCase("1")) {
+                        JSONArray array = object.getJSONArray("offerList");
+                        if (array.length()>0)
+                        {
+
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject data = array.getJSONObject(i);
+                                map = new HashMap<>();
+                                if (data.getString("is_reviewed").equalsIgnoreCase("N"))
+                                {
+                                    map.put("order_id", data.optString("order_id"));
+                                    map.put("offer_id", data.getString("offer_id"));
+                                    map.put("product_owner", data.getString("product_owner"));
+                                    map.put("product_owner_name", data.getString("product_owner_name"));
+                                    map.put("product_id", data.getString("product_id"));
+                                    map.put("product_name", data.getString("product_name"));
+                                    map.put("product_image", data.getString("product_image"));
+                                    map.put("price_cost", data.getString("price_cost"));
+                                    map.put("quantity", data.getString("quantity"));
+                                    map.put("order_status", data.getString("order_status"));
+                                    map.put("is_reviewed", data.getString("is_reviewed"));
+                                    list.add(map);
+                                }
+                                else {}
+
+
+                             }
+
+                            Log.e("offer: ","dddd"+list.size() );
+
+
+
+                        }
+
+
+
+                        JSONArray acceptedarray = object.getJSONArray("accepted_offers");
+
+                        if (acceptedarray.length()>0)
+                        {
+
+
+                        for (int i = 0; i < acceptedarray.length(); i++) {
+                            JSONObject data = acceptedarray.getJSONObject(i);
+                            mark_map = new HashMap<>();
+                            if (data.getString("is_reviewed").equalsIgnoreCase("N"))
+                            {
+                                mark_map.put("order_id", data.optString("order_id"));
+                                mark_map.put("offer_id", data.getString("offer_id"));
+                                mark_map.put("product_owner", data.getString("product_owner"));
+                                mark_map.put("product_owner_name", data.getString("product_owner_name"));
+                                mark_map.put("product_id", data.getString("product_id"));
+                                mark_map.put("product_name", data.getString("product_name"));
+                                mark_map.put("product_image", data.getString("product_image"));
+                                mark_map.put("price_cost", data.getString("price_cost"));
+                                mark_map.put("quantity", data.getString("quantity"));
+                                mark_map.put("is_reviewed", data.getString("is_reviewed"));
+                                mark_map.put("order_status", data.getString("order_status"));
+                                mark_list.add(mark_map);
+
+                            }
+                            else {}
+
+
+
+                        }
+                            Log.e("sdsss: ","dddd"+mark_list );
+
+
+
+
+
+
+
+
+                            if (!mark_list.isEmpty())
+                            {
+                                acceptLayout.setVisibility(View.VISIBLE);
+                                buttonstatus(mark_list);
+                                if (mark_list.size() <=1) {
+
+                                    Log.e( "marklist: ","marklist" );
+                                    markasCompleteBtnCollapsedItems.setVisibility(View.GONE);
+                                    mark_main_offer_list.add(mark_list.get(0));
+                                    setup_accepted(mark_main_offer_list);
+
+
+                                } else {
+                                    Log.e( "marklist: ","marklist else" );
+                                    mark_main_offer_list.add(mark_list.get(0));
+                                    markasCompleteBtnCollapsedItems.setVisibility(View.VISIBLE);
+                                    setup_accepted(mark_main_offer_list);
+                                    markasCompleteBtnCollapsedItems.setText("+ " + String.valueOf(mark_list.size() - 1) + " more products");
+
+                                }
+
+                            }
+                            else
+                            {acceptLayout.setVisibility(View.GONE);}
+
+
+
+
+                            markasCompleteBtnCollapsedItems.setOnClickListener(view1 -> {
+
+
+                                if (markasCompleteBtnCollapsedItems.getText().toString().equalsIgnoreCase("Collapse products")) {
+                                    mark_main_offer_list.clear();
+                                    mark_main_offer_list.add(mark_list.get(0));
+                                    setup_accepted(mark_main_offer_list);
+                                    btnCollapsedItems.setText("+ " + String.valueOf(mark_list.size() - 1) + " more products");
+                                } else {
+                                    mark_main_offer_list.clear();
+                                    mark_main_offer_list.addAll(mark_list);
+
+                                    mark_adapter.notifyDataSetChanged();
+                                    btnCollapsedItems.setText("Collapse products");
+                                }
+
+                            });
+
+
+
+                        }
+
+
+                       if (!list.isEmpty())
+                       {
+                           extra_list.clear();
+                           extra_list.addAll(list);
+                           Log.e("extralist: ","ssss"+extra_list );
+                           payLayout.setVisibility(View.VISIBLE);
+                           mainofferliststatus_btn(extra_list);
+
+                           if (list.size() <=1) {
+
+
+                               Log.e( "ccccc: ", "ccc");
+                               btnCollapsedItems.setVisibility(View.GONE);
+                               main_offer_list.add(list.get(0));
+                               setupoffer(main_offer_list);
+
+
+                           } else {
+                               Log.e( "ccccc: ", "ccc1");
+                               main_offer_list.add(list.get(0));
+                               setupoffer(main_offer_list);
+                               btnCollapsedItems.setText("+ " + String.valueOf(list.size() - 1) + " more products");
+
+
+
+                           }
+                       }
+                       else{payLayout.setVisibility(View.GONE);}
+
+                        List<String> li;
+                        List<String> list1 = new ArrayList<>();
+                        for (int i = 0; i < list.size(); i++) {
+                            li = new ArrayList<>();
+                            li.add(list.get(i).get("offer_id"));
+                            list1.addAll(li);
+                        }
+
+
+                        if (list1.size() != 0) {
+                            StringBuilder sb1 = new StringBuilder();
+                            for (String s : list1) {
+                                sb1.append(",");
+                                sb1.append(s);
+
+                            }
+
+
+                            latitudeList = sb1.substring(1).toString();
+                        }
+                        Log.e("sdsss: ","ssss"+latitudeList );
+
+                        btnCollapsedItems.setOnClickListener(view1 -> {
+
+
+                            if (btnCollapsedItems.getText().toString().equalsIgnoreCase("Collapse products")) {
+                                main_offer_list.clear();
+                                main_offer_list.add(list.get(0));
+                                setupoffer(main_offer_list);
+                                btnCollapsedItems.setText("+ " + String.valueOf(list.size() - 1) + " more products");
+                            } else {
+                                main_offer_list.clear();
+                                main_offer_list.addAll(list);
+
+                                payoffer_adapter.notifyDataSetChanged();
+                                btnCollapsedItems.setText("Collapse products");
+                            }
+
+                        });
+
+
+
+
+                    } else {
+                        payLayout.setVisibility(View.GONE);
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
+
+
+    }
+
+
+    @Override
+    public void updateSubTotal(String subtotal) {
+       getofferlist(otherUserId);
+    }
+
+
+    private void mark_complete(String order_id,String status) {
+        Log.e("xxxc", "order: " + order_id.toString());
+        Log.e("xxxc", "order: " + status.toString());
+        Log.e("xxxc", "order: " + HelperPreferences.get(getActivity()).getString(UID));
+        Log.e("xxxc", "order: " + order_id.toString());
+        WebService webService = Global.WebServiceConstants.getRetrofitinstance();
+        Call<JsonObject> stripePaymentApi = webService.set_order_status(HelperPreferences.get(getActivity()).getString(UID),order_id,status,otherUserId );
+        stripePaymentApi.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+
+
+                Log.e("apiii", "order: " + response.body().toString());
+                if (response.isSuccessful()) {
+                    try {
+                        payNewbtn.setText("Review Pending");
+                        markascomplete.setText("Review Pending");
+                        JSONObject jsonObject = new JSONObject(response.body().toString());
+                        String status = jsonObject.getString("status");
+                        String message = jsonObject.getString("message");
+                        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Log.e("paymentException", "onResponse: " + e.getMessage());
+                    }
+
+                } else {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+
+            }
+        });
+
+    }
+
+
+    public void buttonstatus(ArrayList<Map<String, String>> t)
+    {
+        if (t.get(0).get("order_status").equalsIgnoreCase("A"))
+        {
+            markascomplete.setText("Unpaid");
+        }
+        if (t.get(0).get("order_status").equalsIgnoreCase("S"))
+        {
+            markascomplete.setText("Mark as completed");
+        }
+        if (t.get(0).get("order_status").equalsIgnoreCase("C"))
+        {
+            markascomplete.setText("Review Pending");
+
+        }
+
+    }
+
+    public void mainofferliststatus_btn(ArrayList<Map<String, String>> t)
+    {
+        if (t.get(0).get("order_status").equalsIgnoreCase("A"))
+        {
+            payNewbtn.setText("Pay Now");
+        }
+        if (t.get(0).get("order_status").equalsIgnoreCase("S"))
+        {
+            payNewbtn.setText("Mark as completed");
+        }
+
+        if (t.get(0).get("order_status").equalsIgnoreCase("C"))
+        {
+            payNewbtn.setText("Review Pending");
+
+        }
+    }
+
+
 
 }
 

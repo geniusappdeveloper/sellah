@@ -2,8 +2,10 @@ package com.app.admin.sellah.view.CustomDialogs;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
@@ -45,6 +48,8 @@ import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.view.adapter.CardListAdapter;
 import com.app.admin.sellah.view.fragments.AddCreditCardDetailFragment;
 import com.cooltechworks.creditcarddesign.CreditCardView;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.stripe.android.view.CardMultilineWidget;
 
@@ -121,6 +126,7 @@ public class PaymentDialog extends BottomSheetDialog {
     String packageId="";
     String promoteId="";
 
+
     public PaymentDialog(@NonNull Context context, String offerId, String sellerId, String productId, String packageId, String promoteId, PaymentCallBack callBack) {
         super(context, R.style.CustomDialog);
         this.context = context;
@@ -132,6 +138,7 @@ public class PaymentDialog extends BottomSheetDialog {
         this.packageId=packageId;
         this.promoteId=promoteId;
         this.cardList = new ArrayList<>();
+        Log.e( "PaymentDialog: ","comnd" );
 
     }
 
@@ -145,7 +152,7 @@ public class PaymentDialog extends BottomSheetDialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.layout_payment_bottom);
         FrameLayout bottomSheet = findViewById(android.support.design.R.id.design_bottom_sheet);
-        // Right here!
+
         BottomSheetBehavior.from(bottomSheet)
                 .setState(BottomSheetBehavior.STATE_EXPANDED);
         BottomSheetBehavior.from(bottomSheet).setSkipCollapsed(true);
@@ -198,6 +205,16 @@ public class PaymentDialog extends BottomSheetDialog {
         });
 
     }
+
+
+    private BroadcastReceiver br = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getCardApi();
+        }
+    };
+
+
 
     @OnClick({R.id.card_container, R.id.pb_loading, R.id.credit_card_view, R.id.edt_cvv, R.id.cv_pin, R.id.li_card_detail, R.id.li_card_detail_error, R.id.btn_cancel})
     public void onViewClicked(View view) {
@@ -297,6 +314,13 @@ public class PaymentDialog extends BottomSheetDialog {
            promoteProductApi(cardId,packageId,dialog);
 
        }else{
+
+           Log.e( "user: 1","s"+ HelperPreferences.get(context).getString(UID));
+           Log.e( "prdo: 1","s"+productId);
+           Log.e( "toke: 1","s"+cardId);
+           Log.e( "offer: 1","s"+offerId);
+           Log.e( "seller: 1","s"+sellerId);
+           Log.e( "customer: 1","s"+customerId);
            stripeApiHit(cardId, dialog);
        }
 
@@ -307,7 +331,9 @@ public class PaymentDialog extends BottomSheetDialog {
     private void stripeApiHit(String token, Dialog dialog) {
         dialog.show();
         WebService webService = Global.WebServiceConstants.getRetrofitinstance();
-        Call<JsonObject> stripePaymentApi = webService.stripePayment(HelperPreferences.get(context).getString(UID), productId, "50", "usd", token, offerId, sellerId, customerId);
+
+
+        Call<JsonObject> stripePaymentApi = webService.stripePayment(HelperPreferences.get(context).getString(UID), productId, "50", "usd", token, offerId, sellerId, customerId,"Y");
         stripePaymentApi.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -358,9 +384,10 @@ public class PaymentDialog extends BottomSheetDialog {
                 }
                 if (response.isSuccessful()) {
                     if(response.body().getStatus().equalsIgnoreCase("1")){
+                        callBack.onPaymentSuccess();
                         dismiss();
                         Log.e("PaymentDialog", "promoteProductApi: success");
-                        callBack.onPaymentSuccess();
+
                     }else{
                         dismiss();
                         callBack.onPaymentFail(response.body().getMessage());
@@ -395,14 +422,16 @@ public class PaymentDialog extends BottomSheetDialog {
 
     }
 
-    private void getCardApi() {
-
+    public  void getCardApi() {
 
 //        showCCview();
 
         new ApisHelper().getCardApi(context, new ApisHelper.OnGetCardDataListners() {
             @Override
             public void onGetDataSuccess(CardDetailModel body) {
+
+                Gson gson = new GsonBuilder().create();
+                Log.e( "onGetDataSuccess: ", gson.toJson(body.getCards()));
                 setTabs();
                 cardList.clear();
                 cardList.addAll(body.getCards());
@@ -484,13 +513,12 @@ public class PaymentDialog extends BottomSheetDialog {
             ((Activity) context).startActivityForResult(intent, 2);
         }else{*/
         Intent intent = new Intent(context, AddCreditCardDetailFragment.class);
-            /*intent.putExtra(SAConstants.Keys.CARDHOLDER_NAME, creditCardView.getCardHolderName());
-            intent.putExtra(SAConstants.Keys.CARD_NUMBER, creditCardView.getCardNumber());
-            intent.putExtra(SAConstants.Keys.CARD_EXP, creditCardView.getExpiry());*/
+          dismiss();
         ((Activity) context).startActivityForResult(intent, 2);
-        dismiss();
 //        }
     }
+
+
 
     private void setTabs() {
 
@@ -623,6 +651,12 @@ public class PaymentDialog extends BottomSheetDialog {
         public void destroyItem(ViewGroup container, int position, Object object) {
             // No super
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        new ApisHelper().cancel_striipe_request();
     }
 }
 

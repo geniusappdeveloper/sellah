@@ -5,15 +5,26 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.stripe.StripeApp;
+import com.app.admin.sellah.controller.stripe.StripeButton;
+import com.app.admin.sellah.controller.stripe.StripeConnectListener;
+import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
 import com.app.admin.sellah.view.activities.AddNewVideos;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.activities.MainActivityLiveStream;
@@ -22,6 +33,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 
 public class SellFragment extends Fragment {
 
@@ -40,6 +54,10 @@ public class SellFragment extends Fragment {
     CardView cardView2;
     Unbinder unbinder;
 
+    @BindView(R.id.btn_stripe_connect)
+    StripeButton btnStripeConnect;
+    private StripeApp StripeAppmApp;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,9 +65,11 @@ public class SellFragment extends Fragment {
         View view = inflater.inflate(R.layout.sell_product, container, false);
         unbinder = ButterKnife.bind(this, view);
         hideSearch();
+
+        StripConnect();
+
         return view;
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -60,15 +80,72 @@ public class SellFragment extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.cardView:
-                Intent intent= new Intent(getActivity(),AddNewVideos.class);
-                startActivity(intent);
+
+                if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
+                {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                        //--------------openHere-----------------
+
+                        Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                        stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                    })).show();
+                }
+               else if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                        //--------------openHere-----------------
+
+                        Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                        stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                    })).show();
+                }
+                else
+                {
+                    Intent intent= new Intent(getActivity(),AddNewVideos.class);
+                    startActivity(intent);
+                }
+
+
+
                 break;
             case R.id.cardView2:
-                Intent intent1 = new Intent(new Intent(getActivity(), MainActivityLiveStream.class));
-                intent1.putExtra("value", "LiveStream");
-                getActivity().startActivity(intent1);
+
+                if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
+                {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                        //--------------openHere-----------------
+
+                        Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                        stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                    })).show();
+                }
+                else if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                        //--------------openHere-----------------
+
+                        Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                        stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                    })).show();
+                }
+                else
+                {
+                    Intent intent1 = new Intent(new Intent(getActivity(), MainActivityLiveStream.class));
+                    intent1.putExtra("value", "LiveStream");
+                    getActivity().startActivity(intent1);
+                }
+
                 break;
         }
+    }
+
+    private void paymentMehtod()
+    {
+        btnStripeConnect.performClick();
     }
 
     public void hideSearch() {
@@ -82,5 +159,55 @@ public class SellFragment extends Fragment {
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(2);
     }
+
+
+    private void StripConnect() {
+
+        StripeAppmApp = new StripeApp(getActivity(), "geniusAppDeveloper", "ca_EWK1BYRqruSX1X92DbtLY8UiV46ADGoC",
+                "sk_test_HDkDbhty58uz3aaJi2TDllrR", "https://developer.android.com", "read_write");
+//        mStripeButton = (StripeButton) findViewById(R.id.btnStripeConnect);
+        btnStripeConnect.setStripeApp(StripeAppmApp);
+        btnStripeConnect.setConnectMode(StripeApp.CONNECT_MODE.DIALOG);
+        btnStripeConnect.addStripeConnectListener(new StripeConnectListener() {
+
+            @Override
+            public void onConnected() {
+                Log.e("Connected_as", "onConnected: " + StripeAppmApp.getUserId());
+                if (StripeAppmApp.getUserId() != null) {
+
+                    new ApisHelper().linkStripApi(getActivity(), StripeAppmApp.getUserId(), new ApisHelper.StripeConnectCallback() {
+                        @Override
+                        public void onStripeConnectSuccess(String msg) {
+                            Snackbar.make(((MainActivity) getActivity()).relRoot, msg, Snackbar.LENGTH_SHORT)
+                                    .setAction("", null).show();
+                            HelperPreferences.get(getActivity()).saveString(API_ACCESS_TOKEN, StripeAppmApp.getUserId());
+
+                        }
+
+                        @Override
+                        public void onStripeConnectFailure() {
+                            Snackbar.make(getActivity().getWindow().getDecorView(), "Unable to link account with stripe at this movements", Snackbar.LENGTH_SHORT)
+                                    .setAction("", null).show();
+
+                        }
+                    });
+                }
+//                tvSummary.setText("Connected as " + StripeAppmApp.getAccessToken());
+            }
+
+            @Override
+            public void onDisconnected() {
+                Log.e("Disconnected", "Disconnected: ");
+//                tvSummary.setText("Disconnected");
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+    }
+
 
 }

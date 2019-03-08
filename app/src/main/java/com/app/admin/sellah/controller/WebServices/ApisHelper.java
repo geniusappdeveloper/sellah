@@ -22,6 +22,8 @@ import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.MainActivity;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -45,11 +47,11 @@ public class ApisHelper {
     public ApisHelper() {
         service = Global.WebServiceConstants.getRetrofitinstance();
     }
-
+    Call<GetCategoriesModel> categoriesModelCall1;
     public void getCategories(String user_id) {
 //        ExpandableListData.setDataOnfaliur();
-        Call<GetCategoriesModel> categoriesModelCall = service.getCategoryApi(user_id);
-        categoriesModelCall.enqueue(new Callback<GetCategoriesModel>() {
+         categoriesModelCall1 = service.getCategoryApi(user_id);
+        categoriesModelCall1.enqueue(new Callback<GetCategoriesModel>() {
             @Override
             public void onResponse(Call<GetCategoriesModel> call, Response<GetCategoriesModel> response) {
                 if (response.isSuccessful()) {
@@ -104,11 +106,14 @@ public class ApisHelper {
 
     }
     Call<CardDetailModel> stripePaymentApi;
+
     public void getCardApi(Context context, OnGetCardDataListners listners) {
          stripePaymentApi = service.getCardApi(HelperPreferences.get(context).getString(UID));
+
         stripePaymentApi.enqueue(new Callback<CardDetailModel>() {
             @Override
             public void onResponse(Call<CardDetailModel> call, Response<CardDetailModel> response) {
+                Gson gson = new GsonBuilder().create();
 
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
@@ -137,11 +142,11 @@ public class ApisHelper {
         });
 
     }
-
+    Call<ChattedListModel> chatedListCall;
     public void getChattedUsersListApi(Context context, OnGetChatedListDataListners listDataListners) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
 //        dialog.show();
-        Call<ChattedListModel> chatedListCall = service.getChattedUsersApi(HelperPreferences.get(context).getString(UID));
+        chatedListCall = service.getChattedUsersApi(HelperPreferences.get(context).getString(UID));
         chatedListCall.enqueue(new Callback<ChattedListModel>() {
             @Override
             public void onResponse(Call<ChattedListModel> call, Response<ChattedListModel> response) {
@@ -173,7 +178,7 @@ public class ApisHelper {
 
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<GetProductList> chatedListCall = service.searchProductApi(search_keyword);
+        Call<GetProductList> chatedListCall = service.searchProductApi(search_keyword,"name");
         chatedListCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -387,11 +392,11 @@ public class ApisHelper {
             }
         });
     }
-
+    Call<LiveVideoModel> getVideodataCall;
     public void getLiveVideoData(Context context, String pageNo, String catId, GetLiveVideoCallback callback) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<LiveVideoModel> getVideodataCall = service.getVideoListApi(HelperPreferences.get(context).getString(UID), pageNo, catId);
+         getVideodataCall = service.getVideoListApi(HelperPreferences.get(context).getString(UID), pageNo, catId);
         getVideodataCall.enqueue(new Callback<LiveVideoModel>() {
             @Override
             public void onResponse(Call<LiveVideoModel> call, Response<LiveVideoModel> response) {
@@ -424,11 +429,11 @@ public class ApisHelper {
             }
         });
     }
-
+    Call<LiveVideoModel> streamedVideoListCall;
     public void getStreamedVideoData(Context context, String pageNo, GetLiveVideoCallback callback) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<LiveVideoModel> streamedVideoListCall = service.getStreamedVideoList(HelperPreferences.get(context).getString(UID), pageNo);
+        streamedVideoListCall = service.getStreamedVideoList(HelperPreferences.get(context).getString(UID), pageNo);
         streamedVideoListCall.enqueue(new Callback<LiveVideoModel>() {
             @Override
             public void onResponse(Call<LiveVideoModel> call, Response<LiveVideoModel> response) {
@@ -499,11 +504,11 @@ public class ApisHelper {
         });
     }
 
-    public void readNotificationApi(Context context, String notiId, ReadNotificationCallback callback) {
+    public void readNotificationApi(Context context, String notiId,String type, ReadNotificationCallback callback) {
         Log.e("Notification_id", "readNotificationApi: " + notiId);
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<Common> readNotificationApiCall = service.readNotificationApi(HelperPreferences.get(context).getString(UID), notiId, "1");
+        Call<Common> readNotificationApiCall = service.readNotificationApi(HelperPreferences.get(context).getString(UID), notiId, "1",type);
         readNotificationApiCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
@@ -832,8 +837,31 @@ public class ApisHelper {
         }
 
     }
+    public void cancel_chatlist()
+    {
+        if (chatedListCall!=null)
+        {
+            chatedListCall.cancel();
+        }
 
+    }
+
+    public void getcategoriesmodel1_cancel()
+    {
+        if (categoriesModelCall1!=null)
+        {categoriesModelCall1.cancel();}
+    }
     public void cancel_striipe_request()
     {if (stripePaymentApi!=null)
     {stripePaymentApi.cancel();}}
+    public void getvideodata_cancel()
+    {
+        if (getVideodataCall!=null)
+        {getVideodataCall.cancel();}
+    }
+
+    public void streameedvideolist_cancel()
+    {if (streamedVideoListCall!=null)
+    {streamedVideoListCall.cancel();}}
+
 }

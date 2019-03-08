@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,10 +16,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.SellProductInterface;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
+
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class Add_Product_Cars_Adapter  extends RecyclerView.Adapter<Add_Product_Cars_Adapter.AddProductViewHolder> {
     private List<String> add_list;
@@ -34,7 +45,8 @@ public class Add_Product_Cars_Adapter  extends RecyclerView.Adapter<Add_Product_
     }
 
     @Override
-    public Add_Product_Cars_Adapter.AddProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public Add_Product_Cars_Adapter.AddProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
         View groceryProductView = LayoutInflater.from(parent.getContext()).inflate(R.layout.add_product_car_adapter, parent, false);
 //        Add_Product_Cars_Adapter.AddProductViewHolder cvh = new Add_Product_Cars_Adapter.AddProductViewHolder(groceryProductView);
         return new AddProductViewHolder(groceryProductView);
@@ -42,9 +54,46 @@ public class Add_Product_Cars_Adapter  extends RecyclerView.Adapter<Add_Product_
 
     @Override
     public void onBindViewHolder(final Add_Product_Cars_Adapter.AddProductViewHolder holder, final int position) {
+
+        Log.e( "onBindViewHolder: ",add_list.get(position) );
+
+
         File f = new File(getRealPathFromURI(Uri.parse(add_list.get(position))));
-        Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+
+        Glide.with(context)
+                .load(add_list.get(position))
+                .apply(
+                        new RequestOptions()
+                                .error(R.drawable.image)
+                                .centerCrop()
+                )
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        //on load failed
+                        Log.e( "onLoadFailed: ",e.getLocalizedMessage() );
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        //on load success
+                        return false;
+                    }
+                })
+                .transition(withCrossFade())
+                .into(holder.add_car);
+       /* Glide.with(context)
+                .load(add_list.get(position))
+                .apply(Global.getGlideOptions())
+                .into(holder.add_car);*/
+//        Picasso.with(context).load(f).fit().centerCrop().error(R.drawable.image).
+//                into(holder.add_car);
+       /* Drawable d = Drawable.createFromPath(f.getAbsolutePath());
         holder.add_car.setBackground(d);
+
+*/
+
         if(position==0){
             holder.addCardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorRed));
         }else{

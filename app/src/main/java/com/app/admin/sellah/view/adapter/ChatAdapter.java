@@ -24,6 +24,8 @@ import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.stripe.StripeApp;
 import com.app.admin.sellah.controller.stripe.StripeButton;
 import com.app.admin.sellah.controller.stripe.StripeConnectListener;
+import com.app.admin.sellah.controller.utils.ChatActivityController;
+import com.app.admin.sellah.controller.utils.Prodctfragment_click;
 import com.app.admin.sellah.controller.utils.RecyclerViewClickListener;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.model.extra.ChatModel.ChatMessageModel;
@@ -31,8 +33,11 @@ import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.MakeOffer.MakeOfferModel;
+import com.app.admin.sellah.model.extra.ProductDetails.ProductDetailModel;
 import com.app.admin.sellah.view.CustomDialogs.PaymentDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.activities.ImageViewerActivity;
 import com.app.admin.sellah.view.activities.MainActivity;
@@ -52,6 +57,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.Chat_User_Data;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
@@ -66,6 +72,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
     private int currentFlag = 0;
     private String user_id= "";
     private String reciever_d= "";
+    ChatActivityController showpay;
+
 
     String friendname;
     public static class SendMessageViewHolder extends RecyclerView.ViewHolder {
@@ -73,10 +81,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
         CircleImageView userImage;
         LinearLayout ll_sendchat;
         TextView txtMessage, txtMsgTime;
+        ImageView read_tick;
 
         public SendMessageViewHolder(View itemView) {
             super(itemView);
             this.userImage = itemView.findViewById(R.id.img_user);
+            this.read_tick = itemView.findViewById(R.id.sender_tick);
             this.txtMessage = itemView.findViewById(R.id.txt_message);
             this.txtMsgTime = itemView.findViewById(R.id.txt_msg_time);
             this.ll_sendchat = itemView.findViewById(R.id.ll_sendmsg);
@@ -149,11 +159,11 @@ public class ChatAdapter extends RecyclerView.Adapter {
         TextView txtItemName, txtItemQuantity,dollarsign, txtItemCost, txtCanceled,aftertext_itemsendername,texitem_sendername,aftertxtItemName, aftertxtItemQuantity, aftertxtItemCost;
         Button btnAccept, btnCanceld, btnPay;
         LinearLayout liOffer, liPay, liOfferStatus,upperchat_layout,beforeaccept,afteraccept;
+        ImageView productimage,productimage1;
 
 
         public MakeOfferViewHolder(View itemView) {
             super(itemView);
-
             this.aftertxtItemName = (TextView) itemView.findViewById(R.id.aftertxt_item_name);
             this.dollarsign = (TextView) itemView.findViewById(R.id.dollar_sign);
             this.aftertxtItemQuantity = (TextView) itemView.findViewById(R.id.aftertxt_item_quantity);
@@ -173,16 +183,19 @@ public class ChatAdapter extends RecyclerView.Adapter {
             this.upperchat_layout = itemView.findViewById(R.id.uppperchatlayout);
             this.beforeaccept = itemView.findViewById(R.id.beforeacpt__offer__layout);
             this.afteraccept = itemView.findViewById(R.id.afteracpt_offerlayout);
+            this.productimage = itemView.findViewById(R.id.img_product_image);
+            this.productimage1 = itemView.findViewById(R.id.img_product_image1);
 
         }
     }
 
     private TextView txtReview;
-    public ChatAdapter(List<ChatMessageModel> messageList, Context context, TextView txtReview) {
+    public ChatAdapter(List<ChatMessageModel> messageList, Context context, TextView txtReview, ChatActivityController showpay) {
 
         this.messagelist = messageList;
         this.context = context;
         this.txtReview=txtReview;
+        this.showpay = showpay;
         onBottomReachedListener = new ChatActivity();
         service = Global.WebServiceConstants.getRetrofitinstance();
 
@@ -368,6 +381,20 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     private void handleSentMessageData(RecyclerView.ViewHolder holder, int position) {
 
+
+        if (messagelist.get(position).getMessage_read_status()!=null)
+        {
+
+            if (messagelist.get(position).getMessage_read_status().equalsIgnoreCase("Y"))
+            {
+                ((SendMessageViewHolder) holder).read_tick.setImageResource(R.drawable.red_tick);
+            }
+            else
+            {
+                ((SendMessageViewHolder) holder).read_tick.setImageResource(R.drawable.grey_tick);
+            }
+        }
+
             if (position==0)
             {
                 ((SendMessageViewHolder) holder).ll_sendchat.setBackgroundResource(R.drawable.sendchat1);
@@ -485,6 +512,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
                     new ApisHelper().linkStripApi(context, StripeAppmApp.getUserId(), new ApisHelper.StripeConnectCallback() {
                         @Override
                         public void onStripeConnectSuccess(String msg) {
+                            showpay.updateSubTotal("fg");
+
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                             HelperPreferences.get(context).saveString(API_ACCESS_TOKEN, StripeAppmApp.getUserId());
                             acceptDeclineApi((holder), messagelist.get(position).getOfferId(), "a", position);
@@ -522,6 +551,9 @@ public class ChatAdapter extends RecyclerView.Adapter {
     private void handleOfferData(RecyclerView.ViewHolder holder, int position) {
 
         ((MakeOfferViewHolder) holder).txtItemName.setText(messagelist.get(position).getProductName());
+
+
+
         try {
             if (!TextUtils.isEmpty(messagelist.get(position).getQuantity())) {
                 ((MakeOfferViewHolder) holder).txtItemQuantity.setText(messagelist.get(position).getQuantity());
@@ -575,16 +607,33 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
                     Log.e( "onClick: ","ff"+ HelperPreferences.get(context).getString(API_ACCESS_TOKEN));
 
-                    acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
+                    showpay.updateSubTotal("2");
+                    if (HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("N")) {
 
-//                    HelperPreferences.get(context).remove(API_ACCESS_TOKEN);
-                    /*if (!TextUtils.isEmpty(HelperPreferences.get(context).getString(API_ACCESS_TOKEN))) {
-                        acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
-                    } else {
                         S_Dialogs.getStipeConnectDialog(context, ((dialog, which) -> {
-                            StripConnect((MakeOfferViewHolder) holder, position);
+
+                            Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                            stripe_dialogfragment.show(((ChatActivity)context).getFragmentManager(),"");
+                          //  StripConnect((MakeOfferViewHolder) holder, position);
                         })).show();
-                    }*/
+
+                    }
+                    else if ((HelperPreferences.get(context).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                    {
+                        S_Dialogs.getLiveVideoStopedDialog(context, "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                            //--------------openHere-----------------
+
+                            Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                            stripe_dialogfragment.show(((ChatActivity)context).getFragmentManager(),"");
+
+                        })).show();
+                    }
+                    else {
+
+
+                        acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
+
+                    }
                 }
             });
         }
@@ -592,10 +641,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     }
 
-
     @Override
     public int getItemViewType(int position) {
-
 
 
             if (messagelist.get(position).getSenderId().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
@@ -711,6 +758,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public void showPayOptions(MakeOfferViewHolder holder) {
 
 
+
          holder.texitem_sendername.setVisibility(View.GONE);
         holder.beforeaccept.setVisibility(View.VISIBLE);
         holder.afteraccept.setVisibility(View.GONE);
@@ -729,7 +777,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     public void showOfferStatusSenderSide(MakeOfferViewHolder holder, String status, int pos) {
 
-        Log.e( "showOfferStatusSe: ",status );
+        Log.e( "productimage: ",messagelist.get(pos).getProduct_image() );
+        Glide.with(context).load(messagelist.get(pos).getProduct_image()).apply(Global.getGlideOptions())
+                .into(((MakeOfferViewHolder) holder).productimage);
+        Glide.with(context).load(messagelist.get(pos).getProduct_image()).apply(Global.getGlideOptions())
+                .into(((MakeOfferViewHolder) holder).productimage1);
+
         if (status.equalsIgnoreCase("p")) {
 
             holder.aftertext_itemsendername.setText("Sending offer to "+friendname);
@@ -737,7 +790,9 @@ public class ChatAdapter extends RecyclerView.Adapter {
             showStatus(holder, "Pending", R.color.colorWhite);
         } else if (status.equalsIgnoreCase("a")) {
 
-            showPayOptions(holder);
+            holder.aftertext_itemsendername.setText("Your offer has been accepted by "+friendname);
+            showStatus(holder, "accepted", R.color.colorWhite);
+           // showPayOptions(holder);
         } else if (status.equalsIgnoreCase("s")) {
 
             holder.aftertext_itemsendername.setText("Product successfully purchased from "+friendname);
@@ -750,6 +805,10 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     public void showOfferStatusReceiverSide(MakeOfferViewHolder holder, String status, int pos) {
 
+        Glide.with(context).load(messagelist.get(pos).getProduct_image()).apply(Global.getGlideOptions())
+                .into(((MakeOfferViewHolder) holder).productimage);
+        Glide.with(context).load(messagelist.get(pos).getProduct_image()).apply(Global.getGlideOptions())
+                .into(((MakeOfferViewHolder) holder).productimage1);
         Log.e( "recieveeroffer: ",status );
         if (status.equalsIgnoreCase("p")) {
             showAcceptRejectoption(holder);

@@ -7,13 +7,6 @@
     android:visibility="visible"
     android:orientation="vertical">
 
-    <ProgressBar
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/pb_root"
-        android:padding="@dimen/_3sdp"
-        android:background="@color/colorWhite"/>
 
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -215,6 +208,12 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                  />
+            <ProgressBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/pb_root"
+                android:padding="@dimen/_3sdp"
+                android:background="@color/colorWhite"/>
 
 
 

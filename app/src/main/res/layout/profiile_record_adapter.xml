@@ -36,16 +36,6 @@
                 android:textColor="#000"
                 android:textSize="@dimen/_14sdp" />
 
-            <TextView
-                android:layout_marginLeft="@dimen/_8sdp"
-                android:layout_alignParentRight="true"
-                android:id="@+id/text_time"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_20sdp"
-                android:textColor="@color/colorGrey"
-                android:text="2 hrs ago"
-                android:textSize="@dimen/_11sdp"
-                 />
 
 
             <TextView

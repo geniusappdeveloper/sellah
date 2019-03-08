@@ -8,10 +8,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -34,6 +37,11 @@ import com.app.admin.sellah.view.CustomDialogs.NewVideo_Sell_Better_bottom_Dialo
 import com.app.admin.sellah.view.adapter.Add_Product_Cars_Adapter;
 import com.app.admin.sellah.view.adapter.NewProductAddvideo_Adapter;
 
+import com.vincent.filepicker.Constant;
+import com.vincent.filepicker.activity.ImagePickActivity;
+import com.vincent.filepicker.filter.entity.ImageFile;
+
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,12 +50,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import droidninja.filepicker.FilePickerActivity;
-import droidninja.filepicker.FilePickerBuilder;
-import droidninja.filepicker.FilePickerConst;
+
 
 import static android.os.Build.VERSION_CODES.M;
 import static com.app.admin.sellah.controller.utils.Global.StatusBarLightMode;
+import static com.vincent.filepicker.activity.ImagePickActivity.IS_NEED_CAMERA;
 
 public class AddNewVideos extends AppCompatActivity implements SellProductInterface {
 
@@ -82,6 +89,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
     NewProductAddvideo_Adapter newProductAdapter;
     Add_Product_Cars_Adapter add_product_cars_adapter;
     ArrayList<String> filepaths;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +98,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
         StatusBarLightMode(this);
         setContentView(R.layout.activity_add_new_videos);
         ButterKnife.bind(this);
+        context = this;
         new NewVideo_Sell_Better_bottom_Dialog(this).show();
 
     }
@@ -143,14 +152,15 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
                 }
                 break;
             case R.id.addnewvideo_btn_nxt:
-                AddProductDatabase.imageListG.clear();
-                AddProductDatabase.imageListG.addAll(filepaths);
-                if (filepaths.isEmpty())
+
+                if (filepaths==null||filepaths.isEmpty())
                 {
                     Toast.makeText(this, "Please select atleast one image!", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
+                    AddProductDatabase.imageListG.clear();
+                    AddProductDatabase.imageListG.addAll(filepaths);
                     Intent intent = new Intent(AddNewVideos.this, AddNewInfo.class);
                     startActivity(intent
 
@@ -165,11 +175,29 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 
     private void showPictureDialog() {
 
+        Intent intent1 = new Intent(AddNewVideos.this, ImagePickActivity.class);
+        intent1.putExtra(IS_NEED_CAMERA, true);
+        intent1.putExtra(Constant.MAX_NUMBER, 5);
+        startActivityForResult(intent1, Constant.REQUEST_CODE_PICK_IMAGE);
 
-       new FilePickerBuilder().getInstance().setMaxCount(5)
-                .setSelectedFiles(filepaths)
-                .setActivityTheme(R.style.LibAppTheme)
-                .pickPhoto(this);
+        /*ImagePicker imagePicker = ImagePicker.create(this)
+                .language("in") // Set image picker language
+                .folderMode(false) // set folder mode (false by default)
+                .includeVideo(false) // include video (false by default)
+                .toolbarArrowColor(Color.RED) // set toolbar arrow up color
+                .toolbarFolderTitle("Folder") // folder selection title
+                .toolbarImageTitle("Tap to select") // image selection title
+                .toolbarDoneButtonText("DONE"); // done button text
+
+        imagePicker.limit(5)
+
+                .language("English")// max images can be selected (99 by default)
+                .showCamera(true) // show camera or not (true by default)
+                .imageDirectory("Camera")   // captured image directory name ("Camera" folder by default)
+                .imageFullDirectory(Environment.getExternalStorageDirectory().getPath()) // can be full path
+                .start();*/
+
+    }
 
 
      /*   AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this);
@@ -194,7 +222,7 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 
                 });
         pictureDialog.show();*/
-    }
+
 
     private void takePhotoFromCamera() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -227,20 +255,31 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 
-        switch (requestCode) {
-            case FilePickerConst.REQUEST_CODE_PHOTO:
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    filepaths = new ArrayList<>();
-                    filepaths.addAll(data.getStringArrayListExtra(FilePickerConst.KEY_SELECTED_MEDIA));
 
-                    add_product_cars_adapter = new Add_Product_Cars_Adapter(this, filepaths, this);
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-                    recycler.setLayoutManager(layoutManager);
-                    recycler.setAdapter(add_product_cars_adapter);
-                    add_product_cars_adapter.notifyDataSetChanged();
+
+        if(requestCode== Constant.REQUEST_CODE_PICK_IMAGE)
+        {
+            if(resultCode== RESULT_OK && data!=null)
+            {
+                filepaths = new ArrayList<>();
+                ArrayList<ImageFile> photoPaths = data.getParcelableArrayListExtra(Constant.RESULT_PICK_IMAGE);
+
+                for (int i=0;i<photoPaths.size();i++)
+                {
+                    filepaths.add(photoPaths.get(i).getPath());
                 }
-                break;
-        }
+
+                add_product_cars_adapter = new Add_Product_Cars_Adapter(this, filepaths, this);
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+                recycler.setLayoutManager(layoutManager);
+                recycler.setAdapter(add_product_cars_adapter);
+                add_product_cars_adapter.notifyDataSetChanged();
+
+            }}
+
+
+
+
         if (requestCode == GALLERY) {
             if (data != null) {
                 Uri contentURI = data.getData();

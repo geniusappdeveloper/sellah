@@ -118,6 +118,19 @@ public class Result {
     @SerializedName("product_video")
     @Expose
     private String productVideo;
+
+    public String getProductVideo_thumbnail() {
+        return productVideo_thumbnail;
+    }
+
+    public void setProductVideo_thumbnail(String productVideo_thumbnail) {
+        this.productVideo_thumbnail = productVideo_thumbnail;
+    }
+
+    @SerializedName("product_video_thumbnail")
+    @Expose
+    private String productVideo_thumbnail;
+
     @SerializedName("promotes")
     @Expose
     private List<Promote> promotes = null;

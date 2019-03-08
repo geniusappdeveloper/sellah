@@ -10,8 +10,10 @@ import android.widget.ImageView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.view.activities.ImageSlideShowActivity;
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagerAdapter extends PagerAdapter {
@@ -20,10 +22,12 @@ public class ViewPagerAdapter extends PagerAdapter {
     private LayoutInflater layoutInflater;
     //    private Integer [] images = {R.drawable.car_icon,R.drawable.car_icon,R.drawable.car_icon};
     private List<String> bannerList;
-
+    ArrayList arrayList = new ArrayList();
     public ViewPagerAdapter(Context context, List<String> bannerList) {
         this.context = context;
         this.bannerList = bannerList;
+        arrayList.clear();
+        arrayList.addAll(bannerList);
     }
 
     @Override
@@ -62,6 +66,14 @@ public class ViewPagerAdapter extends PagerAdapter {
                     ,(int) context.getResources().getDimension(R.dimen._10sdp));
 //            imageView.setImageResource(R.drawable.app_dummy_logo);
         }
+
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageSlideShowActivity.start(context,arrayList);
+            }
+        });
 
 
         ViewPager vp = (ViewPager) container;

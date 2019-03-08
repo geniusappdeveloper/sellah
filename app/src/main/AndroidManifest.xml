@@ -175,6 +175,8 @@
             android:label="@string/title_activity_add_new_videos"
             android:theme="@style/AppTheme"></activity>
 
+
+
         <activity
             android:name=".view.fragments.ShowCreditCardDetailFragment"
             android:label="@string/title_activity_add_new_videos"

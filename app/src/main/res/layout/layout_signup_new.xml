@@ -174,7 +174,6 @@
                             android:singleLine="true"
                             android:textColorHint="@color/colorLGrey" />
 
-
                         <TextView
                             android:id="@+id/t_confirmPass"
                             android:layout_width="wrap_content"
@@ -183,7 +182,6 @@
                             android:layout_marginLeft="@dimen/_10sdp"
                             android:text="@string/confirm_password"
                             android:textSize="@dimen/_12sdp" />
-
 
                         <EditText
                             android:id="@+id/et_confirmPass"
@@ -199,6 +197,32 @@
                             android:inputType="textPassword"
                             android:paddingLeft="@dimen/_5sdp"
                             android:singleLine="true" />
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/etSignup_pass"
+                            android:layout_marginLeft="@dimen/_10sdp"
+                            android:text="Country"
+                            android:textSize="@dimen/_12sdp" />
+
+
+                        <com.hbb20.CountryCodePicker
+                            android:layout_marginTop="@dimen/_3sdp"
+                            android:paddingLeft="@dimen/_5sdp"
+                            android:id="@+id/ccp1"
+                            app:ccp_textGravity="LEFT"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:visibility="visible"
+                            app:ccp_showFullName="true"
+                            app:ccp_showPhoneCode="false"
+                            app:ccp_autoDetectCountry="true"
+                            app:ccp_showFlag="true"
+                            app:ccp_showNameCode="false" />
+
 
                         <TextView
                             android:layout_width="wrap_content"

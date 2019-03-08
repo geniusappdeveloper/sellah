@@ -9,7 +9,6 @@
         android:id="@+id/image12"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
-        android:background="@drawable/carlogo"
         android:layout_height="match_parent" />
 
 

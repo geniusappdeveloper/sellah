@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mian_cd_root"
+    android:layout_margin="@dimen/_5sdp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cd_root"
@@ -43,6 +51,7 @@
                 android:textSize="@dimen/_12sdp" />
 
             <TextView
+                android:id="@+id/dummy_txtoffer"
                 android:layout_below="@+id/txt_offer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -51,7 +60,7 @@
                 android:textColor="@color/colorGrey"
                 android:text="No. of clicks"
                 android:gravity="left"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_10sdp" />
 
 
             <TextView
@@ -65,15 +74,17 @@
                 android:textSize="@dimen/_12sdp" />
 
             <TextView
+                android:id="@+id/dummy_txtvalidity"
                 android:layout_below="@+id/txt_offer_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
+                android:textColor="@color/colorGrey"
                 android:layout_alignParentRight="true"
                 android:layout_weight="1"
                 android:text="Validity"
                 android:gravity="right"
-                android:textSize="@dimen/_12sdp" />
+                android:textSize="@dimen/_10sdp" />
 
 
 
@@ -82,4 +93,7 @@
 
 
     </LinearLayout>
+</LinearLayout>
+
+
 </LinearLayout>

@@ -158,6 +158,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
         subCategory.clear();
         subCategory.add("Select Sub-Category");
 
+
         try {
             for (int i = 0; i < model.getResult().size(); i++) {
                 ArrayList<String> subCategories = new ArrayList<>();

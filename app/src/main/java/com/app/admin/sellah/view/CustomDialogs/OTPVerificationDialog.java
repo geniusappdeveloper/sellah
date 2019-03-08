@@ -34,6 +34,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.admin.sellah.controller.utils.Global.deleted_account;
 import static com.app.admin.sellah.controller.utils.Global.makeLinks;
 
 public class OTPVerificationDialog extends AlertDialog {
@@ -261,7 +262,15 @@ public class OTPVerificationDialog extends AlertDialog {
 
         if (mEnteredOTP == mGeneratedOTP/*123456*/) {
             Global.hideKeyboard(getWindow().getDecorView(), mContext);
-            verifyOTP();
+            if (deleted_account)
+            {
+               restore_account_otpverification();
+            }
+            else
+            {
+                verifyOTP();
+            }
+
 
         } else {
 //            WMUtility.showToast(mContext, "Enter correct OTP");
@@ -396,4 +405,43 @@ public class OTPVerificationDialog extends AlertDialog {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
     }
+
+    private void restore_account_otpverification() {
+
+        Log.e("Uid_vCode", uid + " : " + mEnteredOTP);
+
+        Call<Common> verifyOTPcall = service.restore_account(uid, mEnteredOTP);
+        verifyOTPcall.enqueue(new Callback<Common>() {
+            @Override
+            public void onResponse(Call<Common> call, Response<Common> response) {
+                Log.e("VerfyCode_response", response.isSuccessful() + "");
+                Common result = response.body();
+                if (response.isSuccessful()) {
+
+                    if (result.getStatus().equalsIgnoreCase("1")) {
+                        mOTPVerificationListener.onOTPVerified();
+                        dismiss();
+                    } else {
+                        mOTPVerificationListener.onOTPNotVerified();
+//                        dismissProgress();
+                        Toast.makeText(mContext, result.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+//                    dismissProgress();
+                    Toast.makeText(mContext, "Something went's wrong", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Common> call, Throwable t) {
+//                dismissProgress();
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("verifyOtp_failure", t.getMessage());
+            }
+        });
+    }
+
+
+
 }

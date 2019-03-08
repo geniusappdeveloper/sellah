@@ -47,6 +47,15 @@ public class SuggestedPostAdapterHome extends RecyclerView.Adapter<SuggestedPost
 
         holder.item_name.setText(add_items.getResult().get(position).getName());
         holder.item_cost.setText("S$ " + add_items.getResult().get(position).getPrice());
+        String time = Global.getTimeAgo(add_items.getResult().get(position).getCreatedAt());
+        if (time.contains("1 days"))
+        {
+            holder.posted.setText("Posted 1 day ago" );
+        }
+        else
+        {
+            holder.posted.setText("Posted "  +time);
+        }
 
        /* Glide.with(context)
                 .asBitmap()
@@ -95,7 +104,7 @@ public class SuggestedPostAdapterHome extends RecyclerView.Adapter<SuggestedPost
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView add_image;
-        public TextView item_name, item_cost;
+        public TextView item_name, item_cost,posted;
         public LinearLayout rootLayout;
 
         public ViewHolder(View itemView) {
@@ -103,6 +112,7 @@ public class SuggestedPostAdapterHome extends RecyclerView.Adapter<SuggestedPost
             add_image = (ImageView) itemView.findViewById(R.id.additional_image);
             item_name = (TextView) itemView.findViewById(R.id.tb_item_name);
             item_cost = (TextView) itemView.findViewById(R.id.tb_item_cost);
+            posted = (TextView) itemView.findViewById(R.id.recommend_posted);
             rootLayout = itemView.findViewById(R.id.li_root_view);
 
         }

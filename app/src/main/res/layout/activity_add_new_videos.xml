@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/_13sdp"
-            android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:textColor="@color/colorGrey"
             android:text="Add photos"/>
 
@@ -111,11 +111,27 @@
             </android.support.v7.widget.RecyclerView>
         </RelativeLayout>
 
+        <Button
+            android:visibility="gone"
+            android:id="@+id/addmore_photos_btn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/live_product_detail_red_background"
+            android:text="Add more photos"
+            android:textSize="@dimen/_14sdp"
+            android:layout_gravity="center"
+            android:padding="@dimen/_4sdp"
+            android:gravity="center"
+            android:textColor="@color/colorRed"
+            android:textAllCaps="false"/>
+
+
         <TextView
+            android:layout_marginTop="@dimen/_5sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/_13sdp"
-            android:layout_marginTop="@dimen/_20sdp"
             android:textColor="@color/colorGrey"
             android:text="Add a short video"/>
 
@@ -172,20 +188,6 @@
 
         </RelativeLayout>
 
-        <Button
-            android:visibility="gone"
-            android:id="@+id/addmore_photos_btn"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@drawable/live_product_detail_red_background"
-            android:text="Add more photos"
-            android:textSize="@dimen/_14sdp"
-            android:layout_gravity="center"
-            android:padding="@dimen/_4sdp"
-            android:gravity="center"
-            android:textColor="@color/colorRed"
-            android:textAllCaps="false"/>
 
     </LinearLayout>
     <LinearLayout

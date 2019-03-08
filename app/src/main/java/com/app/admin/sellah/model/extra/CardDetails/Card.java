@@ -77,6 +77,18 @@ public class Card {
     @Expose
     private String tokenizationMethod;
 
+    public String getDefault_card() {
+        return default_card;
+    }
+
+    public void setDefault_card(String default_card) {
+        this.default_card = default_card;
+    }
+
+    @SerializedName("default_card")
+    @Expose
+    private String default_card;
+
     public String getId() {
         return id;
     }

@@ -3,12 +3,12 @@ package com.app.admin.sellah.view.CustomDialogs;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,12 +25,13 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.GetCardDetailModel.GetCardDetailModel;
-import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.model.extra.PromotePackages.PackagesList;
 import com.app.admin.sellah.model.extra.PromotePackages.PromotePackageModel;
 import com.app.admin.sellah.view.adapter.PromoteOfferAdapter;
+import com.app.admin.sellah.view.fragments.ShowCreditCardDetailFragment;
 import com.cooltechworks.creditcarddesign.CreditCardView;
 import com.stripe.android.view.CardMultilineWidget;
 
@@ -39,6 +40,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,7 +48,7 @@ import retrofit2.Response;
 import static android.view.View.GONE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
-public class PromoteDialog extends AlertDialog {
+public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentCallBack {
 
     @BindView(R.id.img_tick_1)
     ImageView imgTick1;
@@ -72,6 +74,12 @@ public class PromoteDialog extends AlertDialog {
     ScrollView svRoot;
     @BindView(R.id.cd_root)
     LinearLayout cdRoot;
+    @BindView(R.id.btn_promote_cancel)
+    ImageView btnPromoteCancel;
+    @BindView(R.id.promote_btn)
+    Button promoteBtn;
+    @BindView(R.id.promote_laterbtn)
+    Button promoteLaterbtn;
     private BottomSheetDialog bottomSheetDialog;
     WebService webService;
     private Dialog dialog;
@@ -82,6 +90,7 @@ public class PromoteDialog extends AlertDialog {
     private ViewGroup transitionsContainer;
     PromoteCallback callback;
     String productId = "";
+    String selected_id="";
 
     public PromoteDialog(Context context, String productId, PromoteCallback callback) {
         super(context);
@@ -246,36 +255,90 @@ public class PromoteDialog extends AlertDialog {
                 pbRoot.setVisibility(GONE);
 
                 PromoteOfferAdapter adapter = new PromoteOfferAdapter(context, packagesList, (id) -> {
+
+                    selected_id = id;
          /*   bottomSheetDialog.show();
             getCardApi();*/
-                    PaymentDialog.create(context, "", HelperPreferences.get(context).getString(UID), productId, id,"", new PaymentDialog.PaymentCallBack() {
-                        @Override
-                        public void onPaymentSuccess() {
-                            callback.onPromoteSuccess();
-                            Toast.makeText(context, "Product promoted successfully.", Toast.LENGTH_SHORT).show();
-                            dismiss();
-                        }
-
-                        @Override
-                        public void onPaymentFail(String message) {
-                            callback.onPromoteFailure();
-                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onCancelDialog() {
-
-                        }
-                    }).show();
                 });
 
-                LinearLayoutManager horizontalLayoutManager1 = new GridLayoutManager(context,2);
+                LinearLayoutManager horizontalLayoutManager1 = new GridLayoutManager(context, 2);
                 rvOfferList.setLayoutManager(horizontalLayoutManager1);
                 rvOfferList.setAdapter(adapter);
                 Global.getTotalHeightofLinearRecyclerView(context, rvOfferList, R.layout.layout_promote_offer_list_design, 0);
             }
 
         }, 1000);
+    }
+
+    @OnClick({R.id.btn_promote_cancel, R.id.promote_btn, R.id.promote_laterbtn})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_promote_cancel:
+                dismiss();
+                break;
+            case R.id.promote_btn:
+
+                if (selected_id.equals(""))
+                {
+                    Toast.makeText(context, "Please select a promote plan.", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+
+                    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, selected_id);
+                    dismiss();
+
+                    /*Intent intent = new Intent(context,ShowCreditCardDetailFragment.class);
+                    context.startActivity(intent);*/
+                   /*PaymentDialog.create(context, "", HelperPreferences.get(context).getString(UID), productId, selected_id, "", new PaymentDialog.PaymentCallBack() {
+                        @Override
+                        public void onPaymentSuccess() {
+
+                            dismiss();
+                        }
+
+                        @Override
+                        public void onPaymentFail(String message) {
+
+                        }
+
+                        @Override
+                        public void onCancelDialog() {
+
+                        }
+                    }).show();*/
+
+                }
+
+
+                break;
+            case R.id.promote_laterbtn:
+                dismiss();
+                break;
+        }
+    }
+
+    @Override
+    public void onPaymentSuccess() {
+
+        callback.onPromoteSuccess();
+        Toast.makeText(context, "Product promoted successfully.", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onPaymentFail(String message) {
+
+        callback.onPromoteFailure();
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onCancelDialog() {
+
+        Log.e( "onCancelDialog: ", "cancel");
+
     }
 
    /* public void StripeCreditCard(String acc, int month, int year, String cvc) {
@@ -382,9 +445,9 @@ public class PromoteDialog extends AlertDialog {
     public interface PromoteCallback {
         void onPromoteSuccess();
 
-        void onPromoteFailure();
-    }
 
+    void onPromoteFailure();
+}
     private void getCardApi() {
 
      /*   new ApisHelper().getCardApi(context, new ApisHelper.OnGetCardDataListners() {
@@ -432,12 +495,12 @@ public class PromoteDialog extends AlertDialog {
             public void onResponse(Call<PromotePackageModel> call, Response<PromotePackageModel> response) {
                 if (response.isSuccessful()) {
                     Log.e("PromoteProductApi", "onResponse: success" + response.body().getStatus());
-                  if(response.body().getStatus().equalsIgnoreCase("1")){
-                      hideProgress(response.body().getPackagesList());
-                  }else{
-                      Toast.makeText(context, "Unable to get promote packages at this movement.", Toast.LENGTH_SHORT).show();
-                      dismiss();
-                  }
+                    if (response.body().getStatus().equalsIgnoreCase("1")) {
+                        hideProgress(response.body().getPackagesList());
+                    } else {
+                        Toast.makeText(context, "Unable to get promote packages at this movement.", Toast.LENGTH_SHORT).show();
+                        dismiss();
+                    }
                 } else {
                     Toast.makeText(context, "Unable to get promote packages at this movement.", Toast.LENGTH_SHORT).show();
                     dismiss();

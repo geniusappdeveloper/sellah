@@ -29,6 +29,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -68,6 +69,8 @@ import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.BuyerMakeOfferDialog;
 import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.activities.Previewvideo;
@@ -77,11 +80,6 @@ import com.app.admin.sellah.view.adapter.PromotePackagesAdapter;
 import com.app.admin.sellah.view.adapter.SimpleTagAdapter;
 import com.app.admin.sellah.view.adapter.SuggestedPostAdapter;
 import com.bumptech.glide.Glide;
-import com.google.gson.JsonObject;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -101,11 +99,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.ADDPRODUCTTAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.HOMETAG;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
+import static com.app.admin.sellah.controller.utils.Global.makeTextViewResizable;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.MAKE_OFFER_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -196,6 +196,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     ImageView btnSend;
     @BindView(R.id.li_chat_offer)
     LinearLayout liChatOffer;
+    boolean ishasthumbnail = false;
 
     @BindView(R.id.img_online)
     ImageView imgOnline;
@@ -224,6 +225,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     ImageView productback;
     @BindView(R.id.edit_quanitity)
     TextView editQuanitity;
+    @BindView(R.id.sub_cat_option)
+    ImageView subCatOption;
     private RecyclerView tagRcView;
     ArrayList<String> tagList;
     Button btn_makeOffer;
@@ -233,6 +236,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     WebService service;
     private Dialog dialog;
     String videourl;
+    String prodct_id,package_id;
 
 
     @Nullable
@@ -346,9 +350,11 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 if (!productDetial1.getOnlineStatus().equalsIgnoreCase("off")) {
                     tvStatus.setText("Online");
                     imgOnline.setVisibility(View.VISIBLE);
+                    imgOnline.setBackgroundResource(R.drawable.dot_online);
                 } else {
                     tvStatus.setText("Last seen at : " + Global.getTimeAgo(Global.convertUTCToLocal(productDetial1.getLastSeenTime())));
-                    imgOnline.setVisibility(View.GONE);
+                    imgOnline.setVisibility(View.VISIBLE);
+                    imgOnline.setBackgroundResource(R.drawable.red_dot_icon);
                 }
 
                 if (productDetial1.getProductType().equalsIgnoreCase("U")) {
@@ -356,8 +362,16 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 } else {
                     txtProductCondition.setText("New");
                 }
-                 editQuanitity.setText(productDetial1.getQuantity()+" in stock only");
+                editQuanitity.setText(productDetial1.getQuantity() + " in stock only");
+
                 txtProductDescription.setText(productDetial1.getDescription());
+
+                if (txtProductDescription.getLineCount()>5)
+                {
+                    makeTextViewResizable(txtProductDescription, 5, ".. See More", true);
+                }
+
+
 
 
                 if (HelperPreferences.get(getActivity()).getString(UID) != null && HelperPreferences.get(getActivity()).getString(UID).equalsIgnoreCase(productDetial.getUserId())) {
@@ -392,17 +406,19 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 setUpPackages(productDetial1.getUserId(), productDetial1.getPromotes(), productDetial1.getPromoteProduct());
 
                 if (productDetial1.getProductVideo().equals("") || productDetial1.getProductVideo() == null) {
-
+                    ishasthumbnail=false;
                 } else {
-
                     videourl = productDetial1.getProductVideo();
-                    viewImagesArray.add(getURLForResource(R.drawable.default_image));
+                    viewImagesArray.add(productDetial1.getProductVideo_thumbnail());
+                    ishasthumbnail=true;
                 }
 
 
                 initViewPagger(productDetial1.getProductImages());
+                prodct_id =productDetial1.getId();
                 if (productDetial1.getPromotes() != null && productDetial1.getPromotes().size() > 0) {
                     setupPromoteOptions(productDetial1.getId(), productDetial1.getPromotes().get(0).getId());
+                    package_id = productDetial1.getPromotes().get(0).getId();
                 } else {
                     setupPromoteOptions(productDetial1.getId(), "");
                 }
@@ -443,6 +459,69 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             list.setValidity("55");
             packagesList.add(list);*/
                 PromotePackagesAdapter adapter = new PromotePackagesAdapter(getActivity(), promoteDetail, (id) -> {
+
+
+                    PopupMenu popup = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+
+                    }
+                    else
+                    {
+                        popup = new PopupMenu(getActivity(), rvOfferList);
+                    }
+                    MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.promote_option_new, popup.getMenu());
+                    popup.show();
+
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            if (!Global.NetworStatus.isOnline(getActivity()) || Global.NetworStatus.isInternetAvailable()) {
+                                S_Dialogs.getNetworkErrorDialog(getActivity()).show();
+                            } else {
+
+                                switch (item.getItemId()) {
+
+                                    case R.id.promote_cancel_promote:
+                                        try {
+                                            S_Dialogs.getCancelPromotion(getActivity(), ((dialog, which) -> {
+                                                cancelPromotionApi(productDetial.getUserId(), prodct_id, id);
+                                            })).show();
+                                        } catch (Exception e) {
+                                            Toast.makeText(getActivity(), "Invalid inputs.", Toast.LENGTH_SHORT).show();
+                                        }
+                                        break;
+                                    case R.id.promote_update_promote:
+                                        PromoteDialog.create(getActivity(), prodct_id, new PromoteDialog.PromoteCallback() {
+                                            @Override
+                                            public void onPromoteSuccess() {
+                                                Toast.makeText(getActivity(), "Promote package is updated successfully.", Toast.LENGTH_SHORT).show();
+                                                productDetial.setPromoteProduct("S");
+                                                getProductDetailsApi(prodct_id);
+                                            }
+
+                                            @Override
+                                            public void onPromoteFailure() {
+                                                Toast.makeText(getActivity(), "Unable to update promote package at this movement.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).show();
+                                        break;
+
+
+
+
+
+
+                                }
+                            }
+                            return true;
+                        }
+                    });
+
+
+
                 });
                 LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
                 rvOfferList.setLayoutManager(horizontalLayoutManager1);
@@ -471,7 +550,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     private void setTagAdapter(List<Tag> productTags) {
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        tagAdapter = new SimpleTagAdapter(getActivity(), productTags);
+        tagAdapter = new SimpleTagAdapter(getActivity(), productTags,true);
         tagRcView.setLayoutManager(layoutManager);
         tagRcView.setAdapter(tagAdapter);
     }
@@ -483,6 +562,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         rateImage.setOnClickListener(this);
         btn_makeOffer.setOnClickListener(this);
         user_profile.setOnClickListener(this);
+        cardPromoteDetail.setOnClickListener(this);
+
 
     }
 
@@ -490,7 +571,64 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     public void onClick(View view) {
         switch (view.getId()) {
 
+            case R.id.card_promote_detail:
 
+                PopupMenu popup = new PopupMenu(getActivity(), view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.promote_option_new, popup.getMenu());
+                popup.show();
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        if (!Global.NetworStatus.isOnline(getActivity()) || Global.NetworStatus.isInternetAvailable()) {
+                            S_Dialogs.getNetworkErrorDialog(getActivity()).show();
+                        } else {
+
+                            switch (item.getItemId()) {
+
+                                case R.id.promote_cancel_promote:
+                                    try {
+                                        S_Dialogs.getCancelPromotion(getActivity(), ((dialog, which) -> {
+                                            cancelPromotionApi(productDetial.getUserId(), prodct_id, package_id);
+                                        })).show();
+                                    } catch (Exception e) {
+                                        Toast.makeText(getActivity(), "Invalid inputs.", Toast.LENGTH_SHORT).show();
+                                    }
+                                    break;
+                                case R.id.promote_update_promote:
+                                    PromoteDialog.create(getActivity(), prodct_id, new PromoteDialog.PromoteCallback() {
+                                        @Override
+                                        public void onPromoteSuccess() {
+                                            Toast.makeText(getActivity(), "Promote package is updated successfully.", Toast.LENGTH_SHORT).show();
+                                            productDetial.setPromoteProduct("S");
+                                            getProductDetailsApi(prodct_id);
+                                        }
+
+                                        @Override
+                                        public void onPromoteFailure() {
+                                            Toast.makeText(getActivity(), "Unable to update promote package at this movement.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).show();
+                                    break;
+
+
+
+
+
+
+                            }
+                        }
+                        return true;
+                    }
+                });
+
+
+
+
+                break;
             case R.id.img_send_camera:
                 if (isLogined(getActivity())) {
                     if (Build.VERSION.SDK_INT >= 23) {
@@ -577,12 +715,38 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             case R.id.btn_makeOffer:
                 if (isLogined(getActivity())) {
 //                    navLogout.setVisibility(View.VISIBLE);
-                    BuyerMakeOfferDialog.create(getActivity(), productDetial.getPrice(), productDetial.getQuantity(), new BuyerMakeOfferDialog.OnmakeOfferClick() {
-                        @Override
-                        public void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog) {
-                            makeOfferApi(productDetial.getId(), price, productDetial.getName(), quantity, buyerMakeOfferDialog);
-                        }
-                    }).show();
+
+                    if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
+                    {
+                        S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                            //--------------openHere-----------------
+
+                            Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                            stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                        })).show();
+                    }
+                    else if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                    {
+                        S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                            //--------------openHere-----------------
+
+                            Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                            stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+
+                        })).show();
+                    }
+
+                    else {
+                        BuyerMakeOfferDialog.create(getActivity(), productDetial.getPrice(), productDetial.getQuantity(), new BuyerMakeOfferDialog.OnmakeOfferClick() {
+                            @Override
+                            public void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog) {
+                                makeOfferApi(productDetial.getId(), price, productDetial.getName(), quantity, buyerMakeOfferDialog);
+                            }
+                        }).show();
+
+                    }
+
                 /*    S_Dialogs.getMakeOfferDialog(getActivity(), productDetial.getPrice(), (dialog, input) -> {
                         if (TextUtils.isEmpty(input) || input.toString().equalsIgnoreCase("0")) {
                             Toast.makeText(getActivity(), "Please enter offering amount", Toast.LENGTH_SHORT).show();
@@ -618,7 +782,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             viewImagesArray.add(productImages.get(i).getImage());
 
         mPager = (ViewPager) view.findViewById(R.id.pager);
-        mPager.setAdapter(new GolfAdapter(getActivity(), viewImagesArray, this));
+        mPager.setAdapter(new GolfAdapter(ishasthumbnail,getActivity(), viewImagesArray, this));
 
         CircleIndicator indicator = (CircleIndicator) view.findViewById(R.id.indicator);
         indicator.setViewPager(mPager);
@@ -643,29 +807,25 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(0);
 
-        /**********************************************************************************************/
-        ((MainActivity) getActivity()).rlBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-
-            }
-        });
 
         /**********************************************************************************************/
 
     }
 
     private void setupPromoteOptions(String productId, String packageId) {
-        ((MainActivity) getActivity()).rloptions.setOnClickListener(new View.OnClickListener() {
+        subCatOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
 //                if (isLogined(getActivity())) {
-                PopupMenu popup = new PopupMenu(getActivity(), ((MainActivity) getActivity()).rloptions);
+                PopupMenu popup = new PopupMenu(getActivity(), view);
                 MenuInflater inflater = popup.getMenuInflater();
                 inflater.inflate(R.menu.menu_options, popup.getMenu());
-
+                   if (rateStatus)
+                       popup.getMenu().findItem(R.id.wishlist).setTitle("Add To Wishlist");
+                       else
+                       popup.getMenu().findItem(R.id.wishlist).setTitle("Remove From Wishlist");
                 if (isLogined(getActivity()) && !TextUtils.isEmpty(productDetial.getUserId()) && productDetial.getUserId().equalsIgnoreCase(HelperPreferences.get(getActivity()).getString(UID))
                         && !TextUtils.isEmpty(packageId)) {
                     if (productDetial.getPromoteProduct().equalsIgnoreCase("S")) {
@@ -682,7 +842,9 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                         popup.getMenu().findItem(R.id.menu_promote).setVisible(true);
                         popup.getMenu().findItem(R.id.menu_update_promote).setVisible(false);
                         popup.getMenu().findItem(R.id.menu_cancel_promote).setVisible(false);
+                        popup.getMenu().findItem(R.id.wishlist).setVisible(false);
                     } else {
+                        popup.getMenu().findItem(R.id.wishlist).setVisible(true);
                         popup.getMenu().findItem(R.id.menu_promote).setVisible(false);
                         popup.getMenu().findItem(R.id.menu_update_promote).setVisible(false);
                         popup.getMenu().findItem(R.id.menu_cancel_promote).setVisible(false);
@@ -694,10 +856,13 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                     popup.getMenu().findItem(R.id.menu_mark_sold).setVisible(true);
                     popup.getMenu().findItem(R.id.menu_delete).setVisible(true);
                     popup.getMenu().findItem(R.id.menu_report).setVisible(false);
+                    popup.getMenu().findItem(R.id.wishlist).setVisible(false);
                     popup.getMenu().findItem(R.id.menu_edit_product).setVisible(true);
                 } else {
+
                     popup.getMenu().findItem(R.id.menu_mark_sold).setVisible(false);
                     popup.getMenu().findItem(R.id.menu_delete).setVisible(false);
+                    popup.getMenu().findItem(R.id.wishlist).setVisible(true);
                     popup.getMenu().findItem(R.id.menu_report).setVisible(true);
                     popup.getMenu().findItem(R.id.menu_edit_product).setVisible(false);
                 }
@@ -710,7 +875,28 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                         if (!Global.NetworStatus.isOnline(getActivity()) || Global.NetworStatus.isInternetAvailable()) {
                             S_Dialogs.getNetworkErrorDialog(getActivity()).show();
                         } else {
+
                             switch (item.getItemId()) {
+
+                                case R.id.wishlist:
+
+                                    if (isLogined(getActivity())) {
+                                        if (!rateStatus) {
+//                        rateImage.setImageResource(R.drawable.star_icon_new);
+//                        rateStatus = true;
+                                            removeItemFromWishlist(productDetial.getId() != null ? productDetial.getId() : "");
+                                            popup.getMenu().findItem(R.id.wishlist).setTitle("Add To Wishlist");
+                                        } else {
+                                            addItemToWishlist(productDetial.getId() != null ? productDetial.getId() : "");
+                                            popup.getMenu().findItem(R.id.wishlist).setTitle("Remove From Wishlist");
+//                        rateImage.setImageResource(R.drawable.star_icon);
+//                        rateStatus = false;
+                                        }
+                                    } else {
+                                        S_Dialogs.getLoginDialog(getActivity()).show();
+                                    }
+
+                                    break;
                                 case R.id.menu_cancel_promote:
                                     try {
                                         S_Dialogs.getCancelPromotion(getActivity(), ((dialog, which) -> {
@@ -1513,12 +1699,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             }
         });
     }
-
+    Call<Common> markAsSoldCall;
     private void markProductAsSold(String productId) {
 
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
-        Call<Common> markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
+         markAsSoldCall = service.markProductAsSoldApi(HelperPreferences.get(getActivity()).getString(UID), productId);
         markAsSoldCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
@@ -1563,13 +1749,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     }
 */
 
-
-
+    Call<ProductDetailModel> productDetailCall;
     public void getProductDetailsApi(String productId) {
 
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
-        Call<ProductDetailModel> productDetailCall = service.getProductDetail(HelperPreferences.get(getActivity()).getString(UID), productId);
+        productDetailCall = service.getProductDetail(HelperPreferences.get(getActivity()).getString(UID), productId);
         productDetailCall.enqueue(new Callback<ProductDetailModel>() {
             @Override
             public void onResponse(Call<ProductDetailModel> call, Response<ProductDetailModel> response) {
@@ -1619,6 +1804,10 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     @Override
     public void onStop() {
         super.onStop();
+        if (productDetailCall!=null)
+        {productDetailCall.cancel();}
+        if (markAsSoldCall!=null)
+        {markAsSoldCall.cancel();}
         ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.VISIBLE);
     }
 
@@ -1639,6 +1828,10 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         previewintent.putExtra("video", videourl);
         startActivity(previewintent);
     }
+
+
+
+
 }
 
 

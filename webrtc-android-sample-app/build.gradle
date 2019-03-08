@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
 
     compileSdkVersion 27
-    buildToolsVersion '28.0.2'
 
     defaultConfig {
         applicationId "io.antmedia.webrtc_android_sample_app"

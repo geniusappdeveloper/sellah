@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.view.activities.MainActivity;
 
 import java.util.ArrayList;
 
@@ -58,17 +60,7 @@ public class LegalSectionListAdapter extends BaseAdapter {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(position==0){
-                   /* File myFile = new File( "file:///android_asset/termsandconditions.docx");
-//                    Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider",myFile);
-//                    File newFile=new File(uri.getPath());
-                    try {
-                        Global.openFile(context, myFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }*/
-
-                }
+                ((MainActivity)context).legal_frag(optionList.get(position));
             }
         });
 

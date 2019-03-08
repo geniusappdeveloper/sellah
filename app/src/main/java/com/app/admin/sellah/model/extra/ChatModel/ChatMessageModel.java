@@ -30,6 +30,30 @@ public class ChatMessageModel {
     @Expose
     private String productCost;
 
+    @SerializedName("product_image")
+    @Expose
+    private String product_image;
+
+    public String getProduct_image() {
+        return product_image;
+    }
+
+    public void setProduct_image(String product_image) {
+        this.product_image = product_image;
+    }
+
+    public String getMessage_read_status() {
+        return message_read_status;
+    }
+
+    public void setMessage_read_status(String message_read_status) {
+        this.message_read_status = message_read_status;
+    }
+
+    @SerializedName("message_read_status")
+    @Expose
+    private String message_read_status;
+
     @SerializedName("product_name")
     @Expose
     private String productName;

@@ -81,19 +81,10 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true">
 
+
+
                 <ImageView
                     android:id="@+id/img_send_camera"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:padding="@dimen/_5sdp"
-                    android:src="@drawable/share_live_caht"
-                    android:tint="#fff" />
-
-
-                <ImageView
-                    android:visibility="gone"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
                     android:layout_centerInParent="true"
@@ -578,8 +569,18 @@
                 android:layout_centerVertical="true"
                 android:padding="5dp">
 
+                <ImageView
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:padding="@dimen/_4sdp"
+                    android:src="@drawable/share_live_caht"
+                    android:tint="#fff" />
+
 
                 <ImageView
+                    android:visibility="gone"
                     android:id="@+id/img_send_gallery"
                     android:layout_width="@dimen/_22sdp"
                     android:layout_height="@dimen/_22sdp"

@@ -62,7 +62,7 @@
     <string name="dialog_action_yes">Yes</string>
     <string name="dialog_title_block_user">Are you sure you want to Block this user? Once blocked, you will not able to see any updates from this user?</string>
     <string name="dialog_title_un_follow_user">Are you sure you want to un-follow this user? Once un-follow, you will not able to get any updates notification from this user?</string>
-    <string name="dialog_title_cancel_promotion">Are you sure you want to cancel promotion on this product? Product will not appear at top and no longer marked as featured.</string>
+    <string name="dialog_title_cancel_promotion">Are you sure you want to cancel your product promotion? Because No refunds will be awarded.</string>
     <string name="dialog_title_you_block_user">You have blocked this user. You must have to unblock this user to view his/her profile or to chat with this user. </string>
     <string name="dialog_title_user_block_you">You are blocked by this user. You can"'"t communicate with this user or view his/her profile . </string>
     <string name="dialog_title_unblock_user">Are you sure you want to Un-Block this user?</string>
@@ -96,13 +96,13 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
 
     <string name="media_kit">Media Kit</string>
 
-    <string name="media_kit_description">Please click here to download our Media Kit. For press queries please contact us at press@sellah.com.</string>
+    <string name="media_kit_description">For press queries please contact us at admin@sellah.com.</string>
 
     //************************************************************//
     //****************************Legal Section********************************//
     <string name="legal_body">When you sign-up or sign-in to Sellah you agree to accept our terms which are listed below. Following these terms help protect you and create an enjoyable shopping experience for all Sellahs.</string>
 
-
+    <string name="register_stripe">By registering your account, you agree to our Services Agreement and the Stripe Connected Account Agreement.</string>
     <string name="title_action_reset">Reset</string>
 
     <string name="label_card_number">XXXX XXXX XXXX XXXX</string>
@@ -193,15 +193,14 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
         <item>Mail Item To Customer</item>
     </string-array>
     <string-array name="currency">
-        <item>Select currency</item>
-        <item>SG$- Singapore Dollar</item>
+        <item>S$</item>
 
     </string-array>
 
     <string-array name="add_product_payment_method">
-        <item>Payment Method</item>
-        <item>Cash</item>
-        <item>Credit/Debit Card</item>
+       <!-- <item>Payment Method</item>-->
+       <!-- <item>Cash</item>-->
+        <item>Credit Card</item>
         <!-- <item>Bank Transfer</item>
         <item>DBS PayLah!</item>
         <item>PayNow</item>-->

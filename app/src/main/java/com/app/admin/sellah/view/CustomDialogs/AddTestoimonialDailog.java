@@ -61,6 +61,7 @@ public class AddTestoimonialDailog extends DialogFragment {
     @BindView(R.id.btn_submit_review)
     Button btnSubmitReview;
     Unbinder unbinder;
+    String order_id;
 
 
     @Nullable
@@ -81,6 +82,10 @@ public class AddTestoimonialDailog extends DialogFragment {
                 givenRating = rating;
             }
         });
+        Bundle bundle = this.getArguments();
+        if (bundle!=null)
+        otherUserId = bundle.getString("other_id");
+        order_id = bundle.getString("order_id");
 
         return view;
     }
@@ -89,10 +94,12 @@ public class AddTestoimonialDailog extends DialogFragment {
     private void addTestimonialApi(String otherUserId, String feedBack, String rating) {
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
-        Call<Common> addTestimonialCall = webService.addTestimonialApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId, feedBack, rating);
+        Call<Common> addTestimonialCall = webService.addTestimonialApi(HelperPreferences.get(getActivity()).getString(UID), otherUserId, feedBack, rating,order_id);
         addTestimonialCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
+
+                Log.e("AddTestimonialApi", "onResponse: " + response.body());
                 if (response.isSuccessful()) {
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
@@ -100,10 +107,10 @@ public class AddTestoimonialDailog extends DialogFragment {
                     Log.e("AddTestimonialApi", "onResponse: " + response.body());
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
 
-                        listner.onSuccessListner();
+                     //   listner.onSuccessListner();
                         S_Dialogs.getInformation(getActivity(), response.body().getMessage(), ((dialog1, which) -> {
                             dismiss();
-                            listner.onSuccessListner();
+                          //  listner.onSuccessListner();
                         })).show();
 
                     }
@@ -141,7 +148,7 @@ public class AddTestoimonialDailog extends DialogFragment {
                 if (!Global.getText(edtTestimonials).equalsIgnoreCase("")) {
                     addTestimonialApi(otherUserId, Global.getText(edtTestimonials), String.valueOf(givenRating));
                 } else {
-                    Toast.makeText(getActivity(), "Please give some review aboout user.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please give some review about user.", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }

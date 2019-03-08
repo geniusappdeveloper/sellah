@@ -230,7 +230,8 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
            /* currentDeliveryEdit.setText("ADD");
             relCurrentAddress.setVisibility(View.GONE);*/
         }
-//        ccp.setcode
+
+//      ccp.setcode
         ccp.setCountryForPhoneCode(Integer.parseInt(profileData.getResult().getCountryCode().replace("+", "")));
         ccp.registerCarrierNumberEditText(etPhoneNum);
         etPhoneNum.setText(profileData.getResult().getPhoneNumber());
@@ -240,7 +241,7 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
         onlineWordcount.setText(String.valueOf(profileData.getResult().getDescription().length()));
         aboutWordcount.setText(String.valueOf(profileData.getResult().getAbout().length()));
     }
-    
+
 
     private void setUpCodepicker() {
         ccp.setOnCountryChangeListener(new CountryCodePicker.OnCountryChangeListener() {

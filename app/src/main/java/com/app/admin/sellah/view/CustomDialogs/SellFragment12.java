@@ -1080,7 +1080,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                             model.setPackageId(RequestBody.create(MediaType.parse("text/plain"), ""));
                         }
                         model.setPromote_product(RequestBody.create(MediaType.parse("text/plain"), isPromotingProduct));
-                        addProduct(model);
+                        ///addProduct(model);
                         Log.e("addProduct", "allDone");
                     }
                 }).show();
@@ -1092,6 +1092,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
 
     }
 
+/*
     public void addProduct(AddProductModel addProductModel) {
 
         WebService service = Global.WebServiceConstants.getRetrofitinstance();
@@ -1101,8 +1102,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                 , addProductModel.getPayment_mode(), addProductModel.getDelivery(), addProductModel.getSell_internationally(), addProductModel.getPrice()
                 , addProductModel.getFixed_price(), addProductModel.getProduct_type(), addProductModel.getQuantity(), addProductModel.getDescription()
                 , addProductModel.getPromote_product(), addProductModel.getNo_of_clicks(), addProductModel.getBudget(), addProductModel.getTags()
-                , addProductModel.getImage1(), addProductModel.getImage2(), addProductModel.getImage3(), addProductModel.getImage4(), addProductModel.getImage5(), addProductModel.getImage6()
-                , addProductModel.getImage7(), addProductModel.getImage8(), addProductModel.getPackageId(), addProductModel.getProductVideo());
+                , addProductModel.getImage1(), addProductModel.getImage2(),  addProductModel.getPackageId(), addProductModel.getProductVideo(), addProductModel.getProductVideo());
         addProductCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -1151,7 +1151,8 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                                         ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
                                     }
                                 }).show();
-                               /* PromoteDialog.create(getActivity(), response.body().getResult().get(0).getId(), new PromoteDialog.PromoteCallback() {
+                               */
+/* PromoteDialog.create(getActivity(), response.body().getResult().get(0).getId(), new PromoteDialog.PromoteCallback() {
                                     @Override
                                     public void onPromoteSuccess() {
                                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
@@ -1171,7 +1172,8 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                                         clearForm(rootTag);
                                     }
-                                }).show();*/
+                                }).show();*//*
+
                             } catch (Exception e) {
 
                             }
@@ -1184,12 +1186,14 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
 //                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                             clearForm(rootTag);
                         }
-                       /* Bundle bundle=new Bundle();
+                       */
+/* Bundle bundle=new Bundle();
                         bundle.putString(SAConstants.Keys.CAT_ID, catId);
                         bundle.putString(SAConstants.Keys.SUB_CAT_ID, subCatId);
                         bundle.putParcelableArrayList(SAConstants.Keys.SUB_CAT_LIST, (ArrayList<? extends Parcelable>) subcategories);
                         SubCategoryFragment fragment=new SubCategoryFragment();
-                        fragment.setArguments(bundle);*/
+                        fragment.setArguments(bundle);*//*
+
 
                     } else {
                         Snackbar.make(rootTag, response.body().getMessage(), Snackbar.LENGTH_SHORT)
@@ -1221,6 +1225,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
             }
         });
     }
+*/
 
     public void editProduct(AddProductModel addProductModel) {
 

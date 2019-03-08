@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,15 +28,19 @@ import com.app.admin.sellah.controller.stripe.StripeApp;
 import com.app.admin.sellah.controller.stripe.StripeButton;
 import com.app.admin.sellah.controller.stripe.StripeConnectListener;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.model.extra.CardDetails.Card;
 import com.app.admin.sellah.model.extra.CardDetails.CardDetailModel;
 import com.app.admin.sellah.view.CustomAnimations.MyBounceInterpolator;
-import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +49,7 @@ import butterknife.Unbinder;
 
 import static android.app.Activity.RESULT_OK;
 import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 
 /**
  * PaymentFragment.class
@@ -59,8 +63,6 @@ public class PaymentFragment extends Fragment {
 
     @BindView(R.id.edt_card_edit)
     TextView edtCardEdit;
-
-
 
 
     @BindView(R.id.rel_stripe_connect)
@@ -80,6 +82,8 @@ public class PaymentFragment extends Fragment {
     TextView pOnnewcardCvv;
     @BindView(R.id.rl_addnewstrpeaccount)
     RelativeLayout rlAddnewstrpeaccount;
+    @BindView(R.id.rl_sellahwallet_clicklink)
+    RelativeLayout rlSellahwalletClicklink;
     private Dialog dialog;
     private Animation myAnim;
     HashMap<EditText, String> bankDetaildialogMessages;
@@ -101,21 +105,62 @@ public class PaymentFragment extends Fragment {
     public PaymentFragment(String stripeId) {
         this.stripeId = stripeId;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.account_payment_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+         Log.e("onGetDataSuccess: ", "d"+(HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED)));
 
-        if (TextUtils.isEmpty(HelperPreferences.get(getActivity()).getString(API_ACCESS_TOKEN))) {
+        if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("") || HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N"))) {
+              rlSellahwalletClicklink.setVisibility(View.VISIBLE);
+            Log.e( "onCreateView: ","1" );
+            rlAddnewstrpeaccount.setVisibility(View.GONE);
+        } else {
+            Log.e( "onCreateView: ","2" );
+            rlSellahwalletClicklink.setVisibility(View.GONE);
+            rlAddnewstrpeaccount.setVisibility(View.VISIBLE);
+        }
+
+        new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
+            @Override
+            public void onGetDataSuccess(CardDetailModel body) {
+
+                Gson gson = new GsonBuilder().create();
+                setUpcards(body.getCards());//set card list adapter
+            }
+
+            @Override
+            public void onGetDataFailure() {
+
+
+            }
+        });
+        StripConnect();
+        return view;
+    }
+
+
+    private void setUpcards(List<Card> cards) {
+        if (cards != null && cards.size() > 0) {
+//            txtCardNumber.setText("No card detail available");
+
+            for (int i = 0; i < cards.size(); i++) {
+                if (cards.get(i).getDefault_card().equals("Y")) {
+                    pOnnewcardnumber.setText("**** **** **** " + cards.get(i).getLast4());
+                    pOnnewcardholdername.setText(cards.get(i).getName());
+                    pOnnewcardExpire.setText(cards.get(i).getExpMonth() + "/" + cards.get(i).getExpYear());
+                    break;
+                }
+            }
+
 
         } else {
 
         }
 
-        StripConnect();
-        return view;
     }
 
 
@@ -171,9 +216,9 @@ public class PaymentFragment extends Fragment {
     @OnClick(R.id.edt_card_edit)
     public void editCardDetail() {
         Intent intent = new Intent(getActivity(), ShowCreditCardDetailFragment.class);
+        intent.putExtra("payment", "payment");
         startActivityForResult(intent, GET_NEW_CARD);
     }
-
 
 
     public void bankDetail() {
@@ -286,9 +331,16 @@ public class PaymentFragment extends Fragment {
 
     }
 
-    @OnClick(R.id.rl_addnewstrpeaccount)
+    @OnClick(R.id.rl_sellahwallet_clicklink)
     public void onViewClicked() {
+        Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+        stripe_dialogfragment.show(getActivity().getFragmentManager(), "");
+        // btnStripeConnect.performClick();
+    }
 
-        btnStripeConnect.performClick();
+    @Override
+    public void onStop() {
+        super.onStop();
+        new ApisHelper().cancel_striipe_request();
     }
 }

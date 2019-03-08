@@ -90,8 +90,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
 
 
-
-
             }
 
             else{
@@ -152,6 +150,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.e(TAG, "otherUserId: " + otherUserId);
         Log.e(TAG, "imageUrl: " + imageUrl);
         Log.e(TAG, "timestamp: " + timestamp);
+        Log.e(TAG, "notiype: " + timestamp);
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(NT_DATA, object);

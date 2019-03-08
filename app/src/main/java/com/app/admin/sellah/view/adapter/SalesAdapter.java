@@ -3,6 +3,7 @@ package com.app.admin.sellah.view.adapter;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,9 @@ import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
+import com.app.admin.sellah.view.activities.MainActivityLiveStream;
 import com.app.admin.sellah.view.fragments.SellFragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -41,6 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.ADDPRODUCTTAG;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
@@ -92,7 +97,9 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
                 .into(holder.imageView);
 
         if(!TextUtils.isEmpty(saleList.getResult().get(position).getPromoteProduct())&&saleList.getResult().get(position).getPromoteProduct().equalsIgnoreCase("S")/*&&saleList.getResult().get(position).getPromotes()!=null&&saleList.getResult().get(position).getPromotes().size()>0*/){
-            holder.imgFeatured.setVisibility(View.VISIBLE);
+            holder.
+
+                    imgFeatured.setVisibility(View.VISIBLE);
         }else{
             holder.imgFeatured.setVisibility(View.GONE);
         }
@@ -164,18 +171,44 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
                         }
                        break;
                     case R.id.menu_update_promote:
-                        PromoteDialog.create(context,saleList.getResult().get(position).getId(), new PromoteDialog.PromoteCallback() {
-                            @Override
-                            public void onPromoteSuccess() {
-                                Toast.makeText(context, "Promote package is updated successfully.", Toast.LENGTH_SHORT).show();
-                                saleList.getResult().get(position).setPromoteProduct("S");
-                                notifyDataSetChanged();
-                            }
-                            @Override
-                            public void onPromoteFailure() {
-                                Toast.makeText(context, "Unable to update promote package at this movement.", Toast.LENGTH_SHORT).show();
-                            }
-                        }).show();
+
+                        if (HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("N"))
+                        {
+                            S_Dialogs.getLiveVideoStopedDialog(context, "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                                //--------------openHere-----------------
+
+                                Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                                stripe_dialogfragment.show(((MainActivity)context).getFragmentManager(),"");
+
+                            })).show();
+                        }
+
+                        else if ((HelperPreferences.get(context).getString(STRIPE_VERIFIED).equalsIgnoreCase("P")))
+                        {
+                            S_Dialogs.getLiveVideoStopedDialog((context), "You have not uploaded you Idenitification Documents. Press ok to upload.", ((dialog, which) -> {
+                                //--------------openHere-----------------
+
+                                Stripe_image_verification_dialogfragment stripe_dialogfragment = new Stripe_image_verification_dialogfragment();
+                                stripe_dialogfragment.show(((MainActivity)context).getFragmentManager(),"");
+
+                            })).show();
+                        }
+                        else
+                        {
+                            PromoteDialog.create(context,saleList.getResult().get(position).getId(), new PromoteDialog.PromoteCallback() {
+                                @Override
+                                public void onPromoteSuccess() {
+                                    Toast.makeText(context, "Promote package is updated successfully.", Toast.LENGTH_SHORT).show();
+                                    saleList.getResult().get(position).setPromoteProduct("S");
+                                    notifyDataSetChanged();
+                                }
+                                @Override
+                                public void onPromoteFailure() {
+                                    Toast.makeText(context, "Unable to update promote package at this movement.", Toast.LENGTH_SHORT).show();
+                                }
+                            }).show();
+
+                        }
                         break;
 
                         case R.id.menu_edit_item:

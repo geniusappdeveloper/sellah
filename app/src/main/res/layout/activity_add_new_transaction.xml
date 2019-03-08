@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/_15sdp"
             android:textColor="@color/colorBlack"
-            android:text="Add New Tranaction"/>
+            android:text="Add New Transaction"/>
 
 
         <ImageView
@@ -87,6 +87,9 @@
 
             <RelativeLayout
                 android:id="@+id/rl3"
+                android:enabled="false"
+                android:clickable="false"
+                android:focusable="false"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_33sdp"
                 android:layout_marginTop="@dimen/_2sdp"
@@ -100,7 +103,7 @@
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:layout_marginRight="@dimen/_8sdp"
                     android:drawSelectorOnTop="true"
-                    android:visibility="invisible"
+                    android:visibility="gone"
                     android:entries="@array/add_product_payment_method" />
                 <TextView
                     android:id="@+id/txt_payment_type"
@@ -109,7 +112,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="@dimen/_18sdp"
                     android:dropDownWidth="@dimen/_220sdp"
-                    android:text="Payment Method"
+                    android:text="Credit Card"
                     android:layout_marginRight="@dimen/_25sdp"
                     android:textColor="@color/colorBlack"
                     android:textSize="@dimen/_12sdp" />
@@ -117,7 +120,7 @@
                     android:id="@+id/payemt_img"
                     android:layout_centerVertical="true"
                     android:padding="@dimen/_5sdp"
-                    android:src="@drawable/down_grey"
+                    android:src="@drawable/down_arrow"
                     android:layout_marginRight="@dimen/_10sdp"
                     android:layout_alignParentRight="true"
                     android:layout_width="@dimen/_20sdp"
@@ -189,14 +192,29 @@
                 android:background="@drawable/live_product_detail_grey_background"
                 android:gravity="center_vertical">
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/_18sdp"
+                    android:dropDownWidth="@dimen/_220sdp"
+                    android:text="S$"
+                    android:layout_marginRight="@dimen/_25sdp"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/_12sdp" />
+
                 <Spinner
+
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:enabled="false"
                     android:layout_centerVertical="true"
                     android:id="@+id/spin_sell_internationally"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:drawSelectorOnTop="true"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:background="@null"
                     android:entries="@array/currency" />
 
@@ -204,7 +222,7 @@
                     android:id="@+id/currency_img"
                     android:layout_centerVertical="true"
                     android:padding="@dimen/_5sdp"
-                    android:src="@drawable/down_grey"
+                    android:src="@drawable/down_arrow"
                     android:layout_marginRight="@dimen/_10sdp"
                     android:layout_alignParentRight="true"
                     android:layout_width="@dimen/_20sdp"

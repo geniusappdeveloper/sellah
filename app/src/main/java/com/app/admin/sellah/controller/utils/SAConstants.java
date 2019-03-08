@@ -57,7 +57,7 @@ public class SAConstants {
         public static final String SHARED_PREF = "ah_firebase";
         public static final String MAKE_OFFER_DATA= "sa.make.offer.data";
         public static final String EVENT_CREATEROOM= "createroom";
-        public static final String EVENT_READMESSAGE= "readmessage";
+        public static final String EVENT_READMESSAGE= "readmsg";
         public static final String EVENT_CREATEGROUP= "creatgroup";
 //        public static final String EVENT_JOIN= "creatgroup";
         public static final String EVENT_NEW_MESSAGE= "new_message";
@@ -87,6 +87,7 @@ public class SAConstants {
         public static final String NT_CHAT="chat";
         public static final String NT_PAYMENT="payment";
         public static final String NT_DATA="sa.notification.data";
+        public static final String NT_ORDER="orderstatus";
 
     }
 

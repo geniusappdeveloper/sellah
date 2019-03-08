@@ -21,6 +21,8 @@ public class StripeSession {
 
 	private static final String SHARED = "_StripeAccount_Preferences";
 	public static final String API_ACCESS_TOKEN = "access_token";
+	public static final String STRIPE_VERIFIED = "Stripe_accountverifiec";
+	public static final String USERCITY = "stripeverifies";
 	private static final String API_REFRESH_TOKEN = "refresh_token";
 	private static final String API_TOKEN_TYPE = "token_type";
 	private static final String API_USER_ID = "user_id";

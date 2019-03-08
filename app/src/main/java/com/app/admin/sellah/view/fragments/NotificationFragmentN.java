@@ -139,7 +139,7 @@ public class NotificationFragmentN extends Fragment {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(), new ApisHelper.ReadNotificationCallback() {
+                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(),"one", new ApisHelper.ReadNotificationCallback() {
                                     @Override
                                     public void onReadNotificationSuccess(String msg) {
                                         body.getArrPost().get(pos).setReadStatus("1");
@@ -187,7 +187,7 @@ public class NotificationFragmentN extends Fragment {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(), new ApisHelper.ReadNotificationCallback() {
+                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(),"one", new ApisHelper.ReadNotificationCallback() {
                                     @Override
                                     public void onReadNotificationSuccess(String msg) {
 
@@ -237,7 +237,7 @@ public class NotificationFragmentN extends Fragment {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(), new ApisHelper.ReadNotificationCallback() {
+                                new ApisHelper().readNotificationApi(getActivity(), body.getArrPost().get(pos).getNotiId(),"one", new ApisHelper.ReadNotificationCallback() {
                                     @Override
                                     public void onReadNotificationSuccess(String msg) {
                                         body.getArrFollow().get(pos).setReadStatus("1");

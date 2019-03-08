@@ -8,6 +8,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class AboutUsFragment extends Fragment {
 //                Toast.makeText(getActivity(), "gmail Link", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"press@sellah.com"});
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"admin@sellah.com"});
                 i.putExtra(Intent.EXTRA_SUBJECT, "Query");
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));
@@ -68,7 +69,7 @@ public class AboutUsFragment extends Fragment {
 
 
         makeLinks(txtMediaKitDec, new String[] {
-                "here","press@sellah.com"
+               "admin@sellah.com"
         }, new ClickableSpan[] {
                 normalLinkClickSpan,gmailClick
         });
@@ -109,12 +110,14 @@ public class AboutUsFragment extends Fragment {
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).profile.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).changeOptionColor(7);
 
     }
     public void makeLinks(TextView textView, String[] links, ClickableSpan[] clickableSpans) {
         SpannableString spannableString = new SpannableString(textView.getText());
+
+
+        Log.e( "makeLinks: ",""+ links.length);
         for (int i = 0; i < links.length; i++) {
             ClickableSpan clickableSpan = clickableSpans[i];
             String link = links[i];

@@ -24,7 +24,8 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
     View view;
     List<PackagesList> packagesList;
     OfferCallBack callBack;
-    int pos;
+    int pos=-1;
+    int nottoselect_pos;
 
     public PromoteOfferAdapter(Context context, List<PackagesList> packagesList, OfferCallBack callBack) {
        mInflater=LayoutInflater.from(context);
@@ -45,6 +46,21 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
     public void onBindViewHolder(@NonNull PromoteOfferAdapter.ViewHolder holder, int position) {
 
 
+        Log.e( "onBindViewHolder: ",packagesList.get(position).getAmount());
+
+        /*for dark background */
+
+        if (packagesList.get(position).getAmount().equalsIgnoreCase("10"))
+        {
+            nottoselect_pos = holder.getAdapterPosition();
+            holder.main_cd.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+            holder.txtOffer.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            holder.txtDuration.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            holder.dummy_offer.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            holder.dummy_val.setTextColor(context.getResources().getColor(R.color.colorWhite));
+            holder.txtOfferPrice.setTextColor(context.getResources().getColor(R.color.colorWhite));
+        }
+
 
         if (packagesList.get(position).getAmount().contains("00"))
         {
@@ -56,7 +72,15 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
         }
         if (pos==position)
         {
-            holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
+            if (nottoselect_pos==position)
+            {
+                holder.cardView.setBackgroundResource(0);
+            }
+            else
+            {
+                holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
+            }
+
         }
         else
         {
@@ -100,14 +124,17 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout cardView;
-        TextView txtOffer,txtOfferPrice,txtDuration;
+        LinearLayout cardView,main_cd;
+        TextView txtOffer,txtOfferPrice,txtDuration,dummy_val,dummy_offer;
         public ViewHolder(View v) {
             super(v);
             cardView=view.findViewById(R.id.cd_root);
+            main_cd=view.findViewById(R.id.mian_cd_root);
             txtOffer=view.findViewById(R.id.txt_offer);
             txtOfferPrice=view.findViewById(R.id.txt_offer_price);
             txtDuration=view.findViewById(R.id.txt_offer_duration);
+            dummy_val=view.findViewById(R.id.dummy_txtvalidity);
+            dummy_offer=view.findViewById(R.id.dummy_txtoffer);
         }
     }
 

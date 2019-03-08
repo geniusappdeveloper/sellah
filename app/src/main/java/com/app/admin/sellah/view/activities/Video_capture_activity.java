@@ -218,10 +218,18 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
         mrec.setCamera(mCamera);
         mrec.setOrientationHint(mOrientation);
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
-        mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        /*mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));*/
+        mrec.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
+        mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mrec.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mrec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mrec.setVideoEncodingBitRate(3000000);
+        mrec.setVideoSize(1280, 720);
+        mrec.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_LOW));
+
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
         Global.videopath = Environment.getExternalStorageDirectory().getPath().concat("/" + String.valueOf(System.currentTimeMillis()) + ".3gp");
         mrec.setOutputFile(Global.videopath);
@@ -234,8 +242,11 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
     }
 
     protected void stopRecording() {
-        mrec.stop();
-        mrec.release();
+        if (mrec != null) {
+            mrec.stop();
+            mrec.release();
+        }
+
         mCamera.release();
         Intent intent = new Intent(this, Previewvideo.class);
         startActivity(intent);

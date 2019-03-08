@@ -42,6 +42,7 @@ import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -134,10 +135,8 @@ public class MyAccountFragment extends Fragment {
 
         Log.e("my prosetProfileData: ", profileData.getResult().getImage());
         try {
-            Glide.with(getActivity())
-                    .load(profileData.getResult().getImage())
-                    .apply(requestOptions)
-                    .into(img_user_profile);
+            Picasso.with(getActivity()).load(profileData.getResult().getImage()).fit().centerCrop().
+                    into(img_user_profile);
         } catch (Exception e) {
             Log.e("Exception", "setProfileData: " + e.getMessage());
         }
@@ -194,7 +193,9 @@ public class MyAccountFragment extends Fragment {
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
         adapter.addFrag(new AccountTabFragment(profileData), "Account");
         adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Payment");
-        adapter.addFrag(new SocialFragment(), "Social");
+
+        /* no need now */
+       /* adapter.addFrag(new SocialFragment(), "Social");*/
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -236,7 +237,6 @@ public class MyAccountFragment extends Fragment {
 //        ((MainActivity) getActivity()).title_account.setVisibility(View.VISIBLE);
 //        ((MainActivity) getActivity()).profile.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).changeOptionColor(4);
 
        /* Global.ProfileStatusCheck.checkProfileStatus(getActivity(), new Global.ProfileStatusCheck.ProfileStatusCallback() {
@@ -420,7 +420,9 @@ public class MyAccountFragment extends Fragment {
                         rotatedBitmap = bitmap;
                 }*/
                 Log.e( "onActivityResult: ",""+bitmap);
-                img_user_profile.setImageBitmap(bitmap);
+                Picasso.with(getActivity()).load(pickedImage).fit().centerCrop().
+                        into(img_user_profile);
+
                 updateProfile();
 
 

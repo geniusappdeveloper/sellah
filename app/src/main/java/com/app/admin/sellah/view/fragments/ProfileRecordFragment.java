@@ -15,6 +15,7 @@ import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
+import com.app.admin.sellah.model.wishllist_model.Wishlist;
 import com.app.admin.sellah.view.adapter.WishRecordAdapter;
 
 import butterknife.BindView;
@@ -36,7 +37,7 @@ public class ProfileRecordFragment extends Fragment {
     @BindView(R.id.img_no_data)
     ImageView imgNoData;
     Unbinder unbinder;
-    Call<GetProductList> recordsCall;
+    Call<Wishlist> recordsCall;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,9 +51,9 @@ public class ProfileRecordFragment extends Fragment {
 
     private void getRecordsData() {
          recordsCall = service.getRecordsApi(HelperPreferences.get(getActivity()).getString(UID));
-        recordsCall.enqueue(new Callback<GetProductList>() {
+        recordsCall.enqueue(new Callback<Wishlist>() {
             @Override
-            public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
+            public void onResponse(Call<Wishlist> call, Response<Wishlist> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         setRecordsData(response.body());
@@ -63,13 +64,13 @@ public class ProfileRecordFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<GetProductList> call, Throwable t) {
+            public void onFailure(Call<Wishlist> call, Throwable t) {
 
             }
         });
     }
 
-    private void setRecordsData(GetProductList body) {
+    private void setRecordsData(Wishlist body) {
         wishRecordAdapter = new WishRecordAdapter(body, getActivity());
         LinearLayoutManager birthHorizontalManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recordRecycler.setLayoutManager(birthHorizontalManager);

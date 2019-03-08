@@ -76,11 +76,10 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="@dimen/_8sdp"
                     android:layout_height="@dimen/_8sdp"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center"
                     android:id="@+id/img_online"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:layout_toLeftOf="@+id/txt_user_name"
-                    android:src="@drawable/online_icon_green"
+                    android:background="@drawable/red_dot_icon"
                     />
                 <TextView
                     android:id="@+id/txt_user_name"

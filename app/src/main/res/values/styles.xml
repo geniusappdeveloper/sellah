@@ -41,7 +41,7 @@
 
     <style name="custTab" parent="android:Widget">
         <item name="tabBackground">@drawable/tab_selector</item>
-        <item name="tabIndicatorColor">#fff</item>
+        <item name="tabIndicatorColor">#ffffff</item>
         <item name="tabIndicatorHeight">2dp</item>
         <item name="textAllCaps">false</item>
         <item name="android:textAllCaps">false</item>

@@ -50,6 +50,7 @@ import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.AllCategoryDialog;
 import com.app.admin.sellah.view.CustomDialogs.Notification_dialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomViews.TouchDetectableScrollView;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.HomeCategoryAdapter;
@@ -130,7 +131,7 @@ public class HomeFragment extends Fragment {
     TextView txtSearchSella;
     Unbinder unbinder1;
     @BindView(R.id.nolivevideo_text)
-    TextView nolivevideoText;
+    LinearLayout nolivevideoText;
     private View view;
     Unbinder unbinder;
     View rootTag;
@@ -173,6 +174,7 @@ public class HomeFragment extends Fragment {
     Call<GetProductList> addCommentCall;
     Call<GetProductList> getProductsCall;
     Call<NotificationListModel> notificationListCall;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -182,10 +184,16 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
+
+        if (Global.from_register)
+        {
+            Stripe_dialogfragment stripe_dialogfragment= new Stripe_dialogfragment();
+            stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
+        }
         dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
         service = Global.WebServiceConstants.getRetrofitinstance();
-        hideSearch();
+
         if (view == null) {
             view = inflater.inflate(R.layout.fragment_home_fragment_new, container, false);
             unbinder = ButterKnife.bind(this, view);
@@ -193,7 +201,35 @@ public class HomeFragment extends Fragment {
             new ApisHelper().getBanner(HelperPreferences.get(getActivity()).getString(UID), new ApisHelper.OnGetDataListners() {
                 @Override
                 public void onGetDataSuccess(BannerModel body) {
-                    setupBannerAdds(body.getRecord());
+                     List<String> list1= new ArrayList<>();
+                     List<String> list2= new ArrayList<>();
+                     List<String> list3= new ArrayList<>();
+                     List<String> list4= new ArrayList<>();
+
+                     for (int i=0;i<body.getHomebanners().size();i++)
+                     {
+                         list1 = new ArrayList<>();
+                         list1.add(body.getHomebanners().get(i).getBannerImage());
+                         list4.addAll(list1);
+                     }
+
+                   /* for (int i=0;i<body.getCategorybanners().size();i++)
+                    {
+                        list2 = new ArrayList<>();
+                        list2.add(body.getCategorybanners().get(i).getBannerImage());
+                        list4.addAll(list2);
+                    }
+
+                    for (int i=0;i<body.getSubcategorybanners().size();i++)
+                    {
+                        list3 = new ArrayList<>();
+                        list3.add(body.getSubcategorybanners().get(i).getBannerImage());
+                        list4.addAll(list3);
+                    }*/
+
+
+
+                    setupBannerAdds(list4);
 
                 }
 
@@ -209,17 +245,23 @@ public class HomeFragment extends Fragment {
         } else {
             unbinder = ButterKnife.bind(this, view);
         }
-
+if (((MainActivity) getActivity()).rlResetSearch!=null)
+{
+    hideSearch();
+}
 
         rootTag = ((MainActivity) getActivity()).relRoot;
         productList = new GetProductList();
         resultList = new ArrayList<>();
         productList.setResult(resultList);
         searchSuggestions = new ArrayList<>();
+        getNotificationList();
+        ((MainActivity) getActivity()).getProfileData();
+        /*for profile updation*/
 
         // Notification data=========================
 
-        getNotificationList();
+
         ((MainActivity) getActivity()).notificationRelativelayout.findViewById(R.id.notification_relativelayout).setOnClickListener(view1 -> {
 
             if (isLogined(getActivity())) {
@@ -516,10 +558,9 @@ public class HomeFragment extends Fragment {
         new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage), "", new ApisHelper.GetLiveVideoCallback() {
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel body) {
-                if (body.getList().isEmpty())
-                { nolivevideoText.setVisibility(View.VISIBLE);}
-                else
-                {
+                if (body.getList().isEmpty()) {
+                    nolivevideoText.setVisibility(View.VISIBLE);
+                } else {
                     nolivevideoText.setVisibility(View.GONE);
                     setLiveVideos(body);
                 }
@@ -707,12 +748,18 @@ public class HomeFragment extends Fragment {
         ((MainActivity) getActivity()).notificationRelativelayout.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).text_sell.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).view.setVisibility(View.GONE);
         ((MainActivity) getActivity()).searchEditText.setHint("Search Sellah...");
         ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(0);
 //        ((MainActivity) getActivity()).backArrow.setVisibility(View.GONE);
+
+        txtSearchSella.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSearchBar();
+            }
+        });
 
 
     }
@@ -725,7 +772,7 @@ public class HomeFragment extends Fragment {
             }
         } else {
             Log.e(TAG, "getProductlist: " + currentPage);
-             getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), "", "", String.valueOf(currentPage));
+            getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), "", "", String.valueOf(currentPage));
             getProductsCall.enqueue(new Callback<GetProductList>() {
                 @Override
                 public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -778,9 +825,10 @@ public class HomeFragment extends Fragment {
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
-                    if (pbHome!=null)
-                    {pbHome.setVisibility(View.GONE);
-                        txtNoMoreItem.setVisibility(View.GONE);}
+                    if (pbHome != null) {
+                        pbHome.setVisibility(View.GONE);
+                        txtNoMoreItem.setVisibility(View.GONE);
+                    }
 
 //                    txtErrorItem.setVisibility(View.VISIBLE);
                /* Snackbar.make(rootTag, "Something went's wrong", Snackbar.LENGTH_SHORT)df
@@ -845,7 +893,6 @@ public class HomeFragment extends Fragment {
                 .translationY(0)
                 .alpha(1f)
                 .setDuration(0);
-        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).notificationRelativelayout.setVisibility(View.GONE);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
 //        ((MainActivity) getActivity()).searchEditText.onEdi;
@@ -947,7 +994,7 @@ public class HomeFragment extends Fragment {
 
     private void getNotificationList() {
 
-         notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
+        notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
         notificationListCall.enqueue(new Callback<NotificationListModel>() {
             @Override
             public void onResponse(Call<NotificationListModel> call, Response<NotificationListModel> response) {
@@ -983,22 +1030,19 @@ public class HomeFragment extends Fragment {
     public void onStop() {
         super.onStop();
 
-        if (addCommentCall!=null)
-        {
+        if (addCommentCall != null) {
             addCommentCall.cancel();
         }
 
-        if (getProductsCall!=null)
-        {getProductsCall.cancel();}
+        if (getProductsCall != null) {
+            getProductsCall.cancel();
+        }
         new ApisHelper().cancel_banner_request();
-        if (notificationListCall!=null)
+        new ApisHelper().getvideodata_cancel();
+        if (notificationListCall != null)
             notificationListCall.cancel();
 
     }
-
-
-
-
 
 
 }

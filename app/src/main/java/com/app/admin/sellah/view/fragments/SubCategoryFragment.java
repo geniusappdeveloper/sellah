@@ -4,6 +4,7 @@ package com.app.admin.sellah.view.fragments;
 import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
@@ -126,7 +127,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
     private int dotscount;
     private ImageView[] dots;
     Timer timer;
-
+    Call<GetProductList> getProductsCall;
     //For sale recycler initialization
     List<SubCatTextModel> saletextList = new ArrayList<>();
     RecyclerView recSubCategory;
@@ -179,7 +180,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
     private Animation _showAnimation;
     private AppBarLayout.OnOffsetChangedListener offsetListner;
     private long timeVisibleDelay = 500;
-
+    TextView txt;
     public SubCategoryFragment() {
         // Required empty public constructor
     }
@@ -194,7 +195,9 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
         }
         unbinder= ButterKnife.bind(this,view);*/
         hideSearch();
+         txt = ((MainActivity) getActivity()).findViewById(R.id.title_sell);
         if (view == null) {
+
             view = inflater.inflate(R.layout.fragment_subcategory_fragment_new, container, false);
             unbinder = ButterKnife.bind(this, view);
             dialog = S_Dialogs.getLoadingDialog(getActivity());
@@ -252,7 +255,34 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
             new ApisHelper().getBanner(HelperPreferences.get(getActivity()).getString(UID), new ApisHelper.OnGetDataListners() {
                 @Override
                 public void onGetDataSuccess(BannerModel body) {
-                    setUpBannerAds(body.getRecord());
+
+                    List<String> list1= new ArrayList<>();
+                    List<String> list2= new ArrayList<>();
+                    List<String> list3= new ArrayList<>();
+                    List<String> list4= new ArrayList<>();
+
+                  /*  for (int i=0;i<body.getHomebanners().size();i++)
+                    {
+                        list1 = new ArrayList<>();
+                        list1.add(body.getHomebanners().get(i).getBannerImage());
+                        list4.addAll(list1);
+                    }
+
+                    for (int i=0;i<body.getCategorybanners().size();i++)
+                    {
+                        list2 = new ArrayList<>();
+                        list2.add(body.getCategorybanners().get(i).getBannerImage());
+                        list4.addAll(list2);
+                    }*/
+
+                    for (int i=0;i<body.getSubcategorybanners().size();i++)
+                    {
+                        list3 = new ArrayList<>();
+                        list3.add(body.getSubcategorybanners().get(i).getBannerImage());
+                        list4.addAll(list3);
+                    }
+                    Log.e( "onGetDataSuccess: ",""+list4 );
+                    setUpBannerAds(list4);
                 }
 
                 @Override
@@ -396,10 +426,15 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                 .translationX(((MainActivity) getActivity()).rel_search.getWidth())
                 .alpha(0.0f)
                 .setDuration(timeVisibleDelay);
+/*
         ((MainActivity) getActivity()).rlFilter.animate()
                 .translationX(((MainActivity) getActivity()).rlFilter.getWidth())
                 .alpha(0.0f)
                 .setDuration(timeVisibleDelay);
+*/
+        ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlSearchIcon.setVisibility(View.VISIBLE);
+/*
         ((MainActivity) getActivity()).rlSearchIcon.animate()
                 .translationX(0)
                 .alpha(1f)
@@ -425,6 +460,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
                     }
                 });
+*/
 
         ((MainActivity) getActivity()).text_sell.animate()
                 .translationY(0)
@@ -435,6 +471,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                     public void onAnimationStart(Animator animation) {
                         ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
                         ((MainActivity) getActivity()).text_sell.setText(txtCatName.getText());
+
                     }
 
                     @Override
@@ -458,6 +495,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                     .alpha(0.0f)
                     .setDuration(timeVisibleDelay);
         }
+
         ((MainActivity) getActivity()).rlSearchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -471,11 +509,14 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                 .translationX(0)
                 .alpha(1f)
                 .setDuration(timeVisibleDelay);
-        ((MainActivity) getActivity()).rlFilter.animate()
+        ((MainActivity) getActivity()).rlFilter.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlSearchIcon.setVisibility(View.GONE);
+    /*    ((MainActivity) getActivity()).rlFilter.animate()
                 .translationX(0)
                 .alpha(1f)
-                .setDuration(timeVisibleDelay);
+                .setDuration(timeVisibleDelay);*/
 
+/*
         ((MainActivity) getActivity()).rlSearchIcon.animate()
                 .translationX(0)
                 .alpha(0.0f)
@@ -488,7 +529,11 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        ((MainActivity) getActivity()).rlSearchIcon.setVisibility(View.GONE);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            if (animation.isPaused())
+                            if ( ((MainActivity) getActivity()).rlSearchIcon!=null)
+                            ((MainActivity) getActivity()).rlSearchIcon.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
@@ -501,6 +546,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
                     }
                 });
+*/
         ((MainActivity) getActivity()).text_sell.animate()
                 .translationY(((MainActivity) getActivity()).text_sell.getHeight())
                 .alpha(0.0f)
@@ -513,8 +559,16 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        ((MainActivity) getActivity()).text_sell.setVisibility(View.GONE);
-                        ((MainActivity) getActivity()).text_sell.setText("");
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+
+                            if (animation.isPaused())
+                            if (txt!=null)
+                                txt.setText("");
+                            txt.setVisibility(View.GONE);
+
+                        }
+
                     }
 
                     @Override
@@ -979,7 +1033,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
         WebService service = Global.WebServiceConstants.getRetrofitinstance();
 //        Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
-        Call<GetProductList> getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), cat_id, sub_catId, String.valueOf(currentPage));
+         getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), cat_id, sub_catId, String.valueOf(currentPage));
         getProductsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
@@ -1195,7 +1249,15 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
         });
 
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (getProductsCall!=null)
+        {getProductsCall.cancel();}
+        new ApisHelper().cancel_banner_request();
+        new ApisHelper().getvideodata_cancel();
     }
 }
 

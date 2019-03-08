@@ -34,6 +34,35 @@
                         android:textSize="@dimen/_14sdp" />
                 </RelativeLayout>
 
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/nolivevideo_text"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:gravity="center_horizontal"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="false"
+                    android:layout_height="wrap_content">
+
+
+                    <ImageView
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/no_chats"
+                        android:layout_width="@dimen/_120sdp"
+                        android:layout_height="@dimen/_120sdp" />
+
+                    <TextView
+                        android:textSize="@dimen/_12sdp"
+                        android:gravity="bottom"
+                        android:textColor="@color/colorGrey"
+                        android:text="No live videos at the moment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_25sdp" />
+
+
+                </LinearLayout>
+
+
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_other_videos"

@@ -27,6 +27,7 @@ import com.app.admin.sellah.model.extra.UploadChatImage.UploadChatImageModel;
 import com.app.admin.sellah.model.extra.commentModel.CommentModel;
 import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
+import com.app.admin.sellah.model.wishllist_model.Wishlist;
 import com.google.gson.JsonObject;
 
 import okhttp3.MultipartBody;
@@ -47,7 +48,7 @@ public interface WebService {
     @POST("register")
     Call<RegisterResult> registrationApi(@Field("email") String email, @Field("password") String password
             , @Field("c_password") String confirm_password, @Field("phone_number") String phone_number
-            , @Field("country_code") String country_code, @Field("city") String city);
+            , @Field("country_code") String country_code, @Field("city") String city,@Field("country") String country);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -58,6 +59,11 @@ public interface WebService {
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("verify_code")
     Call<Common> varifyOTPApi(@Field("user_id") String userId, @Field("verification_code") int verification_code, @Field("phone_type") String phone_type);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("restore_account")
+    Call<Common> restore_account(@Field("user_id") String userId, @Field("verification_code") int verification_code);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -87,7 +93,7 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("search_product")
-    Call<GetProductList> searchProductApi(@Field("search_term") String user_id);
+    Call<GetProductList> searchProductApi(@Field("search_term") String user_id, @Field("search_by") String tags);
 
     @Multipart
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -98,8 +104,7 @@ public interface WebService {
             , @Part("product_type") RequestBody productType, @Part("quantity") RequestBody quantity, @Part("description") RequestBody description
             , @Part("promote_product") RequestBody promoteProduct, @Part("no_of_clicks") RequestBody noOfClicks, @Part("budget") RequestBody budget
             , @Part("tags") RequestBody tags, @Part MultipartBody.Part image1, @Part MultipartBody.Part image2, @Part MultipartBody.Part image3
-            , @Part MultipartBody.Part image4, @Part MultipartBody.Part image5, @Part MultipartBody.Part image6, @Part MultipartBody.Part image7
-            , @Part MultipartBody.Part image8, @Part("package_id") RequestBody packageId, @Part MultipartBody.Part productVideo);
+            , @Part MultipartBody.Part image4, @Part MultipartBody.Part image5, @Part("package_id") RequestBody packageId, @Part MultipartBody.Part productVideo, @Part MultipartBody.Part productvideo_thimbnail);
 
     @Multipart
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -144,6 +149,16 @@ public interface WebService {
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("create_stripe_account")
+    Call<JsonObject> stripeadd(@Field("user_id") String user_id,@Field("first_name") String firstname,@Field("last_name") String lastname,@Field("dob") String dob,@Field("personal_id_number") String dpersonal_id_numberob,@Field("address_line") String address_line,@Field("country") String country,@Field("state") String state,@Field("city") String city,@Field("postal_code") String postal_code,@Field("currency") String currency,@Field("account_number") String account_number,@Field("routing_number") String routing_number,@Field("ip_address") String ip_address,@Field("country_of_bank") String country_of_bank);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("set_default_card")
+    Call<JsonObject> set_default_card(@Field("user_id") String user_id, @Field("card_id") String card_id);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("get_product")
     Call<GetProductList> getProductListApi(@Field("user_id") String user_id, @Field("cat_id") String cat_id, @Field("sub_cat_id") String sub_cat_id, @Field("page_no") String page_no);
 
@@ -175,7 +190,7 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("get_records")
-    Call<GetProductList> getRecordsApi(@Field("user_id") String user_id);
+    Call<Wishlist> getRecordsApi(@Field("user_id") String user_id);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -268,7 +283,12 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("charge")
-    Call<JsonObject> stripePayment(@Field("user_id") String user_id, @Field("product_id") String product_id, @Field("amount") String amount, @Field("currency_type") String currency_type, @Field("token") String token, @Field("offer_id") String offerId, @Field("seller_id") String seller_id, @Field("customer_id") String customerId);
+    Call<JsonObject> stripePayment(@Field("user_id") String user_id, @Field("product_id") String product_id, @Field("amount") String amount, @Field("currency_type") String currency_type, @Field("token") String token, @Field("offer_id") String offerId, @Field("seller_id") String seller_id, @Field("customer_id") String customerId,@Field("chatoffer") String chatfofer);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("set_order_status")
+    Call<JsonObject> set_order_status(@Field("user_id") String user_id, @Field("order_id") String order_id, @Field("order_status") String order_status, @Field("other_user_id") String otheruserid);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -322,13 +342,18 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("add_testimonial")
-    Call<Common> addTestimonialApi(@Field("user_id") String user_id, @Field("other_user_id") String other_user_id, @Field("feedback") String feedback, @Field("rating") String rating);
+    Call<Common> addTestimonialApi(@Field("user_id") String user_id, @Field("other_user_id") String other_user_id, @Field("feedback") String feedback, @Field("rating") String rating,@Field("offer_order_id") String offer_order_id);
 
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("getChatDetail")
     Call<ChatListModel> getChatDetailApi(@Field("user_id") String user_id, @Field("receiver_id") String receiver_id);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("chat_offer_list")
+    Call<JsonObject> chat_offer_list(@Field("user_id") String user_id, @Field("friend_id") String receiver_id);
 
 
     @FormUrlEncoded
@@ -369,7 +394,7 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("read_notify")
-    Call<Common> readNotificationApi(@Field("user_id") String userId, @Field("noti_id") String notiId, @Field("read_status") String readStatus);
+    Call<Common> readNotificationApi(@Field("user_id") String userId, @Field("noti_id") String notiId, @Field("read_status") String readStatus ,@Field("read_type") String type);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -380,6 +405,11 @@ public interface WebService {
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("add_video_desc")
     Call<LiveVideoDescModel> addLiveVideoDesc(@Part("group_id") RequestBody groupId, @Part("cat_id") RequestBody catId, @Part("video_title") RequestBody videoTitle, @Part("video_desc") RequestBody videoDesc, @Part("seller_id") RequestBody sellerId, @Part MultipartBody.Part coberImage);
+
+    @Multipart
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("upload_document")
+    Call<LiveVideoDescModel> stripe_imageverification(@Part("user_id") RequestBody sellerId, @Part MultipartBody.Part coberImage);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
