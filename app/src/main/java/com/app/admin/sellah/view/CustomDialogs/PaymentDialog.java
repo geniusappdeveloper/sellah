@@ -125,10 +125,12 @@ public class PaymentDialog extends BottomSheetDialog {
     int selectedCardPos = 0;
     String packageId="";
     String promoteId="";
+    String price;
 
 
-    public PaymentDialog(@NonNull Context context, String offerId, String sellerId, String productId, String packageId, String promoteId, PaymentCallBack callBack) {
+    public PaymentDialog(@NonNull Context context,String price, String offerId, String sellerId, String productId, String packageId, String promoteId, PaymentCallBack callBack) {
         super(context, R.style.CustomDialog);
+        this.price = price;
         this.context = context;
         dialog = S_Dialogs.getLoadingDialog(context);
         this.sellerId = sellerId;
@@ -142,8 +144,8 @@ public class PaymentDialog extends BottomSheetDialog {
 
     }
 
-    public static PaymentDialog create(Context context, String offerId, String sellerId, String productId,String packageId,String promoteId, PaymentCallBack callBack) {
-        return new PaymentDialog(context, offerId, sellerId, productId,packageId,promoteId, callBack);
+    public static PaymentDialog create(Context context,String price, String offerId, String sellerId, String productId,String packageId,String promoteId, PaymentCallBack callBack) {
+        return new PaymentDialog(context,price, offerId, sellerId, productId,packageId,promoteId, callBack);
     }
 
     @Override
@@ -321,6 +323,7 @@ public class PaymentDialog extends BottomSheetDialog {
            Log.e( "offer: 1","s"+offerId);
            Log.e( "seller: 1","s"+sellerId);
            Log.e( "customer: 1","s"+customerId);
+           Log.e( "price: 1","s"+price);
            stripeApiHit(cardId, dialog);
        }
 
@@ -333,7 +336,7 @@ public class PaymentDialog extends BottomSheetDialog {
         WebService webService = Global.WebServiceConstants.getRetrofitinstance();
 
 
-        Call<JsonObject> stripePaymentApi = webService.stripePayment(HelperPreferences.get(context).getString(UID), productId, "50", "usd", token, offerId, sellerId, customerId,"Y");
+        Call<JsonObject> stripePaymentApi = webService.stripePayment(HelperPreferences.get(context).getString(UID), productId, price, "sgd", token, offerId, sellerId, customerId,"Y");
         stripePaymentApi.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -342,6 +345,7 @@ public class PaymentDialog extends BottomSheetDialog {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
+
                 dismiss();
                 if (response.isSuccessful()) {
                     try {

@@ -51,6 +51,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
     Button txtsend_offer;
     int pos=-1;
     boolean check;
+    String price,qty;
 
     public CheckoutProductAdapter(List<Result> itemList, Context context,Button txt_sendoffer, ActionCallback checkSelection) {
         this.recordList = itemList;
@@ -84,7 +85,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
 
         holder.txtProductName.setText(recordList.get(position).getName());
         holder.txtProductCost.setText("S$ " + recordList.get(position).getPrice());
-
+        holder.qty.setText(recordList.get(position).getQuantity());
         Glide.with(context)
                 .load(!recordList.get(position).getProductImages().isEmpty() ? recordList.get(position).getProductImages().get(0).getImage() : "")
                 .apply(Global.getGlideOptions())
@@ -96,8 +97,16 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             @Override
             public void onClick(View view) {
 
-               pos =position;
-               notifyDataSetChanged();
+                if (recordList.get(position).getQuantity().isEmpty() || Integer.parseInt(recordList.get(position).getQuantity())<=0)
+                {
+                    Toast.makeText(context, "Product is out of stock", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    pos =position;
+                    notifyDataSetChanged();
+                }
+
 
 
 
@@ -109,6 +118,9 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             actionCallback.onCheckclicked(recordList.get(pos).getName(), recordList.get(pos).getId(), recordList.get(position).getPrice(),recordList.get(position).getQuantity());
 
             holder.checkout.setBackgroundColor(Color.parseColor("#dbdbdb"));
+
+            price =recordList.get(position).getPrice();
+            qty =recordList.get(position).getQuantity();
 
 
         }
@@ -131,7 +143,10 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             @Override
             public void onClick(View v) {
 
-                BuyerMakeOfferDialog.create(context, recordList.get(position).getPrice(), recordList.get(position).getQuantity(), new BuyerMakeOfferDialog.OnmakeOfferClick() {
+
+
+
+                BuyerMakeOfferDialog.create(context,price, qty, new BuyerMakeOfferDialog.OnmakeOfferClick() {
                     @Override
                     public void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog) {
 //                        makeOfferApi(position,recordList.get(position).getId(), price, recordList.get(position).getName(), buyerMakeOfferDialog);
@@ -200,7 +215,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
 
     public class CheckOutItemHolder extends RecyclerView.ViewHolder {
         CheckBox chkSelect;
-        TextView txtProductName, txtProductCost;
+        TextView txtProductName, txtProductCost,qty;
         ImageView imgProduct, imgMakeOffer;
         RelativeLayout checkout;
 
@@ -212,6 +227,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             imgProduct = view.findViewById(R.id.img_product);
             imgMakeOffer = view.findViewById(R.id.img_btn_make_offer);
             checkout = view.findViewById(R.id.root_checkout);
+            qty = view.findViewById(R.id.txt_product_qty);
         }
     }
 

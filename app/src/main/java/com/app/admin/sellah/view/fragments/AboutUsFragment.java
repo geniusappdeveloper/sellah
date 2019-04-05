@@ -68,6 +68,7 @@ public class AboutUsFragment extends Fragment {
         };
 
 
+
         makeLinks(txtMediaKitDec, new String[] {
                "admin@sellah.com"
         }, new ClickableSpan[] {

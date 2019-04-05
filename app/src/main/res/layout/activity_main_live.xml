@@ -38,8 +38,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:background="@drawable/background_live_chat_header"
             android:visibility="visible" />
@@ -82,7 +82,6 @@
                 android:layout_alignParentRight="true">
 
 
-
                 <ImageView
                     android:id="@+id/img_send_camera"
                     android:layout_width="@dimen/_25sdp"
@@ -100,12 +99,12 @@
 
                    android:layout_alignParentRight="true">-->
             <RelativeLayout
-                android:layout_marginTop="@dimen/_5sdp"
-                android:layout_marginLeft="@dimen/_10sdp"
                 android:id="@+id/relLay_views"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
                 android:layout_below="@+id/relLay_back_live"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:layout_toRightOf="@+id/relLay_live">
 
                 <LinearLayout
@@ -126,10 +125,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="@dimen/_3sdp"
-                        android:paddingBottom="@dimen/_2sdp"
                         android:paddingLeft="@dimen/_3sdp"
-                        android:paddingRight="@dimen/_3sdp"
                         android:paddingTop="@dimen/_2sdp"
+                        android:paddingRight="@dimen/_3sdp"
+                        android:paddingBottom="@dimen/_2sdp"
                         android:text="0"
                         android:textColor="@color/colorWhite"
                         android:textSize="@dimen/_12sdp" />
@@ -153,13 +152,13 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:layout_marginTop="@dimen/_5sdp"
                 android:id="@+id/relLay_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
+                android:layout_below="@+id/relLay_back_live"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/relLay_back_live"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginRight="@dimen/_5sdp">
 
                 <TextView
@@ -170,10 +169,10 @@
                     android:layout_centerVertical="true"
                     android:alpha="0.7"
                     android:background="@color/colorRed"
-                    android:paddingBottom="@dimen/_3sdp"
                     android:paddingLeft="@dimen/_8sdp"
-                    android:paddingRight="@dimen/_8sdp"
                     android:paddingTop="@dimen/_3sdp"
+                    android:paddingRight="@dimen/_8sdp"
+                    android:paddingBottom="@dimen/_3sdp"
                     android:text="00:00"
                     android:textColor="#fff"
                     android:textSize="@dimen/_12sdp" />
@@ -183,14 +182,14 @@
                 android:id="@+id/flipCamera"
                 android:layout_width="@dimen/_35sdp"
                 android:layout_height="@dimen/_35sdp"
+                android:layout_below="@+id/relLay_duration"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/relLay_duration"
-                android:layout_marginRight="@dimen/_8sdp"
                 android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginRight="@dimen/_8sdp"
                 android:alpha="0.80"
-                android:backgroundTint="@color/colorWhite"
                 android:background="@drawable/switch_camera_icon"
+                android:backgroundTint="@color/colorWhite"
                 android:padding="@dimen/_8sdp"
                 android:visibility="visible" />
 
@@ -200,8 +199,8 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/relLay_duration"
                 android:layout_marginLeft="@dimen/_6sdp"
-                android:layout_marginRight="@dimen/_8sdp"
                 android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginRight="@dimen/_8sdp"
                 android:background="@drawable/live_btn_bg"
                 android:gravity="center"
                 android:padding="@dimen/_5sdp"
@@ -212,11 +211,11 @@
                 android:visibility="gone" />
 
             <RelativeLayout
-                android:visibility="gone"
                 android:id="@+id/relLay_live"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
-                android:layout_below="@+id/relLay_back_live">
+                android:layout_below="@+id/relLay_back_live"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/txt_live"
@@ -226,10 +225,10 @@
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_marginRight="@dimen/_5sdp"
                     android:background="@drawable/live_btn_bg"
-                    android:paddingBottom="@dimen/_3sdp"
                     android:paddingLeft="@dimen/_8sdp"
-                    android:paddingRight="@dimen/_8sdp"
                     android:paddingTop="@dimen/_3sdp"
+                    android:paddingRight="@dimen/_8sdp"
+                    android:paddingBottom="@dimen/_3sdp"
                     android:text="Live"
                     android:textColor="#fff"
                     android:textSize="@dimen/_12sdp" />
@@ -273,8 +272,8 @@
                     android:id="@+id/img_user_rec"
                     android:layout_width="@dimen/_20sdp"
                     android:layout_height="@dimen/_20sdp"
-                    android:layout_marginRight="@dimen/_3sdp"
                     android:layout_marginTop="@dimen/_4sdp"
+                    android:layout_marginRight="@dimen/_3sdp"
                     android:src="@drawable/carlogo" />
 
                 <LinearLayout
@@ -286,6 +285,7 @@
                         android:id="@+id/card2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:alpha=".8"
                         android:visibility="visible"
                         app:cardBackgroundColor="@color/colorRed"
                         app:cardCornerRadius="@dimen/_4sdp"
@@ -297,7 +297,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:visibility="visible"
-                            app:cardBackgroundColor="#ffffff"
+                            app:cardBackgroundColor="@color/colorRed"
                             app:cardCornerRadius="@dimen/_4sdp"
                             app:cardElevation="0dp"
                             app:cardUseCompatPadding="true">
@@ -341,8 +341,8 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_below="@+id/txt_Title"
-                                        android:maxLines="1"
                                         android:maxWidth="@dimen/_170sdp"
+                                        android:maxLines="1"
                                         android:text="Category :-"
                                         android:textColor="@color/colorBlack"
                                         android:textSize="@dimen/_12sdp"
@@ -356,7 +356,7 @@
                                         android:layout_marginRight="@dimen/_5sdp"
                                         android:maxWidth="@dimen/_195sdp"
                                         android:text="Description :- "
-                                        android:textColor="@color/colorBlack"
+                                        android:textColor="@color/colorWhite"
                                         android:textSize="@dimen/_12sdp" />
 
                                 </LinearLayout>
@@ -432,7 +432,7 @@
                         android:background="@drawable/pined_msg_bg"
                         android:padding="@dimen/_3sdp"
                         android:src="@drawable/unpined_icon"
-                        android:visibility="visible" />
+                        android:visibility="gone" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -499,8 +499,8 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_below="@+id/txt_Title"
-                                            android:maxLines="1"
                                             android:maxWidth="@dimen/_195sdp"
+                                            android:maxLines="1"
                                             android:text="Category :-"
                                             android:textColor="@color/colorWhite"
                                             android:textSize="@dimen/_12sdp"
@@ -511,8 +511,8 @@
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
                                             android:layout_below="@+id/txt_category"
-                                            android:layout_marginLeft="@dimen/_45sdp"
                                             android:layout_marginStart="@dimen/_5sdp"
+                                            android:layout_marginLeft="@dimen/_45sdp"
                                             android:maxWidth="@dimen/_170sdp"
                                             android:text="Description :- "
                                             android:textColor="@color/colorWhite"
@@ -548,96 +548,93 @@
             </LinearLayout>
         </RelativeLayout>
 
+        //--------------------------------------------------------
         <RelativeLayout
             android:id="@+id/card_bottom_view"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_40sdp"
+            android:layout_height="@dimen/_45sdp"
             android:layout_alignParentBottom="true"
             android:alpha="0.8"
             android:background="@color/colorTrans">
 
+
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </RelativeLayout>
-
-            <LinearLayout
                 android:id="@+id/linear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:padding="5dp">
 
-                <ImageView
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center"
-                    android:layout_centerInParent="true"
-                    android:padding="@dimen/_4sdp"
-                    android:src="@drawable/share_live_caht"
-                    android:tint="#fff" />
 
-
-                <ImageView
-                    android:visibility="gone"
-                    android:id="@+id/img_send_gallery"
-                    android:layout_width="@dimen/_22sdp"
-                    android:layout_height="@dimen/_22sdp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:src="@drawable/gallery_icon_livechat" />
-
-                <!-- <EditText
-                     android:id="@+id/edt_message"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:layout_gravity="center_vertical"
-                     android:layout_marginBottom="3dp"
-                     android:layout_marginLeft="8dp"
-                     android:layout_marginTop="2dp"
-                     android:layout_weight="1.6"
-                     android:background="@drawable/edittextb_back"
-                     android:hint="Type a message here"
-                     android:imeOptions="actionDone"
-                     android:inputType="textMultiLine"
-                     android:maxHeight="100dp"
-                     android:minHeight="40dp"
-                     android:paddingBottom="8dp"
-                     android:paddingLeft="16dp"
-                     android:paddingRight="8dp"
-                     android:paddingTop="8dp"
-                     android:scrollbars="vertical"
-                     android:textSize="12dp" />
- -->
-                <EditText
-                    android:id="@+id/edt_message"
+                <RelativeLayout
+                    android:id="@+id/rel_sendMsg"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:layout_weight="1.6"
-                    android:background="@drawable/edittextb_back_chat"
-                    android:hint="Type a message here"
-                    android:inputType="textMultiLine"
-                    android:maxHeight="@dimen/_100sdp"
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="@color/colorWhite"
-                    android:padding="@dimen/_6sdp"
-                    android:scrollbars="vertical"
-                    android:textSize="@dimen/_12sdp" />
+                    android:layout_height="@dimen/_45sdp"
+                    android:layout_toLeftOf="@+id/share_chat"
+                    android:background="@drawable/edittextb_back_chat">
 
-                <ImageView
-                    android:id="@+id/btn_send_live"
-                    android:layout_width="@dimen/_28sdp"
-                    android:layout_height="@dimen/_28sdp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/_8sdp"
-                    android:layout_marginRight="@dimen/_8sdp"
-                    android:src="@drawable/send_50dp"
-                    android:tint="@color/colorWhite" />
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/img_send_gallery"
+                        android:layout_width="@dimen/_22sdp"
+                        android:layout_height="@dimen/_22sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="@dimen/_8sdp"
+                        android:src="@drawable/gallery_icon_livechat"
+                        android:visibility="gone" />
+
+                    <EditText
+                        android:id="@+id/edt_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="@dimen/_8sdp"
+                        android:layout_weight="1.6"
+                        android:layout_centerVertical="true"
+                        android:background="@null"
+                        android:layout_toLeftOf="@+id/btn_send_live"
+                        android:hint="Type message here..."
+                        android:inputType="textMultiLine"
+                        android:maxHeight="@dimen/_100sdp"
+                        android:padding="@dimen/_6sdp"
+                        android:scrollbars="vertical"
+                        android:textColor="@color/colorWhite"
+                        android:textColorHint="@color/colorWhite"
+                        android:textSize="@dimen/_12sdp" />
+
+                    <ImageView
+                        android:id="@+id/btn_send_live"
+                        android:layout_width="@dimen/_28sdp"
+                        android:layout_height="@dimen/_28sdp"
+                        android:layout_gravity="center"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginLeft="@dimen/_8sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="@dimen/_12sdp"
+                        android:src="@drawable/send_50dp"
+                        android:tint="@color/colorWhite" />
+
+                </RelativeLayout>
+
+
+
+
+
+
+            <ImageView
+                android:id="@+id/share_chat"
+                android:layout_width="@dimen/_22sdp"
+                android:layout_height="@dimen/_22sdp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/share_live_caht"
+                android:tint="#fff" />
+
+            </RelativeLayout>
         </RelativeLayout>
+
+        //--------------------------------------------
 
     </RelativeLayout>
 

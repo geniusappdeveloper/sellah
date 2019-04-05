@@ -68,6 +68,16 @@ public class SellFragment extends Fragment {
 
         StripConnect();
 
+        /*Bundle bundle = getArguments();
+        if (bundle!=null && bundle.containsKey("modelProductListFrag"))
+        {
+
+        }
+        else
+        {
+
+        }*/
+
         return view;
     }
     @Override
@@ -83,7 +93,7 @@ public class SellFragment extends Fragment {
 
                 if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
                 {
-                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe. Press ok to connect.", ((dialog, which) -> {
                         //--------------openHere-----------------
 
                         Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
@@ -114,7 +124,7 @@ public class SellFragment extends Fragment {
 
                 if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N")))
                 {
-                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), "You are not currently connected with stripe. Press ok to connect.", ((dialog, which) -> {
                         //--------------openHere-----------------
 
                         Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
@@ -155,7 +165,7 @@ public class SellFragment extends Fragment {
         ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).text_sell.setText("Sell");
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
-        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(2);
     }

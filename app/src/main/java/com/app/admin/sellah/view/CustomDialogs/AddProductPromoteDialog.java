@@ -105,6 +105,7 @@ public class AddProductPromoteDialog extends Dialog {
         super.onCreate(savedInstanceState);
         webService = Global.WebServiceConstants.getRetrofitinstance();
         dialog = S_Dialogs.getLoadingDialog(context);
+        dialog.setCanceledOnTouchOutside(false);
         setContentView(R.layout.layout_promote_product);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -113,8 +114,8 @@ public class AddProductPromoteDialog extends Dialog {
         PackagesList list = new PackagesList();
         list.setValidity("NA");
         list.setId("NA");
-        list.setClicks("00");
-        list.setAmount("00");
+        list.setClicks("0");
+        list.setAmount("0");
         packagesLists.add(list);
         getPromotePackages();
 
@@ -160,11 +161,13 @@ public class AddProductPromoteDialog extends Dialog {
 
     @OnClick(R.id.btn_promote_cancel)
     public void onViewClicked() {
+        callback.onPackageSelected("NA");
         dismiss();
     }
 
     public interface PromoteCallback {
         void onPackageSelected(String id);
+
 
 //        void onPromoteFailure();
     }

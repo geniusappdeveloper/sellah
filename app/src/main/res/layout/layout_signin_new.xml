@@ -35,13 +35,13 @@
 
             <TextView
                 android:id="@+id/txt_killer_quote"
-                android:layout_width="@dimen/_110sdp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/img_logo"
                 android:layout_marginBottom="@dimen/_10sdp"
                 android:layout_marginLeft="@dimen/_18sdp"
                 android:layout_marginTop="@dimen/_10sdp"
-                android:text="Insert killer quote here, here and also here"
+                android:text=" Buying and Selling \n made Better"
                 android:textColor="@color/colorWhite"
                 android:textSize="@dimen/_16sdp" />
 

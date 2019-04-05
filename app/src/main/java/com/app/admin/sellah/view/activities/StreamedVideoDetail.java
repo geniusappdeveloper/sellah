@@ -1,6 +1,8 @@
 package com.app.admin.sellah.view.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -29,6 +32,7 @@ import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.PinCommentModel.PinCommentModel;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.SendOffer;
 import com.app.admin.sellah.view.adapter.LiveStreamChatAdapter;
 import com.bumptech.glide.Glide;
 import com.google.gson.JsonObject;
@@ -147,6 +151,8 @@ public class StreamedVideoDetail extends Activity {
     private String videoStartTime = "";
     private String videoEndTime = "";
     private String videoViews = "";
+    private String productname_1 = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +208,7 @@ public class StreamedVideoDetail extends Activity {
                         if (isLogined(StreamedVideoDetail.this)) {
                             switch (menuItem.getItemId()) {
                                 case R.id.menu_view_pined:
+
                                     Intent intent1 = new Intent(StreamedVideoDetail.this, ViewPinedMessage.class);
                                     intent1.putExtra("group_id", groupId);
                                     startActivity(intent1);
@@ -329,11 +336,12 @@ public class StreamedVideoDetail extends Activity {
 
     //-----------------------------------------------------------------------
 
-    private void sendOfferApi(String price, String recieverId, MaterialDialog dialog) {
-        new ApisHelper().sendOfferApi(StreamedVideoDetail.this, recieverId, groupId, productId, productName, price, new ApisHelper.SendOfferCallback() {
+    private void sendOfferApi(String name, String price, String recieverId) {
+        Log.e( "sendOfferApi: ",name );
+        new ApisHelper().sendOfferApi(StreamedVideoDetail.this, recieverId, groupId, productId, name, price, new ApisHelper.SendOfferCallback() {
             @Override
             public void onSendOfferSuccess(String msg) {
-                dialog.dismiss();
+
                 Toast.makeText(StreamedVideoDetail.this, msg, Toast.LENGTH_SHORT).show();
             }
 
@@ -352,16 +360,19 @@ public class StreamedVideoDetail extends Activity {
             }*/new LiveStreamChatAdapter.OptionsClickCallBack() {
                 @Override
                 public void onMakeOfferClicked(String comment_id, String senderId) {
-                    Log.e("MakeOffer", "onMakeOfferClicked: ");
-                    S_Dialogs.getSendOfferDialog(StreamedVideoDetail.this, productName, (dialog, input) -> {
-                        if (TextUtils.isEmpty(input) || input.toString().equalsIgnoreCase("0")) {
-                            Toast.makeText(StreamedVideoDetail.this, "Enter offering amount", Toast.LENGTH_SHORT).show();
-//                        dialog.dismiss();
-                        } else {
-//                makeOfferApi(input.toString().trim(), sellerId, dialog, productId);
-                            sendOfferApi(input.toString().trim(), senderId, dialog);
+                 //  alertsendoffer(senderId);
+
+                     SendOffer sendOffer = new SendOffer(StreamedVideoDetail.this);
+                     sendOffer.send(StreamedVideoDetail.this, senderId, new SendOffer.onSendOffer() {
+                        @Override
+                        public void onSendOfferSuccess(String name, String price) {
+
+                            Log.e("response_sendOffer","here: "+name+"  "+price);
+                            sendOfferApi(name,price, senderId);
+
                         }
-                    }).show();
+                    });
+                     sendOffer.show();
                 }
 
                 @Override
@@ -455,4 +466,58 @@ public class StreamedVideoDetail extends Activity {
         });
 
     }
+
+    public void alertsendoffer(String senderid)
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Send Offer");
+
+        final EditText one = new EditText(this);
+        one.setHint("Enter Name");//optional
+        final EditText two = new EditText(this);
+        two.setHint("Enter Price");//optional
+
+        one.setInputType(InputType.TYPE_CLASS_TEXT);
+        two.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        LinearLayout lay = new LinearLayout(this);
+        lay.setPadding(12,0,12,0);
+        lay.setOrientation(LinearLayout.VERTICAL);
+        lay.addView(one);
+        lay.addView(two);
+        builder.setView(lay);
+
+        // Set up the buttons
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                if (TextUtils.isEmpty(two.getText().toString()) || two.getText().toString().equalsIgnoreCase("0")) {
+                    Toast.makeText(StreamedVideoDetail.this, "Enter offering amount", Toast.LENGTH_SHORT).show();
+//                        dialog.dismiss();
+                } else {
+//                makeOfferApi(input.toString().trim(), sellerId, dialog, productId);
+
+                    if (one.getText().toString().trim().isEmpty())
+                    {
+                        productname_1 = productName;
+                    }
+                    else
+                    {productname_1= one.getText().toString();}
+                    sendOfferApi(productname_1,two.getText().toString().trim(), senderid);
+                }
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+
+    }
+
 }

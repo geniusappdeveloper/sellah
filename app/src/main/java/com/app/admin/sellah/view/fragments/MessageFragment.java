@@ -470,7 +470,11 @@ public class MessageFragment extends Fragment {
         }
         if (newMsgList != null && newMsgList.size() > 0) {
             ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.VISIBLE);
+           if ( ((MainActivity)getActivity()).activityImage!=null)((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
+
         } else {
+            if ( ((MainActivity)getActivity()).activityImage!=null)((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
+
             ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.GONE);
         }
         if (oldMsgList1 != null && oldMsgList1.size() > 0) {

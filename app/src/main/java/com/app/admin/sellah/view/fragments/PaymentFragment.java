@@ -22,21 +22,30 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.admin.sellah.Extras.FlipAnimation;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.stripe.StripeApp;
 import com.app.admin.sellah.controller.stripe.StripeButton;
 import com.app.admin.sellah.controller.stripe.StripeConnectListener;
+import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.CardDetails.Card;
 import com.app.admin.sellah.model.extra.CardDetails.CardDetailModel;
 import com.app.admin.sellah.view.CustomAnimations.MyBounceInterpolator;
+import com.app.admin.sellah.view.CustomDialogs.AccountPreshowDialog1;
+import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,10 +55,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
 import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.AVAILABLE_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PENDING_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+
 
 /**
  * PaymentFragment.class
@@ -84,7 +100,15 @@ public class PaymentFragment extends Fragment {
     RelativeLayout rlAddnewstrpeaccount;
     @BindView(R.id.rl_sellahwallet_clicklink)
     RelativeLayout rlSellahwalletClicklink;
-    private Dialog dialog;
+    @BindView(R.id.sel_txt_bal1)
+    TextView selTxtBal1;
+    @BindView(R.id.sel_txt_acc1)
+    TextView selTxtAcc1;
+    @BindView(R.id.withdraw)
+    TextView withdraw;
+    @BindView(R.id.sel_txt_pend1)
+    TextView selTxtPend1;
+    private Dialog progress;
     private Animation myAnim;
     HashMap<EditText, String> bankDetaildialogMessages;
     ArrayList<EditText> allBankDetailFields;
@@ -100,6 +124,13 @@ public class PaymentFragment extends Fragment {
     private String cardExp = "";
     private String stripeId = "";
     private StripeApp StripeAppmApp;
+    private Dialog dialog;
+    WebService service;
+
+    @SuppressLint("ValidFragment")
+    public PaymentFragment() {
+
+    }
 
     @SuppressLint("ValidFragment")
     public PaymentFragment(String stripeId) {
@@ -111,25 +142,40 @@ public class PaymentFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.account_payment_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-         Log.e("onGetDataSuccess: ", "d"+(HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED)));
+        progress = S_Dialogs.getLoadingDialog(getActivity());
+        service = Global.WebServiceConstants.getRetrofitinstance();
+        Log.e("onGetDataSuccess: ", "d" + (HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED)));
 
         if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("") || HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N"))) {
-              rlSellahwalletClicklink.setVisibility(View.VISIBLE);
-            Log.e( "onCreateView: ","1" );
+            rlSellahwalletClicklink.setVisibility(View.VISIBLE);
+            Log.e("onCreateView: ", "1");
             rlAddnewstrpeaccount.setVisibility(View.GONE);
         } else {
-            Log.e( "onCreateView: ","2" );
+            Log.e("onCreateView: ", "2");
             rlSellahwalletClicklink.setVisibility(View.GONE);
             rlAddnewstrpeaccount.setVisibility(View.VISIBLE);
-        }
+            selTxtBal1.setText("S$ " + HelperPreferences.get(getActivity()).getString(AVAILABLE_BALANCE));
+            selTxtPend1.setText("S$ " + HelperPreferences.get(getActivity()).getString(PENDING_BALANCE));
+            String acc = HelperPreferences.get(getActivity()).getString(API_ACCESS_TOKEN);
+            String newacc = acc.substring(acc.length() - 4);
+
+            selTxtAcc1.setText("* *** " + newacc);
+
+            }
+
+
 
         new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
             @Override
             public void onGetDataSuccess(CardDetailModel body) {
 
                 Gson gson = new GsonBuilder().create();
-                setUpcards(body.getCards());//set card list adapter
+
+                if (body != null) {
+                    setUpcards(body.getCards());//set card list adapter
+                }
+
+
             }
 
             @Override
@@ -139,6 +185,8 @@ public class PaymentFragment extends Fragment {
             }
         });
         StripConnect();
+
+
         return view;
     }
 
@@ -149,9 +197,17 @@ public class PaymentFragment extends Fragment {
 
             for (int i = 0; i < cards.size(); i++) {
                 if (cards.get(i).getDefault_card().equals("Y")) {
-                    pOnnewcardnumber.setText("**** **** **** " + cards.get(i).getLast4());
-                    pOnnewcardholdername.setText(cards.get(i).getName());
-                    pOnnewcardExpire.setText(cards.get(i).getExpMonth() + "/" + cards.get(i).getExpYear());
+                    if (pOnnewcardholdername != null) {
+                        pOnnewcardholdername.setText(cards.get(i).getName());
+                    }
+                    if (pOnnewcardnumber != null) {
+                        pOnnewcardnumber.setText("**** **** **** " + cards.get(i).getLast4());
+                    }
+                    if (pOnnewcardExpire != null) {
+                        pOnnewcardExpire.setText(cards.get(i).getExpMonth() + "/" + cards.get(i).getExpYear());
+                    }
+
+
                     break;
                 }
             }
@@ -215,9 +271,12 @@ public class PaymentFragment extends Fragment {
 
     @OnClick(R.id.edt_card_edit)
     public void editCardDetail() {
+
         Intent intent = new Intent(getActivity(), ShowCreditCardDetailFragment.class);
         intent.putExtra("payment", "payment");
         startActivityForResult(intent, GET_NEW_CARD);
+
+
     }
 
 
@@ -331,16 +390,91 @@ public class PaymentFragment extends Fragment {
 
     }
 
-    @OnClick(R.id.rl_sellahwallet_clicklink)
-    public void onViewClicked() {
-        Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
-        stripe_dialogfragment.show(getActivity().getFragmentManager(), "");
-        // btnStripeConnect.performClick();
-    }
 
     @Override
     public void onStop() {
         super.onStop();
         new ApisHelper().cancel_striipe_request();
     }
+
+
+    public void wirhdraw_api() {
+        progress.show();
+        Call<JsonObject> call = service.withdrawal_money(HelperPreferences.get(getActivity()).getString(UID));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (progress != null) {
+                    progress.dismiss();
+                }
+
+                try {
+                    JSONObject obj = new JSONObject(response.body().toString());
+
+                    S_Dialogs.getLiveVideoStopedDialog(getActivity(), obj.getString("message"), ((dialog, which) -> {
+
+
+                    })).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.e("onResponse: ", response.body().toString());
+
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+
+    @OnClick({R.id.withdraw, R.id.rl_sellahwallet_clicklink, R.id.rel_qr_scan,R.id.scan_rel})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.withdraw:
+                wirhdraw_api();
+                break;
+            case R.id.rl_sellahwallet_clicklink:
+
+                AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(getActivity());
+                accountPreshowDialog1.show();
+
+                /*Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                stripe_dialogfragment.show(getActivity().getFragmentManager(), "");*/
+                break;
+
+            case R.id.rel_qr_scan:
+                flip();
+                break;
+
+            case R.id.scan_rel:
+               flip();
+               break;
+
+        }
+    }
+
+
+    public void flip() {
+
+
+        View rootLayout = (View) getActivity().findViewById(R.id.rl_addnewstrpeaccount);
+        View cardFace = (View) getActivity().findViewById(R.id.add_rel);
+        View cardBack = (View) getActivity().findViewById(R.id.scan_rel);
+
+        FlipAnimation flipAnimation = new FlipAnimation(cardFace, cardBack);
+
+        if (cardFace.getVisibility() == View.GONE) {
+            flipAnimation.reverse();
+        }
+        rootLayout.startAnimation(flipAnimation);
+
+    }
+
+
 }

@@ -54,7 +54,6 @@ public class Live_featureViewPagerAdapter extends PagerAdapter {
         if (bannerList != null && bannerList.size() > 0) {
             Glide.with(context)
                     .load(bannerList.get(position))
-
                     .apply(Global.getGlideOptions().transform(new RoundedCorners(10))/*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*/)
                     .into(imageView);
         }

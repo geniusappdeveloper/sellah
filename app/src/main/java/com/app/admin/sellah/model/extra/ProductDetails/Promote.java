@@ -17,6 +17,18 @@ public class Promote {
     @Expose
     private String validity;
 
+    @SerializedName("days_left")
+    @Expose
+    private String days_left;
+
+    public String getDays_left() {
+        return days_left;
+    }
+
+    public void setDays_left(String days_left) {
+        this.days_left = days_left;
+    }
+
     public String getId() {
         return id;
     }

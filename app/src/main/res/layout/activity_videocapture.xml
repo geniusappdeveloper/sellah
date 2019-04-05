@@ -11,12 +11,22 @@
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
+    <Button
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:id="@+id/video_back"
+        android:background="@drawable/cancel"
+        android:layout_width="26dp"
+        android:layout_height="26dp" />
+
+
+
 
     <ProgressBar
         android:layout_alignParentBottom="true"
         android:id="@+id/progressbar"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="100dp"
+        android:layout_width="107dp"
         android:layout_gravity="center"
         android:layout_height="100dp"
         android:layout_centerInParent="true"

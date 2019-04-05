@@ -3,11 +3,14 @@ package com.app.admin.sellah.view.CustomDialogs;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,7 +19,10 @@ import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -33,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.admin.sellah.Extras.ImageFilePath;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
@@ -43,6 +50,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +111,7 @@ public class LiveProductDetailDialog extends Dialog {
     private String catId = "";
     private int CAMERA_PIC_REQUEST = 1212;
     private String imagePath = "";
+    private int GALLERY=2025;
 
     public LiveProductDetailDialog(@NonNull Context context, UpdateDetailCallback callback) {
         super(context);
@@ -118,6 +127,45 @@ public class LiveProductDetailDialog extends Dialog {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         ((Activity) context).startActivityForResult(intent, CAMERA_PIC_REQUEST);
     }
+    private void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        ((Activity) context).startActivityForResult(galleryIntent, GALLERY);
+
+    }
+
+
+        private void showPictureDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(context);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {
+                "Add from your gallery",
+                "Take a photo"};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallary();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                /*if (imageList.size() != 8) {
+                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    startActivityForResult(intent, CAMERA_PIC_REQUEST);
+                                } else {
+                                    Snackbar.make(rootTag, "Please select photo", Snackbar.LENGTH_SHORT)
+                                            .setAction("", null).show();
+                                }*/
+                                break;
+                        }
+                    }
+
+                });
+        pictureDialog.show();
+    }
+
 
 
     @Override
@@ -182,6 +230,7 @@ public class LiveProductDetailDialog extends Dialog {
             }
         });
 
+
     }
 
     private List<String> getCategoryList() {
@@ -216,7 +265,7 @@ public class LiveProductDetailDialog extends Dialog {
 
     @OnClick(R.id.li_take_picture)
     public void onCaptureViewClicked() {
-        takePhotoFromCamera();
+        showPictureDialog();
         remove_focus();
     }
 
@@ -225,7 +274,7 @@ public class LiveProductDetailDialog extends Dialog {
         switch (view.getId()) {
 
             case R.id.editimage_btn_live:
-                takePhotoFromCamera();
+                showPictureDialog();
                 break;
 
             case R.id.relative_spinnerrl:
@@ -289,7 +338,47 @@ public class LiveProductDetailDialog extends Dialog {
             imagePath = getRealPathFromURI(tempUri);
             Log.e("ImageString", "onActivityResult: " + imagePath);
 //            uploadChatImage(ImageUploadHelper.convertImageTomultipart(imagePath, "image"));
+
         }
+
+        if (requestCode == GALLERY) {
+            if (data != null) {
+                Uri pickedImage = data.getData();
+
+                // Let's read picked image path using content resolver
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor cursor = context.getContentResolver().query(pickedImage, filePath, null, null, null);
+                cursor.moveToFirst();
+                String path = cursor.getString(cursor.getColumnIndex(filePath[0]));
+
+                dummylive1Text.setVisibility(View.GONE);
+                dummylive2Text.setVisibility(View.GONE);
+                liveImgview.setVisibility(View.VISIBLE);
+                liveImgviewName.setVisibility(View.VISIBLE);
+                editimageBtnLive.setVisibility(View.VISIBLE);
+                liTakePicture.setBackgroundResource(R.drawable.live_product_detail_background);
+                submit.setEnabled(true);
+                submit.setBackgroundResource(R.drawable.round_red_border_testimonial);
+                Glide.with(context).applyDefaultRequestOptions(new RequestOptions().transform(new RoundedCorners(10)))
+                        .load(path).into(liveImgview);
+                liveImgviewName.setText(getFileName(pickedImage));
+
+
+               imagePath = path;
+                Log.e( "myactivity: ", ""+imagePath);
+
+
+
+
+
+
+                cursor.close();
+
+            }
+        }
+
+
+
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -384,5 +473,12 @@ public class LiveProductDetailDialog extends Dialog {
             return false;
         });
     }
+
+
+
+
+
+
+
 
 }

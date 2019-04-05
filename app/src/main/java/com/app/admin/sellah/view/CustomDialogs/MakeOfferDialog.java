@@ -28,6 +28,8 @@ import com.app.admin.sellah.model.extra.CheckOutModel;
 import com.app.admin.sellah.model.extra.MakeOffer.MakeOfferModel;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.view.adapter.CheckoutProductAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,7 +170,8 @@ public class MakeOfferDialog extends Dialog {
                 }
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
-                        Log.e("ForSaleData", response.body().getResult().toString());
+                        Gson gson = new GsonBuilder().create();
+                        Log.e("ForSaleData", gson.toJson(response.body()));
                         checkOutProductList(response.body());
                     }
                 } else {
@@ -235,7 +238,6 @@ public class MakeOfferDialog extends Dialog {
     @Override
     protected void onStop() {
         super.onStop();
-        recordsCall.cancel();
-        makeOfferCall.cancel();
+
     }
 }

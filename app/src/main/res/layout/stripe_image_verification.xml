@@ -44,7 +44,7 @@
             android:textSize="@dimen/_13sdp"
             android:layout_marginTop="@dimen/_10sdp"
             android:textColor="@color/colorGrey"
-            android:text=" Please upload a photo of your IC (front) OR birth certificate OR driving license (front) OR any other government issued photo ID."/>
+            android:text="Please upload a photo of your IC (front) OR birth certificate OR driving license (front) OR any other government issued photo ID."/>
 
         <TextView
             android:layout_width="match_parent"

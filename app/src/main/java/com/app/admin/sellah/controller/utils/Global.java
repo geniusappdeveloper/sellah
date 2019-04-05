@@ -14,10 +14,12 @@ import android.os.Build;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
@@ -560,7 +562,20 @@ public class Global extends MultiDexApplication {
         int sec = (int) ((difference / 1000) % 60);
         hours = (hours < 0 ? -hours : hours);
 //        Log.e("Hours", " :: " + hours + ":" + min + ":" + sec);
-        return (min + ":" + sec);
+
+
+
+        String   minVal="";
+        try {  minVal = String.format("%02d", min);  }catch (Exception e){ }
+
+        String   secVal="";
+        try {  secVal = String.format("%02d", sec);  }catch (Exception e){ }
+
+
+
+
+
+        return (minVal + ":" + secVal);
     }
 
     public static class BackstackConstants {
@@ -885,5 +900,78 @@ public class Global extends MultiDexApplication {
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setText(spannableString, TextView.BufferType.SPANNABLE);
     }
+    public static void CheckPriceDecimal(EditText editText) {
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String str = editText.getText().toString();
+                if (str.isEmpty()) return;
+                String str2 = PerfectDecimal(str, 20, 2);
+
+                if (!str2.equals(str)) {
+                    editText.setText(str2);
+                    int pos = editText.getText().length();
+                    editText.setSelection(pos);
+                }
+
+            }
+        });
+
+
+
+    }
+
+
+    public static String PerfectDecimal(String str, int MAX_BEFORE_POINT, int MAX_DECIMAL){
+        if(str.charAt(0) == '.') str = "0"+str;
+        int max = str.length();
+
+        String rFinal = "";
+        boolean after = false;
+        int i = 0, up = 0, decimal = 0; char t;
+        while(i < max){
+            t = str.charAt(i);
+            if(t != '.' && after == false){
+                up++;
+                if(up > MAX_BEFORE_POINT) return rFinal;
+            }else if(t == '.'){
+                after = true;
+            }else{
+                decimal++;
+                if(decimal > MAX_DECIMAL)
+                    return rFinal;
+            }
+            rFinal = rFinal + t;
+            i++;
+        }return rFinal;
+    }
+
+    public static String gettotalamount(String amount)
+    {
+        if (!amount.isEmpty())
+        {
+            float a = Float.parseFloat(amount);
+            double cardFees = 3.4*a/100 + 0.50;
+            double adminFee = 1*a/100 + 1;
+            double totalDeductionAmount = cardFees + adminFee;
+            double finalPrice = a - totalDeductionAmount;
+
+            return String.valueOf(finalPrice);
+        }
+        return "";
+
+    }
+
 
 }

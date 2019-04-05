@@ -40,7 +40,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     ArrayList<Integer> viewImagesArray = new ArrayList<Integer>();
     String[] stringArray = new String[]{"What is Sellah?", "Marketplace", "Sell Effectively", "Easy to shop", "Secure Payment"};
-    String[] stringArray2 = new String[]{"   Sellah! is the revolutionary vCommerce \n platform where e-commerce meets video!", "Buy and sell everything for free, \n          in less than a minute", "Sell more effectively with \n    short and live videos", "Shop with confidence in this v-Commerce, \n       where you only buy what you see!", "Send and receive payments \n         safely with Stripe"};
+    String[] stringArray2 = new String[]{"   Sellah! is the revolutionary vCommerce \n platform where e-commerce meets video!", "Buy and sell everything for free, \n          in less than a minute", "Sell more effectively with \n    short and live videos", "Shop with confidence in this v-Commerce, \n       where you only buy what you see!", "Send and receive payments \n    safely with Sellah Wallet"};
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

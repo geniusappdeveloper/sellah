@@ -68,6 +68,7 @@ public class SimpleTagAdapter extends RecyclerView.Adapter<SimpleTagAdapter.MyVi
 
                     Bundle bundle = new Bundle();
                     bundle.putString("tag",title.get(position).getTagName());
+                    bundle.putString("root","tags");
                     fragment.setArguments(bundle);
                     ((MainActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
                 }

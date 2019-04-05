@@ -1,10 +1,8 @@
 package com.app.admin.sellah.view.CustomDialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -17,11 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,20 +32,18 @@ import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.Validations;
-import com.app.admin.sellah.view.activities.LoginActivity;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.google.gson.JsonObject;
-import com.hbb20.CountryCodePicker;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,7 +56,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
 public class Stripe_dialogfragment extends DialogFragment {
@@ -79,7 +77,6 @@ public class Stripe_dialogfragment extends DialogFragment {
     EditText strAddress;
 
 
-
     @BindView(R.id.str_edt_postal_coe)
     EditText strEdtPostalCoe;
 
@@ -93,9 +90,19 @@ public class Stripe_dialogfragment extends DialogFragment {
 
     @BindView(R.id.str_doblayout)
     LinearLayout strDoblayout;
+    @BindView(R.id.spinner_routing)
+    Spinner spinnerRouting;
+    @BindView(R.id.routing_img)
+    ImageView routingImg;
+    @BindView(R.id.routing_rl)
+    RelativeLayout routingRl;
+    @BindView(R.id.str_edt_routingnumber)
+    EditText strEdtRoutingnumber;
     private WebService service;
-    String firstname, lastname, ip, dob,  pid, address,  postalcodem,  accountnumber;
-    String currencyCode;
+    String firstname, lastname, ip, dob, pid, address, postalcodem, accountnumber;
+    String up_routingnumber="";
+    List<String> list= new ArrayList<>();
+    int selected_routingpositioin;
 
 
     @Nullable
@@ -104,6 +111,10 @@ public class Stripe_dialogfragment extends DialogFragment {
 
         View view = inflater.inflate(R.layout.stripe_new_ui, container, false);
 
+       /* AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(getActivity());
+        accountPreshowDialog1.show();*/
+
+
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         getDialog().setCanceledOnTouchOutside(false);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -111,8 +122,17 @@ public class Stripe_dialogfragment extends DialogFragment {
         unbinder = ButterKnife.bind(this, view);
         service = Global.WebServiceConstants.getRetrofitinstance();
         getLocalIpAddress();
+        list.add("Select your bank");
+        list.add("7171-081");
+        list.add("7375-030");
+        list.add("7339-501");
+        list.add("7232-146");
+        list.add("7144-001");
+        list.add("7214-011");
+        list.add("other");
 
         focuslisteneres();
+        routing_spinner_method();
 
 
 
@@ -152,12 +172,9 @@ public class Stripe_dialogfragment extends DialogFragment {
         accountnumber = strEdtAccountnumber.getText().toString();
 
 
-
-
     }
 
     private void focuslisteneres() {
-
 
         strEdtFirstname.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -227,11 +244,6 @@ public class Stripe_dialogfragment extends DialogFragment {
         });
 
 
-
-
-
-
-
         strEdtPostalCoe.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
@@ -244,7 +256,6 @@ public class Stripe_dialogfragment extends DialogFragment {
                 }
             }
         });
-
 
 
         strEdtAccountnumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -260,18 +271,33 @@ public class Stripe_dialogfragment extends DialogFragment {
             }
         });
 
+        strEdtRoutingnumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (b) {
+
+                    strEdtRoutingnumber.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
+
+                } else {
+                    strEdtRoutingnumber.setBackgroundResource(R.drawable.live_product_detail_background);
+                }
+            }
+        });
+
     }
 
-    @OnClick({R.id.str_doblayout,R.id.addnewinfo_back, R.id.add_info_post})
+    @OnClick({R.id.routing_rl,R.id.str_doblayout, R.id.addnewinfo_back, R.id.add_info_post})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.routing_rl:
+                spinnerRouting.performClick();
+                break;
             case R.id.str_doblayout:
-
                 Log.e("onViewClicked: ", "jkm");
                 Datedialog datedialog = new Datedialog();
                 datedialog.seteditext(strEdtDob);
                 datedialog.show(getActivity().getFragmentManager(), "");
-
                 strEdtDob.setBackgroundResource(R.drawable.live_product_detail_background);
                 break;
             case R.id.addnewinfo_back:
@@ -280,7 +306,7 @@ public class Stripe_dialogfragment extends DialogFragment {
             case R.id.add_info_post:
                 getstrings();
                 Log.e("firs: ", firstname);
-                Log.e("last: ",lastname);
+                Log.e("last: ", lastname);
                 Log.e("dob: ", dob);
                 Log.e("pid: ", pid);
                 Log.e("bid: ", "");
@@ -294,9 +320,36 @@ public class Stripe_dialogfragment extends DialogFragment {
                 Log.e("account: ", accountnumber);
                 Log.e("Ip: ", ip);
 
-                boolean valid = new Validations().stripevalid(getActivity(), firstname, lastname, dob, pid,  address, "Dd", "dd", "dd", postalcodem, "dd", accountnumber, "fgfg");
+
+
+
+                boolean valid = new Validations().stripevalid(getActivity(), firstname, lastname, dob, pid, address, "Dd", "dd", "dd", postalcodem, "dd", accountnumber, "fgfg");
                 if (valid) {
-                   addtripeaccount(getActivity());
+
+
+                    if (list.get(selected_routingpositioin).equalsIgnoreCase("Select your bank"))
+                    {
+                        Toast.makeText(getActivity(), "Please Select Routing Number Bank", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (list.get(selected_routingpositioin).equalsIgnoreCase("other"))
+                    {
+                        if (strEdtRoutingnumber.getText().toString().isEmpty())
+                        {
+                            Toast.makeText(getActivity(), "Please Add Routing Number Bank", Toast.LENGTH_SHORT).show();
+
+                        }
+                        else
+                        {
+                            up_routingnumber = strEdtRoutingnumber.getText().toString();
+                        }
+                    }
+                    else
+                    {
+                        up_routingnumber = list.get(selected_routingpositioin);
+                    }
+
+                    Log.e( "onViewClicked: ", up_routingnumber);
+                    addtripeaccount(getActivity(),up_routingnumber);
                 }
 
                 break;
@@ -304,11 +357,11 @@ public class Stripe_dialogfragment extends DialogFragment {
     }
 
 
-    public void addtripeaccount(Context context) {
+    public void addtripeaccount(Context context,String routing) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
         Log.e("user", "" + HelperPreferences.get(context).getString(UID));
-        Call<JsonObject> getProfileCall = service.stripeadd(HelperPreferences.get(context).getString(UID), firstname, lastname, dob, pid,  address, "SG", "Singapore", "Singapore", postalcodem, "SGD", accountnumber, "1100-000", ip, "SG");
+        Call<JsonObject> getProfileCall = service.stripeadd(HelperPreferences.get(context).getString(UID), firstname, lastname, dob, pid, address, "SG", "Singapore", "Singapore", postalcodem, "SGD", accountnumber, routing, ip, "SG");
         getProfileCall.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -316,21 +369,18 @@ public class Stripe_dialogfragment extends DialogFragment {
                     dialog.dismiss();
                 }
                 try {
-                  //  Log.e("onResponse: ", response.errorBody().string());
+                    //  Log.e("onResponse: ", response.errorBody().string());
                     Log.e("onResponse: ", response.body().toString());
                     JSONObject obj = new JSONObject(response.body().toString());
                     String status = obj.getString("status");
-                    if (status.equalsIgnoreCase("0"))
-                    {
-                        Toast.makeText(getActivity(),obj.getString("message"),Toast.LENGTH_LONG).show();
+                    if (status.equalsIgnoreCase("0")) {
+                        Toast.makeText(getActivity(), obj.getString("message"), Toast.LENGTH_LONG).show();
 
-                    }
-                    else
-                    {
-                        Toast.makeText(getActivity(),obj.getString("message"),Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getActivity(), obj.getString("message"), Toast.LENGTH_LONG).show();
                         ((MainActivity) getActivity()).getProfileData();
                         Stripe_image_verification_dialogfragment dialogfragment = new Stripe_image_verification_dialogfragment();
-                        dialogfragment.show(getActivity().getFragmentManager(),"");
+                        dialogfragment.show(getActivity().getFragmentManager(), "");
                         dismiss();
 
                     }
@@ -338,11 +388,8 @@ public class Stripe_dialogfragment extends DialogFragment {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getActivity(),"Wrong information",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Wrong information", Toast.LENGTH_LONG).show();
                 }
-
-
-
 
 
             }
@@ -394,6 +441,54 @@ public class Stripe_dialogfragment extends DialogFragment {
             Log.e("eroor", ex.toString());
         }
         return null;
+    }
+
+
+    public void routing_spinner_method() {
+        ArrayAdapter<String> priceModeSpinAdapter = new ArrayAdapter<String>
+                (getActivity(), R.layout.spinner_dropdown,
+                        getResources().getStringArray(R.array.routing_banks));
+        priceModeSpinAdapter.setDropDownViewResource(android.R.layout
+                .simple_spinner_dropdown_item);
+        spinnerRouting.setAdapter(priceModeSpinAdapter);
+
+        spinnerRouting.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Object item = parent.getItemAtPosition(position);
+                      selected_routingpositioin = parent.getSelectedItemPosition();
+                if (!item.toString().equalsIgnoreCase("Select your bank")) {
+
+                    ((TextView) spinnerRouting.getSelectedView()).setText(list.get(selected_routingpositioin));
+                    ((TextView) spinnerRouting.getSelectedView()).setTextColor(Color.BLACK);
+                    routingRl.setBackgroundResource(R.drawable.live_product_detail_background);
+                    routingImg.setImageDrawable(getResources().getDrawable(R.drawable.down_arrow));
+
+                }
+                 else {
+
+                    ((TextView) spinnerRouting.getSelectedView()).setTextColor(Color.parseColor("#c9c9c9"));
+                    routingImg.setImageDrawable(getResources().getDrawable(R.drawable.down_grey));
+
+                }
+
+                if (item.toString().equalsIgnoreCase("Others")) {
+
+                    Log.e( "onItemSelected: ", "coid");
+                    strEdtRoutingnumber.setVisibility(View.VISIBLE);
+                    strEdtRoutingnumber.requestFocus();
+                    routingRl.setVisibility(View.GONE);
+                    spinnerRouting.setVisibility(View.GONE);
+                    //  strEdtRoutingnumber.setText(item.toString());
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 

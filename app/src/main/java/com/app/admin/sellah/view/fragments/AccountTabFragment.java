@@ -146,6 +146,9 @@ public class AccountTabFragment extends Fragment implements View.OnClickListener
 
     private ProfileModel profileData;
 
+    public AccountTabFragment() {
+
+    }
     public AccountTabFragment(ProfileModel profileData) {
         this.profileData = profileData;
     }

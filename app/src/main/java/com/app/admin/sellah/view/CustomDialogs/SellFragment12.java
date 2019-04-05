@@ -1229,7 +1229,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
 
     public void editProduct(AddProductModel addProductModel) {
 
-        WebService service = Global.WebServiceConstants.getRetrofitinstance();
+/*        WebService service = Global.WebServiceConstants.getRetrofitinstance();
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
         Call<GetProductList> addProductCall = service.editProductApi(addProductModel.getProduct_id()
@@ -1243,6 +1243,8 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
                 if (response.isSuccessful()) {
+
+                    Log.e("onResponseMethod","editProduct");
 
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
@@ -1259,14 +1261,14 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                                     public void onPromoteSuccess() {
                                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                                         clearForm(rootTag);
-/*
+*//*
 
                                     Bundle bundle = new Bundle();
                                     bundle.putParcelable(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0));
                                     ProductFrgament fragment = new ProductFrgament();
                                     fragment.setArguments(bundle);
                                     ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
-*/
+*//*
 
                                     }
 
@@ -1281,20 +1283,20 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
 
                             }
                         } else {
-                           /* Bundle bundle = new Bundle();
+                           *//* Bundle bundle = new Bundle();
                             bundle.putParcelable(SAConstants.Keys.PRODUCT_DETAIL, response.body().getResult().get(0));
                             ProductFrgament fragment = new ProductFrgament();
                             fragment.setArguments(bundle);
-                            ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();*/
+                            ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();*//*
 //                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment()).addToBackStack(PROFILETAG).commit();
                             clearForm(rootTag);
                         }
-                       /* Bundle bundle=new Bundle();
+                       *//* Bundle bundle=new Bundle();
                         bundle.putString(SAConstants.Keys.CAT_ID, catId);
                         bundle.putString(SAConstants.Keys.SUB_CAT_ID, subCatId);
                         bundle.putParcelableArrayList(SAConstants.Keys.SUB_CAT_LIST, (ArrayList<? extends Parcelable>) subcategories);
                         SubCategoryFragment fragment=new SubCategoryFragment();
-                        fragment.setArguments(bundle);*/
+                        fragment.setArguments(bundle);*//*
 
                     } else {
                         Snackbar.make(rootTag, response.body().getMessage(), Snackbar.LENGTH_SHORT)
@@ -1322,7 +1324,7 @@ public class SellFragment12 extends Fragment implements SellProductInterface {
                 Snackbar.make(rootTag, "Please try again later.", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
             }
-        });
+        });*/
     }
 
     private void clearForm(ViewGroup group) {

@@ -2,19 +2,27 @@ package com.app.admin.sellah.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.model.extra.LiveVideoModel.VideoList;
+import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.MainActivityLiveStream;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class LiveVideoPaggerAdapter extends PagerAdapter {
@@ -53,10 +61,18 @@ public class LiveVideoPaggerAdapter extends PagerAdapter {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.layout_live_pagger_view, null);
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
+        TextView time = (TextView) view.findViewById(R.id.home_livetime);
         imageView.setPadding(0, 0, 0, 0);
 //        imageView.setImageResource(images[position]);
 
 
+
+
+      try {
+          time.setText(Global.getTimeDuration(Global.convertUTCToLocal(videoList.get(position).getCreatedAt()),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+          } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (videoList != null && videoList.size() > 0) {
             Glide.with(context)
                     .load(videoList.get(position).getCoverImage())
@@ -74,16 +90,25 @@ public class LiveVideoPaggerAdapter extends PagerAdapter {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(new Intent(context, MainActivityLiveStream.class));
-                intent.putExtra("value", "noLiveStream");
-                intent.putExtra("id",videoList.get(position).getVideoId());
-                intent.putExtra("group_id",videoList.get(position).getGroupId());
-                intent.putExtra("product_id",videoList.get(position).getProductId());
-                intent.putExtra("product_name",videoList.get(position).getProductName());
-                intent.putExtra("seller_id",videoList.get(position).getSellerId());
-                intent.putExtra("start_time",videoList.get(position).getStartTime());
-                intent.putExtra("views",videoList.get(position).getViews());
-                context.startActivity(intent);
+
+                if (Global.getUser.isLogined(context))
+                {
+                    Intent intent = new Intent(new Intent(context, MainActivityLiveStream.class));
+                    intent.putExtra("value", "noLiveStream");
+                    intent.putExtra("id",videoList.get(position).getVideoId());
+                    intent.putExtra("group_id",videoList.get(position).getGroupId());
+                    intent.putExtra("product_id",videoList.get(position).getProductId());
+                    intent.putExtra("product_name",videoList.get(position).getProductName());
+                    intent.putExtra("seller_id",videoList.get(position).getSellerId());
+                    intent.putExtra("start_time",videoList.get(position).getStartTime());
+                    intent.putExtra("views",videoList.get(position).getViews());
+                    context.startActivity(intent);
+                }
+                else
+                {
+                    S_Dialogs.getLoginDialog(context).show();
+                }
+
             }
         });
 
@@ -102,4 +127,8 @@ public class LiveVideoPaggerAdapter extends PagerAdapter {
 
     }
 
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        return LiveVideoPaggerAdapter.POSITION_NONE;
+    }
 }

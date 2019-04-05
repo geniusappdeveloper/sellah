@@ -36,7 +36,6 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
 
@@ -48,6 +47,8 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
 
     @BindView(R.id.anim_ciricleimage)
     ImageView animCiricleimage;
+    @BindView(R.id.video_back)
+    Button videoBack;
     private SurfaceHolder surfaceHolder;
     private SurfaceView surfaceView;
     public MediaRecorder mrec = new MediaRecorder();
@@ -89,6 +90,7 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
                         break;
                     }
                 }
+
                 setCameraDisplayOrientation(Video_capture_activity.this, cameraId, mCamera);
                 surfaceView = (SurfaceView) findViewById(R.id.surface_camera);
                 surfaceHolder = surfaceView.getHolder();
@@ -218,17 +220,16 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
         mrec.setCamera(mCamera);
         mrec.setOrientationHint(mOrientation);
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
-        /*mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_CIF));*/
-        mrec.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mrec.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mrec.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mrec.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        mrec.setVideoEncodingBitRate(3000000);
-        mrec.setVideoSize(1280, 720);
-        mrec.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mrec.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mrec.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_1080P));
 
+        /*mrec.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mrec.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mrec.setVideoEncodingBitRate(512 * 1000);
+        mrec.setVideoFrameRate(30);
+        mrec.setVideoSize(640, 480);
+*/
 
         mrec.setPreviewDisplay(surfaceHolder.getSurface());
         Global.videopath = Environment.getExternalStorageDirectory().getPath().concat("/" + String.valueOf(System.currentTimeMillis()) + ".3gp");
@@ -347,5 +348,15 @@ public class Video_capture_activity extends AppCompatActivity implements Surface
 
     @OnClick(R.id.anim_ciricleimage)
     public void onViewClicked() {
+    }
+
+    @OnClick({R.id.video_back })
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.video_back:
+                finish();
+                break;
+
+        }
     }
 }

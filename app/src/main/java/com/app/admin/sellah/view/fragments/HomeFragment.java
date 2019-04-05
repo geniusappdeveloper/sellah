@@ -1,5 +1,6 @@
 package com.app.admin.sellah.view.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -58,6 +59,8 @@ import com.app.admin.sellah.view.adapter.HomeProductAdapter;
 import com.app.admin.sellah.view.adapter.LiveVideoPaggerAdapter;
 import com.app.admin.sellah.view.adapter.SuggestedPostAdapterHome;
 import com.app.admin.sellah.view.adapter.ViewPagerAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,6 +76,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.HOMETAG;
 import static com.app.admin.sellah.controller.utils.Global.getTotalHeightofGridRecyclerView;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -175,6 +179,7 @@ public class HomeFragment extends Fragment {
     Call<GetProductList> getProductsCall;
     Call<NotificationListModel> notificationListCall;
 
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -191,6 +196,7 @@ public class HomeFragment extends Fragment {
             stripe_dialogfragment.show(getActivity().getFragmentManager(),"");
         }
         dialog = S_Dialogs.getLoadingDialog(getActivity());
+        dialog.setOwnerActivity(getActivity());
         dialog.show();
         service = Global.WebServiceConstants.getRetrofitinstance();
 
@@ -228,7 +234,7 @@ public class HomeFragment extends Fragment {
                     }*/
 
 
-
+                     if (viewPager!=null)
                     setupBannerAdds(list4);
 
                 }
@@ -238,6 +244,7 @@ public class HomeFragment extends Fragment {
 //                    BannerModel model=new BannerModel();
                     List<String> images = new ArrayList<>();
 //                    images.add("NA");
+                    if (viewPager!=null)
                     setupBannerAdds(images);
                 }
             });
@@ -298,6 +305,7 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
         txtSearchSella.setText(Html.fromHtml(next + first));
 
         unbinder1 = ButterKnife.bind(this, view);
+
         return view;
     }
 
@@ -427,14 +435,16 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                     @Override
                     public void run() {
                         // Reload current fragment
-                        Fragment frg = null;
+                        /*Fragment frg = null;
                         frg = new HomeFragment();
 //                        frg = getActivity().getSupportFragmentManager().findFragmentByTag("Your_Fragment_TAG");
                         final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                         ft.detach(frg);
                         ft.attach(frg);
-                        ft.commit();
+                        ft.commit();*/
+                        ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
                         swipeContainer.setRefreshing(false);
+
                     }
                 }, 100);
             }
@@ -494,6 +504,15 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                 ((MainActivity) getActivity()).searchEditText.setText(autoCompleteText);
                 Global.hideKeyboard(((MainActivity) getActivity()).searchEditText, getActivity());
 
+                Show_tag_result_fragment fragment = new Show_tag_result_fragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("tag",Global.getText(((MainActivity) getActivity()).searchEditText));
+                bundle.putString("root","search");
+                fragment.setArguments(bundle);
+                ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
+
+/*
                 new ApisHelper().getSeaarchResultApi(getActivity(), new ApisHelper.SearchResultCallback() {
                     @Override
                     public void onProductListSuccess(GetProductList body) {
@@ -510,12 +529,23 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                         Log.e("searchResult", "onProductListFailure: ");
                     }
                 }, Global.getText(((MainActivity) getActivity()).searchEditText));
+*/
             }
         });
         editorActionListener = new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+
+                    Show_tag_result_fragment fragment = new Show_tag_result_fragment();
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("tag",Global.getText(((MainActivity) getActivity()).searchEditText));
+                    bundle.putString("root","search");
+                    fragment.setArguments(bundle);
+                    ((MainActivity) getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
+
+/*
                     new ApisHelper().getSeaarchResultApi(getActivity(), new ApisHelper.SearchResultCallback() {
                         @Override
                         public void onProductListSuccess(GetProductList body) {
@@ -532,6 +562,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                             Log.e("searchResult", "onProductListFailure: ");
                         }
                     }, Global.getText(((MainActivity) getActivity()).searchEditText));
+*/
+
 
 //                    yourcalc();
 
@@ -559,9 +591,12 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel body) {
                 if (body.getList().isEmpty()) {
-                    nolivevideoText.setVisibility(View.VISIBLE);
+                  if (nolivevideoText!=null)nolivevideoText.setVisibility(View.VISIBLE);
+                    if (vpLive!=null)  vpLive.setVisibility(View.GONE);
+
                 } else {
-                    nolivevideoText.setVisibility(View.GONE);
+                    if (nolivevideoText!=null) nolivevideoText.setVisibility(View.GONE);
+                    if (vpLive!=null) vpLive.setVisibility(View.VISIBLE);
                     setLiveVideos(body);
                 }
 
@@ -577,7 +612,14 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
 
     private void setLiveVideos(LiveVideoModel body) {
         LiveVideoPaggerAdapter viewPagerAdapter = new LiveVideoPaggerAdapter(getActivity(), body.getList());
-        vpLive.setAdapter(viewPagerAdapter);
+         vpLive.setAdapter(viewPagerAdapter);
+        viewPagerAdapter.notifyDataSetChanged();
+
+        Gson gson = new GsonBuilder().create();
+        Log.e( "setLiveVideos: ", gson.toJson(body));
+
+
+
         if (body.getList().size() > 3) {
             dotscount = 3/*viewPagerAdapter.getCount()*/;
         } else {
@@ -767,7 +809,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
     public void getProductlist() {
         if (!Global.NetworStatus.isOnline(getActivity()) || Global.NetworStatus.isInternetAvailable()) {
             S_Dialogs.getNetworkErrorDialog(getActivity()).show();
-            if (dialog != null && dialog.isShowing()) {
+            if ( dialog.getOwnerActivity()!=null &&!dialog.getOwnerActivity().isFinishing() &&dialog != null && dialog.isShowing()) {
+
                 dialog.dismiss();
             }
         } else {
@@ -777,7 +820,9 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                 @Override
                 public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
                     if (response.isSuccessful()) {
-                        if (dialog != null && dialog.isShowing()) {
+
+                        if ( dialog.getOwnerActivity()!=null &&!dialog.getOwnerActivity().isFinishing() &&dialog != null && dialog.isShowing()) {
+
                             dialog.dismiss();
                         }
                         TOTAL_PAGES = Integer.parseInt(response.body().getTotalPages());
@@ -801,7 +846,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
 //                        setMainProductList(productList);
                         Log.e("Getproducts", "Success" + response.body().toString());
                     } else {
-                        if (dialog != null && dialog.isShowing()) {
+                        if ( dialog.getOwnerActivity()!=null &&!dialog.getOwnerActivity().isFinishing() &&dialog != null && dialog.isShowing()) {
+
                             dialog.dismiss();
                         }
 //                        productList = new GetProductList();
@@ -822,7 +868,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
 
                 @Override
                 public void onFailure(Call<GetProductList> call, Throwable t) {
-                    if (dialog != null && dialog.isShowing()) {
+                    if ( dialog.getOwnerActivity()!=null &&!dialog.getOwnerActivity().isFinishing() &&dialog != null && dialog.isShowing()) {
+
                         dialog.dismiss();
                     }
                     if (pbHome != null) {
@@ -863,7 +910,9 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                 if (response.isSuccessful()) {
 
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
-                        setUpSuggestedPosts(response.body());
+
+                       if (rvRecomandation!=null)
+                           setUpSuggestedPosts(response.body());
                     }
 
                 } else {
@@ -934,6 +983,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
         }
     }
 
+
+
     private void setMainProductList() {
 
         try {
@@ -1003,9 +1054,11 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                     Log.e("GetNotificationList", "onResponse: " + response.body().getStatus());
                     notificationListModel = response.body();
                     if (notificationListModel.getListReadStatus().equals("0")) {
-                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                        MainActivity.homeNotidot.setVisibility(View.GONE);
                     } else {
-                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                        if (MainActivity.homeNotidot!=null) {
+                            MainActivity.homeNotidot.setVisibility(View.VISIBLE);
+                        }
                     }
 
 
@@ -1025,6 +1078,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
             }
         });
     }
+
+
 
     @Override
     public void onStop() {

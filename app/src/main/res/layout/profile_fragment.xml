@@ -113,7 +113,25 @@
                         android:textColor="@color/light_grey"
                         />
 
+                    <TextView
+                        android:layout_marginTop="@dimen/_1sdp"
+                        android:layout_marginLeft="@dimen/_10sdp"
+                        android:layout_width="@dimen/_12sdp"
+                        android:layout_height="@dimen/_12sdp"
+                        android:background="@drawable/wallet_profile"
+                        android:gravity="center" />
 
+
+                    <TextView
+
+                        android:paddingLeft="@dimen/_5sdp"
+                        android:id="@+id/profile_availableBal_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/_12sdp"
+                        android:gravity="center"
+                        android:text="0.00"
+                        android:textColor="@color/light_grey"
+                        />
 
                 </LinearLayout>
 
@@ -141,7 +159,7 @@
                         android:id="@+id/tv_followers_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00"
+                        android:text="0"
                         android:maxLength="4"
                         android:textColor="#727272"
                         android:textSize="@dimen/_10sdp" />
@@ -160,7 +178,7 @@
                         android:id="@+id/tv_following_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="00"
+                        android:text="0"
                         android:maxLength="4"
                         android:textColor="#727272"
                         android:textSize="@dimen/_10sdp" />

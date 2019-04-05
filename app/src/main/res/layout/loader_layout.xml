@@ -15,10 +15,10 @@
     
     <ImageView
         android:id="@+id/img_loading"
-        android:layout_width="@dimen/_90sdp"
-        android:layout_height="@dimen/_90sdp"
-        android:padding="@dimen/_5sdp"
-        android:src="@drawable/sellah_icon_red"
+        android:layout_width="@dimen/_60sdp"
+        android:layout_height="@dimen/_60sdp"
+        android:padding="@dimen/_15sdp"
+        android:src="@drawable/loading_gif"
         android:layout_gravity="center"/>
 <!--    <ImageView
         android:id="@+id/img_loading1"

@@ -54,9 +54,9 @@
             android:layout_marginRight="@dimen/_12sdp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/_20sdp"
+            android:textSize="@dimen/_18sdp"
             android:textColor="@color/colorBlack"
-            android:text="Add Transaction Info"/>
+            android:text="How do you wish to transaction with your buyers?"/>
 
         <TextView
             android:layout_marginLeft="@dimen/_12sdp"
@@ -77,6 +77,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_12sdp"
@@ -86,6 +87,7 @@
 
 
             <RelativeLayout
+                android:visibility="gone"
                 android:id="@+id/rl3"
                 android:enabled="false"
                 android:clickable="false"
@@ -176,6 +178,7 @@
             </RelativeLayout>
 
             <TextView
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:textColor="@color/colorGrey"
                 android:textSize="@dimen/_12sdp"
@@ -185,6 +188,7 @@
 
 
             <RelativeLayout
+                android:visibility="gone"
                 android:id="@+id/currency_rl"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_33sdp"

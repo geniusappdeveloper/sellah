@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/_8sdp">
+
+            <TextView
+                android:id="@+id/txt_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_3sdp"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:padding="@dimen/_5sdp"
+                android:text="Sales Records"
+                android:textAllCaps="false"
+                android:textColor="@color/colorGrey"
+                android:textSize="@dimen/_13sdp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/profile_record_recycler"
+                android:layout_width="match_parent"
+                android:nestedScrollingEnabled="false"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <ImageView
+            android:layout_centerInParent="true"
+            android:id="@+id/img_no_data"
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_150sdp"
+            android:layout_gravity="center"
+            android:src="@drawable/no_data_icon"
+            android:visibility="gone" />
+    </RelativeLayout>
+</ScrollView>

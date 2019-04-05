@@ -37,6 +37,19 @@ public class Result {
     @SerializedName("product_type")
     @Expose
     private String productType;
+
+    @SerializedName("product_view_count")
+    @Expose
+    private String product_view_count ;
+
+    public String getProduct_view_count() {
+        return product_view_count;
+    }
+
+    public void setProduct_view_count(String product_view_count) {
+        this.product_view_count = product_view_count;
+    }
+
     @SerializedName("quantity")
     @Expose
     private String quantity;

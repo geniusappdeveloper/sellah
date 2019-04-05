@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
@@ -28,10 +29,8 @@ import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
 import com.app.admin.sellah.view.adapter.SalesAdapter;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -46,11 +45,13 @@ import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.stripe.StripeSession.USERCITY;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.AVAILABLE_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PENDING_BALANCE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
 
-public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextController {
+public class ProfileFragment extends Fragment implements SalesAdapter.TabTextController {
 
     @BindView(R.id.li_profile_root)
     LinearLayout liProfileRoot;
@@ -81,6 +82,8 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
     LinearLayout liFollowList;
     @BindView(R.id.tv_location)
     TextView tvLocation;
+    @BindView(R.id.profile_availableBal_txt)
+    TextView profileAvailableBalTxt;
 
     @Nullable
     @Override
@@ -112,9 +115,15 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
                     dismissDialog(dialog);
                     HelperPreferences.get(getActivity()).saveString(USER_PROFILE_PIC, response.body().getResult().getImage());
                     HelperPreferences.get(getActivity()).saveString(USER_EMAIL, response.body().getResult().getEmail());
-                    profileData = response.body();
+                    HelperPreferences.get(getActivity()).saveString(PENDING_BALANCE, response.body().getResult().getPending_bal());
+                    HelperPreferences.get(getActivity()).saveString(AVAILABLE_BALANCE, response.body().getResult().getAvailable_bal());
+                    try {
+                        profileAvailableBalTxt.setText("S$ " + response.body().getResult().getAvailable_bal());
+                        profileData = response.body();
+                        setProfileData(response.body());
+                    }catch (Exception e){
+                    }
 
-                    setProfileData(response.body());
                 } else {
                     dismissDialog(dialog);
                     Snackbar.make(liProfileRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
@@ -154,10 +163,9 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
                     tvProffesion.setText("NA");
                 }
                 RequestOptions requestOptions = Global.getGlideOptions();
-                Glide.with(getActivity())
-                        .load(body.getResult().getImage())
-                        .apply(requestOptions)
-                        .into(imgProfilePic);
+                Picasso.with(getActivity()).load(body.getResult().getImage()).fit().centerCrop().
+                        into(imgProfilePic);
+
                 tvFollowersCount.setText(profileData.getResult().getFollowers());
                 tvFollowingCount.setText(profileData.getResult().getFollowing());
             } catch (Exception e) {
@@ -170,7 +178,7 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
         adapter.addFrag(new ProfileSalesFragment(), "For Sale");
         adapter.addFrag(new WishListFragment(), "WishList");
-        adapter.addFrag(new ProfileRecordFragment(), "Statistics");
+        adapter.addFrag(new ProfileRecordFragment(), "Transactions");
         viewPager.setAdapter(adapter);
     }
 
@@ -180,7 +188,7 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
         ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).text_sell.setText("Profile");
 //        ((MainActivity) getActivity()).rlBack.setVisibility("Profile");
-        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
 //        ((MainActivity) getActivity()).profile.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
@@ -199,14 +207,12 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
         }
     }
 
-    @OnClick(R.id.img_profile_pic)
-    public void onViewClicked() {
 
-    }
 
     @OnClick(R.id.btn_edit_profile)
     public void onEditButtonClicked() {
         Bundle bundle = new Bundle();
+        bundle.putString("from","my_account");
         bundle.putParcelable(SAConstants.Keys.PROFILE_DATA, profileData);
         MyAccountFragment fragment = new MyAccountFragment();
         fragment.setArguments(bundle);
@@ -216,7 +222,7 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
     @Override
     public void tabTextController(int count) {
         try {
-           // profileTabLayout.getTabAt(0).setText("For Sale (" + count + ")");
+            // profileTabLayout.getTabAt(0).setText("For Sale (" + count + ")");
         } catch (Exception e) {
         }
     }
@@ -225,6 +231,25 @@ public class  ProfileFragment extends Fragment implements SalesAdapter.TabTextCo
     public void onFollowListClicked() {
 
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new ViewFollowListFragment(HelperPreferences.get(getActivity()).getString(UID))).addToBackStack(PROFILETAG).commit();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        new ApisHelper().cancel_striipe_request();
+    }
+
+    @OnClick(R.id.profile_availableBal_txt)
+    public void onViewClicked() {
+
+        Bundle bundle = new Bundle();
+        bundle.putString("from","wallet");
+        bundle.putParcelable(SAConstants.Keys.PROFILE_DATA, profileData);
+        MyAccountFragment fragment = new MyAccountFragment();
+        fragment.setArguments(bundle);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(PROFILETAG).commit();
+
 
     }
 }

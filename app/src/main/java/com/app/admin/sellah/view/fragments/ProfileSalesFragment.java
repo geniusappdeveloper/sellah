@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -130,6 +131,7 @@ public class ProfileSalesFragment extends Fragment {
 
     private void getSaledata() {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
+
         recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
@@ -137,6 +139,7 @@ public class ProfileSalesFragment extends Fragment {
                 if (response.isSuccessful()) {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         forSaleProducts = response.body();
+                        if (getActivity()!=null)
                         setSalesData(forSaleProducts);
 
                     }

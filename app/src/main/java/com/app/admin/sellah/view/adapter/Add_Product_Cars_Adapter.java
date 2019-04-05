@@ -55,10 +55,25 @@ public class Add_Product_Cars_Adapter  extends RecyclerView.Adapter<Add_Product_
     @Override
     public void onBindViewHolder(final Add_Product_Cars_Adapter.AddProductViewHolder holder, final int position) {
 
-        Log.e( "onBindViewHolder: ",add_list.get(position) );
+        Log.e( "onBindViewHolderAdd: ",add_list.get(position) );
 
 
         File f = new File(getRealPathFromURI(Uri.parse(add_list.get(position))));
+
+        if (add_list.size()>0)
+        {
+            Glide.with(context)
+                    .load(add_list.get(position))
+                    .apply(
+                            new RequestOptions()
+                                    .error(R.drawable.image)
+                                    .centerCrop()
+                    )
+                    .into(holder.add_car);
+        }
+        else
+        {
+
 
         Glide.with(context)
                 .load(add_list.get(position))
@@ -83,27 +98,22 @@ public class Add_Product_Cars_Adapter  extends RecyclerView.Adapter<Add_Product_
                 })
                 .transition(withCrossFade())
                 .into(holder.add_car);
-       /* Glide.with(context)
-                .load(add_list.get(position))
-                .apply(Global.getGlideOptions())
-                .into(holder.add_car);*/
-//        Picasso.with(context).load(f).fit().centerCrop().error(R.drawable.image).
-//                into(holder.add_car);
-       /* Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-        holder.add_car.setBackground(d);
 
-*/
+    }
+
 
         if(position==0){
             holder.addCardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorRed));
         }else{
             holder.addCardView.setCardBackgroundColor(context.getResources().getColor(R.color.colorWhite));
         }
-        if(add_list.size()!=8){
+
+        if(add_list.size()!=5){
             sellProductInterface.setImageCaptureVisiblty(true);
         }else{
             sellProductInterface.setImageCaptureVisiblty(false);
         }
+
         Log.e("items",""+add_list.get(position));
         holder.crossImage.setOnClickListener(new View.OnClickListener() {
             @Override

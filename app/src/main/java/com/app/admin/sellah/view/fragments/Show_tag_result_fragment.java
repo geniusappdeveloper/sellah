@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
@@ -84,20 +85,81 @@ public class Show_tag_result_fragment extends Fragment {
         unbinder = ButterKnife.bind(this, aboutUsView);
 
         Bundle bundle = this.getArguments();
-        if (bundle!=null)
-        {
-            tag_name = bundle.getString("tag");
-        }
+
+
         service = Global.WebServiceConstants.getRetrofitinstance();
         dialog = S_Dialogs.getLoadingDialog(getActivity());
-        ((MainActivity) getActivity()).text_sell.setText("Tag Result");
+        hideSearch();
         productList = new GetProductList();
         resultList = new ArrayList<>();
         productList.setResult(resultList);
         pagginationCode();
 
-        getProductlist();
+
         setMainProductList();
+
+
+        Log.e( "bundle: ",bundle.getString("root") );
+
+        if (bundle.getString("root").equals("search"))
+        {
+            new ApisHelper().getSeaarchResultApi(getActivity(), new ApisHelper.SearchResultCallback() {
+                @Override
+                public void onProductListSuccess(GetProductList body) {
+                    Log.e( "onProductListSuccess: ",body.getStatus() );
+                    if (body.getStatus().equals("1")) {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        try {
+                            productList.setStatus(body.getStatus());
+                            productList.setMessage(body.getMessage());
+                            resultList.addAll(body.getResult());
+                            productList.setResult(resultList);
+                            isFeedsFetchInProgress = false;
+                            pbHome.setVisibility(View.GONE);
+                            txtNoMoreItem.setVisibility(View.GONE);
+                            mainCategoriesAdapter.notifyItemRangeInserted(productList.getResult().size() > 0 ? productList.getResult().size() - 1 : 0, productList.getResult().size());
+                            if (productList.getResult().size() > 0) {
+                                nolivevideoText.setVisibility(View.GONE);
+                                tagRecycler.setVisibility(View.VISIBLE);
+
+                                getTotalHeightofGridRecyclerView(getActivity(), tagRecycler, R.layout.main_categories_adapter, 1);
+                            } else {
+                                nolivevideoText.setVisibility(View.VISIBLE);
+                                tagRecycler.setVisibility(View.GONE);
+                            }
+
+
+                        } catch (Exception e) {
+
+                        }
+
+
+                    } else {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+
+                        pbHome.setVisibility(View.GONE);
+                        txtNoMoreItem.setVisibility(View.GONE);
+
+                    }
+                }
+
+                @Override
+                public void onProductListFailure() {
+                    Log.e("searchResult", "onProductListFailure: ");
+                }
+            },bundle.getString("tag"));
+
+        }
+        else
+        {
+            tag_name = bundle.getString("tag");
+
+            getProductlist();
+        }
 
         return aboutUsView;
     }
@@ -273,5 +335,28 @@ public class Show_tag_result_fragment extends Fragment {
             });
         }
     }
+
+    public void hideSearch() {
+
+
+        ((MainActivity) getActivity()).rel_search.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).changeOptionColor(0);
+        ((MainActivity) getActivity()).text_sell.setText("Search Result");
+        ((MainActivity) getActivity()).findViewById(R.id.relativeLayout).setVisibility(View.VISIBLE);
+
+
+
+
+
+        /**********************************************************************************************/
+
+    }
+
 
 }

@@ -181,16 +181,15 @@ public class WishListFragment extends Fragment {
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
                 if (response.isSuccessful()) {
 
+                    try {
+
+
+
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         setUpSuggestedPosts(response.body());
                     }
+                    }catch (Exception e) { }
 
-                } else {
-                    try {
-                        Log.e("suggested_post_error", "onResponse: " + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             }
 
@@ -222,17 +221,22 @@ public class WishListFragment extends Fragment {
 
     public void showErrorMsg() {
         if (view != null) {
-            wishlistRoot.setVisibility(View.GONE);
-            llNoNetwork.setVisibility(View.GONE);
-            llNoProduct.setVisibility(View.VISIBLE);
+           if (wishlistRoot!=null)wishlistRoot.setVisibility(View.GONE);
+            if (llNoNetwork!=null) llNoNetwork.setVisibility(View.GONE);
+            if (llNoProduct!=null) llNoProduct.setVisibility(View.VISIBLE);
         }
     }
 
     public void hideErrorMsg() {
         if (view != null) {
-            wishlistRoot.setVisibility(View.VISIBLE);
-            llNoNetwork.setVisibility(View.GONE);
-            llNoProduct.setVisibility(View.GONE);
+            try {
+                wishlistRoot.setVisibility(View.VISIBLE);
+                llNoNetwork.setVisibility(View.GONE);
+                llNoProduct.setVisibility(View.GONE);
+            }catch (Exception e){
+
+            }
+
 
         }
     }

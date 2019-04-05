@@ -34,6 +34,7 @@
     <string name="forget_pass_line_3">So rest assured that we will never send your password via email.</string>
     <string name="tags">Tags</string>
     <string name="makeOffer">S$</string>
+    <string name="entername">Enter Name</string>
     <string name="report_reason">your reason</string>
     <string name="city">City</string>
     <string name="logo">Logo</string>
@@ -241,7 +242,16 @@ Sellah will expand rapidly across the Southeast Asia region delivering products 
         <item>Price</item>
     </string-array>
 
-
+    <string-array name="routing_banks">
+          <item>Select your bank</item>
+          <item>POSB/DBS</item>
+        <item>UOB</item>
+        <item>OCBC</item>
+        <item>HSBC </item>
+        <item>Standard Chartered Bank (SCB)</item>
+        <item>CitiBank</item>
+        <item>Others </item>
+    </string-array>
     <string-array name="add_product_fixed">
         <item>Select Type</item>
         <item>Fixed Price</item>

@@ -90,7 +90,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 //        holder.imageView.setImageResource(chattedListModel.get(position).getProfileImage());
        if (state==3)
        {
-           holder.order.setVisibility(View.GONE);
+
        }
 
        else
@@ -106,23 +106,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
            holder.subHeadingText.setText(chattedListModel.get(position).getMessage());
            holder.msgTime.setText(Global.formateDateTo_HHmm(Global.convertUTCToLocal(chattedListModel.get(position).getLastMsgTime())));
 
-           if (state == 0) {
-               if (position == 0) {
-                   holder.order.setVisibility(View.VISIBLE);
-               } else {
-                   holder.order.setVisibility(View.GONE);
-               }
 
-           } else {
 
-               holder.order.setVisibility(View.GONE);
-           }
-
-        /*if(chattedListModel.get(position).getIsRead().equalsIgnoreCase("Y")){
-            holder.imgNew.setVisibility(View.VISIBLE);
-        }else{
-
-        }*/
            holder.relDetails.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
@@ -227,7 +212,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     public class MessagesViewHolder extends RecyclerView.ViewHolder {
         CircleImageView imageView;
-        TextView headingText, subHeadingText, order, msgTime;
+        TextView headingText, subHeadingText, msgTime;
         ImageView imgNew;
         RelativeLayout relDetails;
 
@@ -236,7 +221,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             imageView = view.findViewById(R.id.profileimage);
             headingText = view.findViewById(R.id.personHeading);
             subHeadingText = view.findViewById(R.id.personSubHeading);
-            order = view.findViewById(R.id.textOrder);
+
             msgTime = view.findViewById(R.id.txt_time);
             imgNew = view.findViewById(R.id.img_new_entry);
             relDetails = view.findViewById(R.id.rel_details);

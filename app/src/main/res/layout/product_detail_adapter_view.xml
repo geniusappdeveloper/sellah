@@ -6,6 +6,7 @@
     >
 
     <ImageView
+        android:alpha="0.9"
         android:id="@+id/image12"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"

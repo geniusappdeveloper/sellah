@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +25,12 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.commonResults.Common;
+import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
+import com.app.admin.sellah.view.activities.AddNewVideos;
 import com.app.admin.sellah.view.activities.MainActivityLiveStream;
 import com.app.admin.sellah.view.fragments.SellFragment;
 import com.bumptech.glide.Glide;
@@ -40,6 +43,8 @@ import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.fragments.ProductFrgament;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -95,14 +100,27 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
                 .load(imageUrl)
                 .apply(requestOptions)
                 .into(holder.imageView);
+        Log.e( "onBindViewHolder: ","s"+saleList.getResult().get(position).getQuantity() );
+        if (saleList.getResult().get(position).getQuantity().isEmpty()||Integer.parseInt(saleList.getResult().get(position).getQuantity())<=0)
+        {
 
-        if(!TextUtils.isEmpty(saleList.getResult().get(position).getPromoteProduct())&&saleList.getResult().get(position).getPromoteProduct().equalsIgnoreCase("S")/*&&saleList.getResult().get(position).getPromotes()!=null&&saleList.getResult().get(position).getPromotes().size()>0*/){
-            holder.
-
-                    imgFeatured.setVisibility(View.VISIBLE);
-        }else{
+            holder.outofstock.setVisibility(View.VISIBLE);
             holder.imgFeatured.setVisibility(View.GONE);
         }
+        else
+        {
+            if(!TextUtils.isEmpty(saleList.getResult().get(position).getPromoteProduct())&&saleList.getResult().get(position).getPromoteProduct().equalsIgnoreCase("S")/*&&saleList.getResult().get(position).getPromotes()!=null&&saleList.getResult().get(position).getPromotes().size()>0*/){
+                holder.
+
+                        imgFeatured.setVisibility(View.VISIBLE);
+                holder.outofstock.setVisibility(View.GONE);
+            }else{
+                holder.imgFeatured.setVisibility(View.GONE);
+                holder.outofstock.setVisibility(View.GONE);
+            }
+        }
+
+
 
         holder.salesText.setText(saleList.getResult().get(position).getName());
         holder.costText.setText(saleList.getResult().get(position).getPrice());
@@ -110,7 +128,16 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
             @Override
             public void onClick(View view) {
                 if (isOwner) {
-                    getOwnerMenu(holder.btnOption, position);
+
+                    if (saleList.getResult().get(position).getQuantity().isEmpty()||Integer.parseInt(saleList.getResult().get(position).getQuantity())<=0)
+                    {
+                        Toast.makeText(context, "Product is out of stock", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        getOwnerMenu(holder.btnOption, position);
+                    }
+
                 } else {
                     getUserMenu(holder.btnOption, position);
                 }
@@ -174,7 +201,7 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
 
                         if (HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("N"))
                         {
-                            S_Dialogs.getLiveVideoStopedDialog(context, "You are not currently connected with stripe Press ok to connect", ((dialog, which) -> {
+                            S_Dialogs.getLiveVideoStopedDialog(context, "You are not currently connected with stripe. Press ok to connect.", ((dialog, which) -> {
                                 //--------------openHere-----------------
 
                                 Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
@@ -212,11 +239,29 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
                         break;
 
                         case R.id.menu_edit_item:
-                            Bundle bundle = new Bundle();
+                            /*Bundle bundle = new Bundle();
                             bundle.putParcelable(PRODUCT_DETAIL, saleList.getResult().get(position));
                             SellFragment fragment = new SellFragment();
                             fragment.setArguments(bundle);
-                            loadFragment(fragment, ADDPRODUCTTAG, bundle);
+                            loadFragment(fragment, ADDPRODUCTTAG, bundle);*/
+
+
+
+                            ArrayList<Result> list = new ArrayList<>();
+                            list.addAll(saleList.getResult());
+
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelableArrayList("modelProductList",list);
+
+
+
+                            Intent intent= new Intent(context,AddNewVideos.class);
+                            intent.putExtra("way_status","SalesAdapter");
+                            intent.putExtra("position",String.valueOf(position));
+                         //   intent.putParcelableArrayListExtra("modelProductList",list);
+                            intent.putExtras(bundle);
+                            context.startActivity(intent);
+
                         break;
                     case R.id.menu_delete_item:
                         onDeleteItemCallback.onDeleteIteClick(saleList.getResult().get(position).getId(), position);
@@ -284,7 +329,7 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         AppCompatImageView imageView;
-        TextView salesText, costText;
+        TextView salesText, costText,outofstock;
         ImageView btnOption,imgFeatured;
 
         public ViewHolder(View v) {
@@ -292,6 +337,7 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
             imageView = v.findViewById(R.id.third_image);
             btnOption = v.findViewById(R.id.btn_option);
             salesText = (TextView) v.findViewById(R.id.txt_product_name);
+            outofstock = (TextView) v.findViewById(R.id.txt_out_ofstock);
             costText = (TextView) v.findViewById(R.id.txt_product_cost);
             imgFeatured =  v.findViewById(R.id.img_featured);
         }

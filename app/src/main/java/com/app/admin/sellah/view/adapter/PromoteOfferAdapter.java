@@ -53,6 +53,8 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
         if (packagesList.get(position).getAmount().equalsIgnoreCase("10"))
         {
             nottoselect_pos = holder.getAdapterPosition();
+
+            callBack.onOfferSelect(packagesList.get(holder.getAdapterPosition()).getId());
             holder.main_cd.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
             holder.txtOffer.setTextColor(context.getResources().getColor(R.color.colorWhite));
             holder.txtDuration.setTextColor(context.getResources().getColor(R.color.colorWhite));

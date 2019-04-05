@@ -366,13 +366,14 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
                 }
 
                 if (videoLists.size() == 0) {
-                    llNoProduct.setVisibility(View.VISIBLE);
-                    rvOtherVideos.setVisibility(View.GONE);
-                    llNoNetwork.setVisibility(View.GONE);
+                    if (llNoProduct!=null)  llNoProduct.setVisibility(View.VISIBLE);
+                    if (rvOtherVideos!=null)    rvOtherVideos.setVisibility(View.GONE);
+                    if (llNoNetwork!=null) llNoNetwork.setVisibility(View.GONE);
                 } else {
-                    llNoNetwork.setVisibility(View.GONE);
-                    llNoProduct.setVisibility(View.GONE);
-                    rvOtherVideos.setVisibility(View.VISIBLE);
+                    if (llNoNetwork!=null) llNoNetwork.setVisibility(View.GONE);
+                    if (llNoProduct!=null) llNoProduct.setVisibility(View.GONE);
+                    if (rvOtherVideos!=null) rvOtherVideos.setVisibility(View.VISIBLE);
+
                 }
 
 
@@ -465,7 +466,7 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
         ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
         ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).text_sell.setText("Live Videos");
-        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
         ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
         ((MainActivity) getActivity()).changeOptionColor(1);
@@ -508,4 +509,6 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
     public void onFilterResponse(GetProductList productList) {
 
     }
+
+
 }

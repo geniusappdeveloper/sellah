@@ -1,0 +1,1000 @@
+package com.app.admin.sellah.view.fragments;
+
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Rect;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.controller.utils.ExpandableListData;
+import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.SAConstants;
+import com.app.admin.sellah.model.extra.BannerModel.BannerModel;
+import com.app.admin.sellah.model.extra.LiveVideoModel.LiveVideoModel;
+import com.app.admin.sellah.model.extra.Notification.NotificationModel;
+import com.app.admin.sellah.model.extra.NotificationList.NotificationListModel;
+import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
+import com.app.admin.sellah.model.extra.getProductsModel.Result;
+import com.app.admin.sellah.view.CustomDialogs.AllCategoryDialog;
+import com.app.admin.sellah.view.CustomDialogs.Notification_dialog;
+import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomViews.TouchDetectableScrollView;
+import com.app.admin.sellah.view.activities.MainActivity;
+import com.app.admin.sellah.view.adapter.HomeCategoryAdapter;
+import com.app.admin.sellah.view.adapter.HomeProductAdapter;
+import com.app.admin.sellah.view.adapter.LiveVideoPaggerAdapter;
+import com.app.admin.sellah.view.adapter.SuggestedPostAdapterHome;
+import com.app.admin.sellah.view.adapter.ViewPagerAdapter;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.app.admin.sellah.controller.utils.Global.getTotalHeightofGridRecyclerView;
+import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_ACCEPT_REJECT;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_CHAT;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_COMMENT_ADDED;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_DATA;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_FOLLOW;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_OFFER_MAKE;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PAYMENT;
+import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PRODUCT_ADDED;
+
+public class HomeFragment extends Fragment {
+
+
+    @BindView(R.id.viewPager)
+    ViewPager viewPager;
+    @BindView(R.id.SliderDots)
+    LinearLayout SliderDots;
+    @BindView(R.id.rel_adds)
+    RelativeLayout relAdds;
+    @BindView(R.id.txt_live)
+    TextView txtLive;
+    @BindView(R.id.vp_live)
+    ViewPager vpLive;
+    @BindView(R.id.vp_live_dots)
+    LinearLayout vpLiveDots;
+    @BindView(R.id.txt_category)
+    TextView txtCategory;
+    @BindView(R.id.see_more)
+    TextView seeMore;
+    @BindView(R.id.rv_categories)
+    RecyclerView rvCategories;
+    @BindView(R.id.recycler_sub_categories)
+    RecyclerView recyclerSubCategories;
+    @BindView(R.id.txt_recomandation)
+    TextView txtRecomandation;
+    @BindView(R.id.rv_recomandation)
+    RecyclerView rvRecomandation;
+    @BindView(R.id.txt_more_products)
+    TextView txtMoreProducts;
+    @BindView(R.id.rv_products)
+    RecyclerView rvProducts;
+    @BindView(R.id.pb_home)
+    ProgressBar pbHome;
+    @BindView(R.id.txt_no_more_item)
+    TextView txtNoMoreItem;
+    @BindView(R.id.img_data_error)
+    ImageView imgDataError;
+    @BindView(R.id.sv_root)
+    TouchDetectableScrollView svRoot;
+    @BindView(R.id.swipe_container)
+    SwipeRefreshLayout swipeContainer;
+    @BindView(R.id.txt_search_sella)
+    TextView txtSearchSella;
+    Unbinder unbinder1;
+    @BindView(R.id.nolivevideo_text)
+    TextView nolivevideoText;
+    private View view;
+    Unbinder unbinder;
+    View rootTag;
+    HomeCategoryAdapter categoriesAdapter;
+    //Recyclerlist3
+    HomeProductAdapter mainCategoriesAdapter;
+    WebService service;
+    GetProductList productList;
+    GetProductList productListFiltered;
+    private int numberOfColumns;
+    private Dialog dialog;
+    private TextWatcher searchWacher;
+    View.OnKeyListener onKeyListener;
+    TextView.OnEditorActionListener editorActionListener;
+    private ArrayList<String> searchSuggestions;
+    private ArrayAdapter<String> searchSuggessionAdapter;
+    private boolean inAnimation;
+    private String TAG = HomeFragment.class.getSimpleName();
+
+    private static final int PAGE_START = 1;
+    // Indicates if footer ProgressBar is shown (i.e. next page is loading)
+    private boolean isLoading = false;
+    // If current page is the last page (Pagination will stop after this page load)
+    private boolean isLastPage = false;
+    // total no. of pages to load. Initial load is page 0, after which 2 more pages will load.
+    private int TOTAL_PAGES = 0;
+    // indicates the current page which Pagination is fetching.
+    private int currentPage = PAGE_START;
+    private int previousPage = 0;
+    private boolean isFeedsFetchInProgress = false;
+    private ArrayList<Result> resultList;
+    private boolean isSearching;
+    private int dotscount;
+    private ImageView[] dots;
+    private Timer timer;
+    int timerDelay = 5000;
+    private ImageView[] dotsLive;
+    private long timeVisibleDelay = 300;
+    NotificationListModel notificationListModel;
+    Call<GetProductList> addCommentCall;
+    Call<GetProductList> getProductsCall;
+    public HomeFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
+        dialog = S_Dialogs.getLoadingDialog(getActivity());
+        dialog.show();
+        service = Global.WebServiceConstants.getRetrofitinstance();
+        hideSearch();
+        if (view == null) {
+            view = inflater.inflate(R.layout.fragment_home_fragment_new, container, false);
+            unbinder = ButterKnife.bind(this, view);
+
+            new ApisHelper().getBanner(HelperPreferences.get(getActivity()).getString(UID), new ApisHelper.OnGetDataListners() {
+                @Override
+                public void onGetDataSuccess(BannerModel body) {
+                    setupBannerAdds(body.getRecord());
+
+                }
+
+                @Override
+                public void onGetDataFailure() {
+//                    BannerModel model=new BannerModel();
+                    List<String> images = new ArrayList<>();
+//                    images.add("NA");
+                    setupBannerAdds(images);
+                }
+            });
+            getVideoListOther();
+        } else {
+            unbinder = ButterKnife.bind(this, view);
+        }
+
+
+        rootTag = ((MainActivity) getActivity()).relRoot;
+        productList = new GetProductList();
+        resultList = new ArrayList<>();
+        productList.setResult(resultList);
+        searchSuggestions = new ArrayList<>();
+
+        // Notification data=========================
+
+        getNotificationList();
+        ((MainActivity) getActivity()).notificationRelativelayout.findViewById(R.id.notification_relativelayout).setOnClickListener(view1 -> {
+
+            if (isLogined(getActivity())) {
+
+
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(SAConstants.Keys.NOTI_KEY, notificationListModel);
+                Notification_dialog dialog = new Notification_dialog();
+                dialog.setArguments(bundle);
+                dialog.show(getActivity().getFragmentManager(), "");
+            } else {
+                S_Dialogs.getLoginDialog(getActivity()).show();
+            }
+
+
+        });
+
+
+        //list1
+        categoriesAdapter = new HomeCategoryAdapter(getActivity(), ExpandableListData.getData());
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, LinearLayoutManager.HORIZONTAL);
+        rvCategories.setLayoutManager(staggeredGridLayoutManager);
+        rvCategories.setAdapter(categoriesAdapter);
+        numberOfColumns = 2;
+
+        searchProduct();
+        setUpSwipeView();
+        pagginationCode();
+        setMainProductList();
+        getProductlist();
+        getSuggestedPostList();
+
+        String first = " Sellah";
+        String next = "<font color='#EE0000'>Search</font>";
+        txtSearchSella.setText(Html.fromHtml(next + first));
+
+        unbinder1 = ButterKnife.bind(this, view);
+        return view;
+    }
+
+
+    private int[] getVieePostion(View view) {
+        int[] location = {0, 0};
+        view.getLocationOnScreen(location);
+        return location;
+    }
+
+    private void hideSearchBar() {
+
+        ((MainActivity) getActivity()).rel_search.animate()
+                .translationY(-((MainActivity) getActivity()).rel_search.getHeight())
+                .alpha(0.0f)
+                .setDuration(timeVisibleDelay);
+    }
+
+    private void showSearchBar() {
+        ((MainActivity) getActivity()).rel_search.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rel_search.animate()
+                .translationY(0)
+                .alpha(1f)
+                .setDuration(timeVisibleDelay);
+    }
+
+    private void pagginationCode() {
+
+        Rect scrollBounds = new Rect();
+        svRoot.getHitRect(scrollBounds);
+   /*     if (txtSearchSella.getLocalVisibleRect(scrollBounds)) {
+//                    Log.e(TAG, "View Visible" );
+            Log.e(TAG, "onScrollUp: View Visible" );
+            hideSearchBar();
+            // Any portion of the imageView, even a single pixel, is within the visible window
+        } else {
+            showSearchBar();
+            Log.e(TAG, "onScrollUp: not View Visible");
+//                    Log.e(TAG, "onScrollDup not View Visible" );
+            // NONE of the imageView is within the visible window
+        }*/
+        svRoot.setMyScrollChangeListener(new TouchDetectableScrollView.OnMyScrollChangeListener() {
+            @Override
+            public void onScroll() {
+                if (txtSearchSella.getLocalVisibleRect(scrollBounds)) {
+//                    Log.e(TAG, "View Visible" );
+                    Log.e(TAG, "onScrollUp: View Visible");
+                    hideSearchBar();
+                    // Any portion of the imageView, even a single pixel, is within the visible window
+                } else {
+                    showSearchBar();
+                    Log.e(TAG, "onScrollUp: not View Visible");
+//                    Log.e(TAG, "onScrollDup not View Visible" );
+                    // NONE of the imageView is within the visible window
+                }
+            }
+
+            @Override
+            public void onScrollUp() {
+//                Log.e(TAG, "onScrollUp: ");
+                pbHome.setVisibility(View.GONE);
+
+                /*if (svRoot.getScaleY()==getVieePostion(txtSearchSella)[1]) {
+                    Log.e(TAG, "onScrollDown: top Reached" );
+                }*/
+            }
+
+            @Override
+            public void onScrollDown() {
+                pbHome.setVisibility(View.VISIBLE);
+//                Log.e(TAG, "onScrollDown: ");
+               /* if (txtSearchSella.getLocalVisibleRect(scrollBounds)) {
+//                    Log.e(TAG, "View Visible" );
+                    Log.e(TAG, "onScrollDown: View Visible" );
+                    // Any portion of the imageView, even a single pixel, is within the visible window
+                } else {
+                    Log.e(TAG, "onScrollDown: not View Visible");
+//                    Log.e(TAG, "onScrollDup not View Visible" );
+                    // NONE of the imageView is within the visible window
+                }*/
+                /*if (svRoot.getScaleY()!=getVieePostion(txtSearchSella)[1]) {
+                    Log.e(TAG, "onScrollDown: top gone" );
+                }*/
+            }
+
+            @Override
+            public void onBottomReached() {
+                Log.e(TAG, "onBottomReached: ");
+                if (isFeedsFetchInProgress) {
+                    pbHome.setVisibility(View.VISIBLE);
+                    return;
+                }
+                if (TOTAL_PAGES > 1) {
+
+                    //End of list
+                    previousPage = currentPage;
+                    currentPage++;
+                    isFeedsFetchInProgress = true;
+                    pbHome.setVisibility(View.VISIBLE);
+//                        loader = LOADER.BOTTOM;
+                    if ((currentPage) <= TOTAL_PAGES) {
+                        getProductlist();
+                        Log.e(TAG, "onBottomReached: LoadNextPage");
+                    } else {
+                        isFeedsFetchInProgress = false;
+                        pbHome.setVisibility(View.GONE);
+                        txtNoMoreItem.setVisibility(View.VISIBLE);
+                    }
+//                    }
+                } else {
+                    isFeedsFetchInProgress = false;
+                    pbHome.setVisibility(View.GONE);
+                    txtNoMoreItem.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void setUpSwipeView() {
+
+//        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipe_view);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeContainer.setRefreshing(true);
+                swipeContainer.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Reload current fragment
+                        Fragment frg = null;
+                        frg = new HomeFragment();
+//                        frg = getActivity().getSupportFragmentManager().findFragmentByTag("Your_Fragment_TAG");
+                        final FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        ft.detach(frg);
+                        ft.attach(frg);
+                        ft.commit();
+                        swipeContainer.setRefreshing(false);
+                    }
+                }, 100);
+            }
+        });
+        swipeContainer.setColorSchemeColors(getActivity().getResources().getColor(R.color.colorRed));
+//        swipeContainer.setDistanceToTriggerSync(20);// in dips
+        swipeContainer.setSize(SwipeRefreshLayout.DEFAULT);// LARGE also can be used
+    }
+
+    private void searchProduct() {
+
+        searchSuggessionAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.layout_autocomplete_text_design, R.id.text1, searchSuggestions);
+        ((MainActivity) getActivity()).searchEditText.setAdapter(searchSuggessionAdapter);
+        isSearching = false;
+        searchWacher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
+                ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+//                 filterProducts(s.toString());
+                Log.e(TAG, "afterTextChanged: ");
+                if (s.length() < 1) {
+                    dialog.show();
+                    isSearching = false;
+                    Log.e(TAG, "resetData: ");
+                    Global.hideKeyboard(((MainActivity) getActivity()).searchEditText, getActivity());
+                    currentPage = 1;
+                    resultList.clear();
+                    productList.setResult(resultList);
+                    mainCategoriesAdapter.notifyDataSetChanged();
+                    getProductlist();
+                    ((MainActivity) getActivity()).rlMenu.setVisibility(View.VISIBLE);
+                    ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
+                } else {
+                    if (!isSearching) {
+                        isSearching = true;
+                        ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
+                        ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        };
+        ((MainActivity) getActivity()).searchEditText.addTextChangedListener(searchWacher);
+        ((MainActivity) getActivity()).searchEditText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String autoCompleteText = (String) adapterView.getItemAtPosition(i);
+                ((MainActivity) getActivity()).searchEditText.setText(autoCompleteText);
+                Global.hideKeyboard(((MainActivity) getActivity()).searchEditText, getActivity());
+
+                new ApisHelper().getSeaarchResultApi(getActivity(), new ApisHelper.SearchResultCallback() {
+                    @Override
+                    public void onProductListSuccess(GetProductList body) {
+                        Log.e("searchResult", "onProductListSuccess: ");
+                        productList.setStatus(body.getStatus());
+                        productList.setMessage(body.getMessage());
+                        productList.setResult(body.getResult());
+                        mainCategoriesAdapter.notifyDataSetChanged();
+//                        setMainProductList(body);
+                    }
+
+                    @Override
+                    public void onProductListFailure() {
+                        Log.e("searchResult", "onProductListFailure: ");
+                    }
+                }, Global.getText(((MainActivity) getActivity()).searchEditText));
+            }
+        });
+        editorActionListener = new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    new ApisHelper().getSeaarchResultApi(getActivity(), new ApisHelper.SearchResultCallback() {
+                        @Override
+                        public void onProductListSuccess(GetProductList body) {
+                            Log.e("searchResult", "onProductListSuccess: ");
+                            productList.setStatus(body.getStatus());
+                            productList.setMessage(body.getMessage());
+                            productList.setResult(body.getResult());
+                            mainCategoriesAdapter.notifyDataSetChanged();
+//                            setMainProductList(body);
+                        }
+
+                        @Override
+                        public void onProductListFailure() {
+                            Log.e("searchResult", "onProductListFailure: ");
+                        }
+                    }, Global.getText(((MainActivity) getActivity()).searchEditText));
+
+//                    yourcalc();
+
+                    return true;
+                }
+                return false;
+            }
+        };
+
+
+        ((MainActivity) getActivity()).searchEditText.setOnEditorActionListener(editorActionListener);
+
+//        ((MainActivity) getActivity()).searchEditText.setOnKeyListener(onKeyListener);
+
+    }
+
+    /* @Override
+     public void onDestroyView() {
+         super.onDestroyView();
+         unbinder.unbind();
+     }*/
+    public void getVideoListOther() {
+
+        new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage), "", new ApisHelper.GetLiveVideoCallback() {
+            @Override
+            public void onGetLiveVideoSuccess(LiveVideoModel body) {
+                if (body.getList().isEmpty())
+                { nolivevideoText.setVisibility(View.VISIBLE);}
+                else
+                {
+                    nolivevideoText.setVisibility(View.GONE);
+                    setLiveVideos(body);
+                }
+
+            }
+
+            @Override
+            public void onGetLiveVideoFailure() {
+
+
+            }
+        });
+    }
+
+    private void setLiveVideos(LiveVideoModel body) {
+        LiveVideoPaggerAdapter viewPagerAdapter = new LiveVideoPaggerAdapter(getActivity(), body.getList());
+        vpLive.setAdapter(viewPagerAdapter);
+        if (body.getList().size() > 3) {
+            dotscount = 3/*viewPagerAdapter.getCount()*/;
+        } else {
+            dotscount = viewPagerAdapter.getCount();
+        }
+//        dotscount = 4/*viewPagerAdapter.getCount()*/;
+        dotsLive = new ImageView[dotscount];
+        //automatic slide
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                vpLive.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        if (vpLive.getCurrentItem() == dotscount - 1) {
+                            vpLive.setCurrentItem(0);
+//                            Log.e("pagger","pos"+vPBannerAdd.getCurrentItem());
+                        } else {
+                            vpLive.setCurrentItem((vpLive.getCurrentItem() + 1));
+//                            Log.e("pagger_else","pos"+vPBannerAdd.getCurrentItem());
+                        }
+                    }
+                });
+            }
+        };
+        timer = new Timer();
+        timer.schedule(timerTask, timerDelay, timerDelay);
+
+
+        for (int i = 0; i < dotscount; i++) {
+            dotsLive[i] = new ImageView(getActivity());
+            dotsLive[i].setImageResource(R.drawable.dot_icon);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(15,
+                    15);
+            params.setMargins(5, 0, 8, 0);
+            vpLiveDots.addView(dotsLive[i], params);
+        }
+//      dots[0].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
+        vpLive.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                try {
+                    for (int i = 0; i < dotscount; i++) {
+                        dotsLive[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon));
+                    }
+                    dotsLive[position].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
+
+                } catch (Exception e) {
+
+                }
+
+            }
+
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private void setupBannerAdds(List<String> bannerAddList) {
+
+        if (bannerAddList != null && bannerAddList.size() > 0) {
+//           .setVisibility(View.VISIBLE);
+            ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity(), bannerAddList);
+            viewPager.setAdapter(viewPagerAdapter);
+            dotscount = viewPagerAdapter.getCount();
+            dots = new ImageView[dotscount];
+            //automatic slide
+           /* TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    viewPager.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            if (viewPager.getCurrentItem() == viewPager.getChildCount()) {
+                                viewPager.setCurrentItem(0);
+//                            Log.e("pagger","pos"+vPBannerAdd.getCurrentItem());
+                            } else {
+                                viewPager.setCurrentItem((viewPager.getCurrentItem() + 1));
+//                            Log.e("pagger_else","pos"+vPBannerAdd.getCurrentItem());
+                            }
+                        }
+                    });
+                }
+            };
+            timer = new Timer();
+            timer.schedule(timerTask, timerDelay, timerDelay);*/
+
+
+            for (int i = 0; i < dotscount; i++) {
+                dots[i] = new ImageView(getActivity());
+                dots[i].setImageResource(R.drawable.dot_icon);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(15,
+                        15);
+                params.setMargins(5, 0, 8, 0);
+                SliderDots.addView(dots[i], params);
+            }
+//      dots[0].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    try {
+                        for (int i = 0; i < dotscount; i++) {
+                            dots[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon));
+                        }
+                        dots[position].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
+
+                    } catch (Exception e) {
+
+                    }
+
+                }
+
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+        } else {
+//           cvAdds.setVisibility(View.GONE);
+        }
+
+
+    }
+
+    @OnClick(R.id.see_more)
+    public void onViewClicked() {
+        Log.e("Click", "Seemore");
+        AllCategoryDialog.create(getActivity()).show();
+        /*loadFragment(new SeeMoreFragment(), HOMETAG);*/
+    }
+
+    public boolean loadFragment(Fragment seeMoreFragment, String backStackTag) {
+        if (seeMoreFragment != null) {
+            Global.hideKeyboard(rootTag, getActivity());
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, seeMoreFragment).addToBackStack(null).commit();
+//                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, seeMoreFragment).commit();
+            return true;
+        }
+        return false;
+
+    }
+
+    public void hideSearch() {
+
+        hideSearchBar();
+//        new MainActivity().hideToolbar(false);
+        ((MainActivity) getActivity()).rel_search.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlMenu.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).notificationRelativelayout.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).text_sell.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).view.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).searchEditText.setHint("Search Sellah...");
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).changeOptionColor(0);
+//        ((MainActivity) getActivity()).backArrow.setVisibility(View.GONE);
+
+
+    }
+
+    public void getProductlist() {
+        if (!Global.NetworStatus.isOnline(getActivity()) || Global.NetworStatus.isInternetAvailable()) {
+            S_Dialogs.getNetworkErrorDialog(getActivity()).show();
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        } else {
+            Log.e(TAG, "getProductlist: " + currentPage);
+             getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), "", "", String.valueOf(currentPage));
+            getProductsCall.enqueue(new Callback<GetProductList>() {
+                @Override
+                public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
+                    if (response.isSuccessful()) {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        TOTAL_PAGES = Integer.parseInt(response.body().getTotalPages());
+                        try {
+                            productList.setStatus(response.body().getStatus());
+                            productList.setMessage(response.body().getMessage());
+                            resultList.addAll(response.body().getResult());
+                            productList.setResult(resultList);
+                            isFeedsFetchInProgress = false;
+                            pbHome.setVisibility(View.GONE);
+                            txtNoMoreItem.setVisibility(View.GONE);
+                            mainCategoriesAdapter.notifyItemRangeInserted(productList.getResult().size() > 0 ? productList.getResult().size() - 1 : 0, productList.getResult().size());
+                            if (productList.getResult().size() > 0) {
+                                getTotalHeightofGridRecyclerView(getActivity(), rvProducts, R.layout.main_categories_adapter, 1);
+                            }
+                            setSearchData();
+                        } catch (Exception e) {
+
+                        }
+//                        mainCategoriesAdapter.notifyDataSetChanged();
+//                        setMainProductList(productList);
+                        Log.e("Getproducts", "Success" + response.body().toString());
+                    } else {
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+//                        productList = new GetProductList();
+//                    setMainProductList(productList);
+                        pbHome.setVisibility(View.GONE);
+                        txtNoMoreItem.setVisibility(View.GONE);
+//                        txtErrorItem.setVisibility(View.VISIBLE);
+                        try {
+                            Log.e("Getproducts", "failure" + response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    /*Snackbar.make(rootTag, "Something went's wrong", Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();*/
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<GetProductList> call, Throwable t) {
+                    if (dialog != null && dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
+                    if (pbHome!=null)
+                    {pbHome.setVisibility(View.GONE);
+                        txtNoMoreItem.setVisibility(View.GONE);}
+
+//                    txtErrorItem.setVisibility(View.VISIBLE);
+               /* Snackbar.make(rootTag, "Something went's wrong", Snackbar.LENGTH_SHORT)df
+                        .setAction("", null).show();*/
+                }
+            });
+        }
+    }
+
+    private void setUpSuggestedPosts(GetProductList list) {
+
+        /*List<Result> resultList = list.getResult();
+        for (int i = 0; i < resultList.size(); i++) {
+            Result row = resultList.get(i);
+            if (row.getId().equals(productDetial.getId())) {
+                list.getResult().remove(list.getResult().indexOf(row));
+            }
+        }*/
+        SuggestedPostAdapterHome suggestedPostAdapter = new SuggestedPostAdapterHome(getActivity(), list);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        //    LinearLayoutManager addLayoutManager = new LinearLayoutManager(getApplicationContext());
+        rvRecomandation.setLayoutManager(layoutManager);
+        rvRecomandation.setAdapter(suggestedPostAdapter);
+    }
+
+    private void getSuggestedPostList() {
+        addCommentCall = service.suggestedProductsApi("");
+        addCommentCall.enqueue(new Callback<GetProductList>() {
+            @Override
+            public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
+                if (response.isSuccessful()) {
+
+                    if (response.body().getStatus().equalsIgnoreCase("1")) {
+                        setUpSuggestedPosts(response.body());
+                    }
+
+                } else {
+                    try {
+                        Log.e("comment_error", "onResponse: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetProductList> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if (timer != null) {
+            timer.cancel();
+        }
+        ((MainActivity) getActivity()).rel_search.animate()
+                .translationY(0)
+                .alpha(1f)
+                .setDuration(0);
+        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).notificationRelativelayout.setVisibility(View.GONE);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+//        ((MainActivity) getActivity()).searchEditText.onEdi;
+        searchSuggessionAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.layout_autocomplete_text_design, R.id.text1, new ArrayList<>());
+        ((MainActivity) getActivity()).searchEditText.setAdapter(searchSuggessionAdapter);
+        ((MainActivity) getActivity()).searchEditText.removeTextChangedListener(searchWacher);
+        ((MainActivity) getActivity()).searchEditText.setText("");
+        ((MainActivity) getActivity()).rlMenu.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlResetSearch.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).searchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    Global.hideKeyboard(swipeContainer, getActivity());
+//                    ((MainActivity) getActivity()).searchEditText.setText("");
+                } else {
+//                    ((MainActivity) getActivity()).searchEditText.setText("");
+                    Global.hideKeyboard(swipeContainer, getActivity());
+                }
+
+                return false;
+            }
+        });
+
+        ((MainActivity) getActivity()).searchEditText.setText("");
+        searchSuggestions = new ArrayList<>();
+        searchSuggessionAdapter.notifyDataSetChanged();
+        unbinder.unbind();
+    }
+
+    private void setSearchData() {
+        try {
+            for (int i = 0; i < productList.getResult().size(); i++) {
+                searchSuggestions.add(productList.getResult().get(i).getName());
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void setMainProductList() {
+
+        try {
+            setSearchData();
+            searchSuggessionAdapter.notifyDataSetChanged();
+            rvProducts.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
+            mainCategoriesAdapter = new HomeProductAdapter(getActivity(), productList);
+            rvProducts.setAdapter(mainCategoriesAdapter);
+            imgDataError.setVisibility(View.GONE);
+            if (productList.getResult().size() > 0) {
+                getTotalHeightofGridRecyclerView(getActivity(), rvProducts, R.layout.main_categories_adapter, 0);
+            }
+        } catch (Exception e) {
+
+        }
+
+
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            try {
+                NotificationModel message = intent.getParcelableExtra(NT_DATA);
+                if (message != null) {
+                    Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+
+                    switch (message.getNotiType()) {
+                        case NT_ACCEPT_REJECT:
+                            break;
+                        case NT_FOLLOW:
+                            break;
+                        case NT_COMMENT_ADDED:
+                            break;
+                        case NT_PRODUCT_ADDED:
+                            if (f instanceof HomeFragment)
+                                getProductlist();
+                            break;
+                        case NT_CHAT:
+                            break;
+                        case NT_PAYMENT:
+                            break;
+                        case NT_OFFER_MAKE:
+                            break;
+                        default:
+
+                            break;
+                    }
+                }
+                Log.e("receiver", "Got message: Home" + message.getMessage());
+            } catch (Exception e) {
+                Log.e("receiver_failure", "onReceive: " + e.getMessage());
+            }
+        }
+    };
+
+
+    private void getNotificationList() {
+
+        Call<NotificationListModel> notificationListCall = service.getNotificationList(HelperPreferences.get(getActivity()).getString(UID));
+        notificationListCall.enqueue(new Callback<NotificationListModel>() {
+            @Override
+            public void onResponse(Call<NotificationListModel> call, Response<NotificationListModel> response) {
+
+                if (response.isSuccessful()) {
+                    Log.e("GetNotificationList", "onResponse: " + response.body().getStatus());
+                    notificationListModel = response.body();
+                    if (notificationListModel.getListReadStatus().equals("0")) {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.GONE);
+                    } else {
+                        ((MainActivity) getActivity()).findViewById(R.id.home_notidot).setVisibility(View.VISIBLE);
+                    }
+
+
+                } else {
+                    try {
+                        Log.e("GetNotificationList", "onResponse: errorBody" + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NotificationListModel> call, Throwable t) {
+
+                Log.e("GetNotificationList", "onFailure: " + t.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        if (addCommentCall!=null)
+        {
+            addCommentCall.cancel();
+        }
+
+        if (getProductsCall!=null)
+        {getProductsCall.cancel();}
+        new ApisHelper().cancel_banner_request();
+
+    }
+
+
+
+
+}

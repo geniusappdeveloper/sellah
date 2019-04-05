@@ -139,7 +139,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     boolean isOffer = true;
     boolean isOnBottom = true;
     @BindView(R.id.btn_menu)
-    ImageButton btnMenu;
+  public ImageButton btnMenu;
     @BindView(R.id.btn_back)
     ImageView btnBack;
     @BindView(R.id.rl_back)
@@ -181,7 +181,8 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     public ChatActivity() {
 
     }
-
+    PopupMenu popup;
+   public MenuItem item,item1,item3;
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -199,6 +200,16 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         chatedListRecord = new ArrayList<>();
         setUpchatHeaderList();
         getChatListApi();
+
+         popup = new PopupMenu(ChatActivity.this, btnMenu);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_report, popup.getMenu());
+         item = popup.getMenu().findItem(R.id.menu_report);
+         item1 = popup.getMenu().findItem(R.id.menu_block_user);
+         item3 = popup.getMenu().findItem(R.id.menu_dispute);
+        item3.setVisible(false);
+        item.setTitle("Report "+otherUserName);
+        item1.setTitle("Block "+otherUserName);
 
         DetectSwipeGestureListener gestureListener = new DetectSwipeGestureListener();
 
@@ -309,13 +320,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
     @OnClick(R.id.btn_menu)
     public void onViewClicked() {
 
-        PopupMenu popup = new PopupMenu(ChatActivity.this, btnMenu);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.menu_report, popup.getMenu());
-         MenuItem item = popup.getMenu().findItem(R.id.menu_report);
-         MenuItem item1 = popup.getMenu().findItem(R.id.menu_block_user);
-         item.setTitle("Report "+otherUserName);
-         item1.setTitle("Block "+otherUserName);
+
         popup.show();
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
@@ -459,7 +464,7 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         new ApisHelper().getChattedUsersListApi(ChatActivity.this, new ApisHelper.OnGetChatedListDataListners() {
             @Override
             public void onGetChattedListSuccess(ChattedListModel body, Dialog dialog) {
-
+                Log.e( "getChatListApi: ", "come");
                 Log.e("ChatBody", "" + body.getRecord().size());
 
                 Gson gson = new GsonBuilder().create();
@@ -477,6 +482,8 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
             @Override
             public void onGetChattedListFailure() {
 
+                Log.e( "getChatListApi: ", "come");
+                getIntentData();
             }
         });
     }

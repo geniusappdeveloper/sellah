@@ -3,13 +3,12 @@ package com.app.admin.sellah.model.extra.getProductsModel;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GetProductList implements Parcelable, Cloneable {
+public class GetProductList  implements Parcelable, Cloneable {
 
     @SerializedName("status")
     @Expose

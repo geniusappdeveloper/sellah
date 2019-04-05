@@ -15,7 +15,10 @@ import com.app.admin.sellah.view.activities.MainActivityLiveStream;
 import com.app.admin.sellah.view.activities.VideoPlayerActivity;
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,6 +50,13 @@ public class  VideoSubcategoriesAdpt extends RecyclerView.Adapter<VideoSubcatego
 
         holder.txtVideoTitle.setText(arrayList.get(position).getProductName()+"");
         holder.userName.setText(arrayList.get(position).getUsername()+"");
+
+        try {
+            holder.time.setText(Global.getTimeDuration(Global.convertUTCToLocal(arrayList.get(position).getStartTime()), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         if(arrayList.get(position).getViews()!=null){
             if(Integer.parseInt(arrayList.get(position).getViews())<1000){
                 if (Integer.parseInt(arrayList.get(position).getViews()) < 10) {
@@ -92,7 +102,7 @@ public class  VideoSubcategoriesAdpt extends RecyclerView.Adapter<VideoSubcatego
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView Click,userProfile;
-        TextView userName,txtVideoTitle,txtVideoViewers;
+        TextView userName,txtVideoTitle,txtVideoViewers,time;
         public ViewHolder(View itemView) {
             super(itemView);
             Click = itemView.findViewById(R.id.videoview_categories_play);
@@ -100,6 +110,7 @@ public class  VideoSubcategoriesAdpt extends RecyclerView.Adapter<VideoSubcatego
             userName = itemView.findViewById(R.id.txt_user_name);
             txtVideoTitle = itemView.findViewById(R.id.txt_title);
             txtVideoViewers = itemView.findViewById(R.id.txt_views);
+            time = itemView.findViewById(R.id.live_time_textview);
         }
     }
 }

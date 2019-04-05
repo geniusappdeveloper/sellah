@@ -175,8 +175,10 @@ public class ShowCreditCardDetailFragment extends AppCompatActivity {
 
                 if (getIntent().hasExtra("payment")) {
                     setdefaultcard(ShowCreditCardDetailFragment.this);
+                    Log.e( "onViewClicked: ","payment" );
                 } else {
                     StripeCreditCard();
+
                 }
 
 
@@ -187,15 +189,18 @@ public class ShowCreditCardDetailFragment extends AppCompatActivity {
 
     public void StripeCreditCard() {
 
-        callBack.onCancelDialog();
-        finish();
 
+        Log.e( "onViewClicked: ",packageId );
         if (!TextUtils.isEmpty(packageId)) {
             promoteProductApi(cardId, packageId);
 
         } else {
             stripeApiHit(cardId, dialog);
+            callBack.onCancelDialog();
+             finish();
         }
+
+
     }
 
 
@@ -258,6 +263,7 @@ public class ShowCreditCardDetailFragment extends AppCompatActivity {
 
                         Log.e("PaymentDialog", "promoteProductApi: success");
                         callBack.onPaymentSuccess();
+                        onBackPressed();
                     } else {
 
                         callBack.onPaymentFail(response.body().getMessage());

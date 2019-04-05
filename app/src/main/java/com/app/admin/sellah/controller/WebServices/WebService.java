@@ -46,7 +46,7 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("register")
-    Call<RegisterResult> registrationApi(@Field("email") String email, @Field("password") String password
+    Call<RegisterResult> registrationApi(@Field("username") String username,@Field("email") String email, @Field("password") String password
             , @Field("c_password") String confirm_password, @Field("phone_number") String phone_number
             , @Field("country_code") String country_code, @Field("city") String city,@Field("country") String country);
 
@@ -95,6 +95,7 @@ public interface WebService {
     @POST("search_product")
     Call<GetProductList> searchProductApi(@Field("search_term") String user_id, @Field("search_by") String tags);
 
+
     @Multipart
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("add_product")
@@ -109,7 +110,7 @@ public interface WebService {
     @Multipart
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("edit_product")
-    Call<GetProductList> editProductApi(@Part("product_id") RequestBody productId, @Part("user_id") RequestBody user_id, @Part("name") RequestBody productName, @Part("cat_id") RequestBody categoryId
+    Call<JsonObject> editProductApi(@Part("product_id") RequestBody productId, @Part("user_id") RequestBody user_id, @Part("name") RequestBody productName, @Part("cat_id") RequestBody categoryId
             , @Part("sub_cat_id") RequestBody subCategoryId, @Part("payment_mode") RequestBody paymentMode, @Part("delivery") RequestBody delivery
             , @Part("sell_internationally") RequestBody sellInternationally, @Part("price") RequestBody price, @Part("fixed_price") RequestBody fixedPrice
             , @Part("product_type") RequestBody productType, @Part("quantity") RequestBody quantity, @Part("description") RequestBody description
@@ -364,7 +365,7 @@ public interface WebService {
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("accept_decline_offer")
-    Call<MakeOfferModel> acceptDeclineOfferApi(@Field("user_id") String user_id, @Field("offer_id") String offer_id, @Field("status") String status);
+    Call<MakeOfferModel> acceptDeclineOfferApi(@Field("user_id") String user_id,@Field("friend_id") String friend_id,@Field("offer_id") String offer_id, @Field("status") String status);
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
@@ -466,5 +467,21 @@ public interface WebService {
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
     @POST("cancel_promote")
     Call<Common> cancelPromotionApi(@Field("user_id") String userId, @Field("product_id") String productId, @Field("package_id") String package_id);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("disputeOffer")
+    Call<JsonObject> disputeOffer(@Field("user_id") String userId, @Field("friend_id") String friend_id, @Field("order_id") String order_id,@Field("reason") String reason);
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("manage_inventory")
+    Call<JsonObject> manage_inventory(@Field("user_id") String userId, @Field("product_id") String p_id, @Field("quantity") String qty);
+
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("withdrawal_money")
+    Call<JsonObject> withdrawal_money(@Field("user_id") String userId);
 
 }

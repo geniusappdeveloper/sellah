@@ -36,7 +36,7 @@ import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys
 
 public class SplashScreen extends AppCompatActivity {
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 3000;
+    private static int SPLASH_TIME_OUT = 2000;
     ImageView imageView;
     SharedPreferences sharedPreferences;
     private String user_id;

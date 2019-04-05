@@ -28,7 +28,6 @@ import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import com.app.admin.sellah.model.extra.RegisterPojo.RegisterResult;
 import com.app.admin.sellah.view.CustomDialogs.OTPVerificationDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
-import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.hbb20.CountryCodePicker;
 
 import java.io.IOException;
@@ -76,6 +75,9 @@ public class SignupActivity extends AppCompatActivity {
     TextView text;
     @BindView(R.id.ccp1)
     CountryCodePicker ccp1;
+    @BindView(R.id.et_username)
+    EditText etUsername;
+
     private String TAG = SignupActivity.class.getSimpleName();
     //    @BindView(R.id.toolbar)
 //    Toolbar toolbar;
@@ -101,7 +103,7 @@ public class SignupActivity extends AppCompatActivity {
     @BindView(R.id.ccp)
     CountryCodePicker ccp;
     private int phoneLength = 8;
-    String country="";
+    String country = "";
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -139,7 +141,6 @@ public class SignupActivity extends AppCompatActivity {
         });
 
 
-
         txtSignIn.setLinkTextColor(Color.BLACK); // default link color for clickable span, we can also set it in xml by android:textColorLink=""
         ClickableSpan normalLinkClickSpan = new ClickableSpan() {
             @Override
@@ -168,15 +169,17 @@ public class SignupActivity extends AppCompatActivity {
     @OnClick({R.id.b_signUp})
     void signupClick() {
 //        Global.hideKeyboard(rel_root,this);
-        if (getText(email).equalsIgnoreCase("")) {
-            Snackbar.make(rel_root, "Please enter E-mail ", Snackbar.LENGTH_SHORT)
+
+        if (getText(etUsername).equalsIgnoreCase("")) {
+            Snackbar.make(rel_root, "Please enter UserName ", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
         }
-        else if (country.equalsIgnoreCase(""))
-        {
+       else if (getText(email).equalsIgnoreCase("")) {
+            Snackbar.make(rel_root, "Please enter E-mail ", Snackbar.LENGTH_SHORT)
+                    .setAction("", null).show();
+        } else if (country.equalsIgnoreCase("")) {
             country = ccp.getDefaultCountryNameCode();
-        }
-        else if (getText(pass).equalsIgnoreCase("")) {
+        } else if (getText(pass).equalsIgnoreCase("")) {
             Snackbar.make(rel_root, "Please enter password ", Snackbar.LENGTH_SHORT)
                     .setAction("", null).show();
         } else if (getText(confirmPass).equalsIgnoreCase("")) {
@@ -224,7 +227,7 @@ public class SignupActivity extends AppCompatActivity {
             Log.e("Ccp_number", ccp.getFullNumberWithPlus());
             Log.e("Ccp_number", getText(phoneNum));
             Log.e("Ccp_number", country);
-            Call<RegisterResult> registerCall = webService.registrationApi(getText(email), getText(pass), getText(confirmPass), actualPhoneNo, ccp.getSelectedCountryCodeWithPlus(), "",country);
+            Call<RegisterResult> registerCall = webService.registrationApi(getText(etUsername),getText(email), getText(pass), getText(confirmPass), actualPhoneNo, ccp.getSelectedCountryCodeWithPlus(), "", country);
             registerCall.enqueue(new Callback<RegisterResult>() {
                 @Override
                 public void onResponse(Call<RegisterResult> call, Response<RegisterResult> response) {

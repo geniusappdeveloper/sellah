@@ -117,7 +117,7 @@
                         android:textSize="@dimen/_12sdp"
                         android:gravity="bottom"
                         android:textColor="@color/colorGrey"
-                        android:text="No live videos at the moment"
+                        android:text="No live video at the moment"
                         android:layout_width="wrap_content"
                         android:layout_height="@dimen/_25sdp" />
 

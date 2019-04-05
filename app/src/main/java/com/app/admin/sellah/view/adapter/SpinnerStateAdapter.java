@@ -78,7 +78,6 @@ public class SpinnerStateAdapter extends ArrayAdapter<SpinnerStateCheck> {
         holder.mTextView.setText(listState.get(position).getTitle());
 
         // To check weather checked event fire from getview() or user input
-
         holder.mCheckBox.setChecked(listState.get(position).isSelected());
         if ((position == 0)) {
             holder.mCheckBox.setVisibility(View.INVISIBLE);

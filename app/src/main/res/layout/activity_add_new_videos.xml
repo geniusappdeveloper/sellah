@@ -133,10 +133,9 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/_13sdp"
             android:textColor="@color/colorGrey"
-            android:text="Add a short video"/>
+            android:text="Add a product story"/>
 
         <RelativeLayout
-
             android:id="@+id/rl_addnewvideo1"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_100sdp"
@@ -148,16 +147,24 @@
 
 
             <ImageView
-               android:visibility="gone"
+                android:visibility="gone"
                 android:id="@+id/thumbnail_video"
-                android:layout_margin="@dimen/_5sdp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:padding="@dimen/_5sdp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/rec_icon" />
+                android:padding="@dimen/_7sdp"
+                android:scaleType="fitXY"
+                android:src="@drawable/car_icon" />
 
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/deleteimg"
+                android:padding="@dimen/_7sdp"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_centerInParent="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/delete_icon" />
 
 
             <TextView
@@ -172,6 +179,7 @@
 
 
             <TextView
+
                 android:layout_centerInParent="true"
                 android:id="@+id/dummylive2_text1"
                 android:paddingTop="@dimen/_3sdp"
@@ -187,6 +195,7 @@
 
 
         </RelativeLayout>
+
 
 
     </LinearLayout>
@@ -210,4 +219,5 @@
 
             android:layout_gravity="center"/>
     </LinearLayout>
+
 </RelativeLayout>

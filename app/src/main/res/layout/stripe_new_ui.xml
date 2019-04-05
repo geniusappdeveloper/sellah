@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/_15sdp"
             android:textColor="@color/colorBlack"
-            android:text="Stripe "/>
+            android:text="Wallet "/>
 
 
         <ImageView
@@ -52,11 +52,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/_17sdp"
+            android:gravity="center_horizontal"
             android:textColor="@color/colorBlack"
-            android:text="Connect Stripe"/>
+            android:text="Create Your Sellah Wallet"/>
+
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/_3sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:layout_width="match_parent"
+            android:textStyle="italic"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_12sdp"
+            android:text="Powered by Stripe"/>
 
 
-            <LinearLayout
+
+        <LinearLayout
                 android:layout_marginLeft="@dimen/_12sdp"
                 android:layout_marginRight="@dimen/_12sdp"
                 android:id="@+id/rootTag"
@@ -214,6 +227,66 @@
                         android:singleLine="true"
                         android:textColor="@color/colorBlack"
                         android:textSize="@dimen/_12sdp" />
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:textColor="@color/colorGrey"
+                        android:textSize="@dimen/_12sdp"
+                        android:text="Routing Number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                    <EditText
+                        android:visibility="gone"
+                        android:paddingLeft="@dimen/_10sdp"
+                        android:id="@+id/str_edt_routingnumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_33sdp"
+                        android:layout_centerVertical="true"
+                        android:gravity="center|left"
+                        android:textColorHint="@color/light_grey"
+                        android:hint="Routing code"
+                        android:background="@drawable/live_product_detail_grey_background"
+                        android:singleLine="true"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="@dimen/_12sdp" />
+
+
+                    <RelativeLayout
+                        android:id="@+id/routing_rl"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_33sdp"
+                        android:layout_marginTop="@dimen/_2sdp"
+                        android:background="@drawable/live_product_detail_grey_background"
+                        android:textSize="@dimen/_13sdp">
+                        <ImageView
+                            android:id="@+id/routing_img"
+                            android:tint="#dcdcdc"
+                            android:layout_centerVertical="true"
+                            android:padding="@dimen/_5sdp"
+                            android:src="@drawable/down_arrow"
+                            android:layout_marginRight="@dimen/_10sdp"
+                            android:layout_alignParentRight="true"
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp" />
+
+                        <Spinner
+                            android:layout_centerVertical="true"
+                            android:id="@+id/spinner_routing"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/_10sdp"
+                            android:drawSelectorOnTop="true"
+                            android:entries="@array/routing_banks" />
+                    </RelativeLayout>
 
                 </LinearLayout>
 

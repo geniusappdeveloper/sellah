@@ -1,0 +1,229 @@
+package com.app.admin.sellah.view.fragments;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.app.admin.sellah.R;
+import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.model.extra.ProfileModel.ProfileModel;
+import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.SAConstants;
+import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.activities.MainActivity;
+import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
+import com.app.admin.sellah.view.adapter.SalesAdapter;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
+import java.io.IOException;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
+import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
+
+public class ProfileFragment extends Fragment implements SalesAdapter.TabTextController {
+
+    @BindView(R.id.li_profile_root)
+    LinearLayout liProfileRoot;
+    @BindView(R.id.img_profile_pic)
+    CircleImageView imgProfilePic;
+    @BindView(R.id.tv_profile_name)
+    TextView tvProfileName;
+    @BindView(R.id.tv_proffesion)
+    TextView tvProffesion;
+    @BindView(R.id.tv_followers_count)
+    TextView tvFollowersCount;
+    @BindView(R.id.tv_following_count)
+    TextView tvFollowingCount;
+    @BindView(R.id.btn_edit_profile)
+    Button btnEditProfile;
+    @BindView(R.id.txt_rationg)
+    TextView txtRationg;
+    @BindView(R.id.profile_TabLayout)
+    TabLayout profileTabLayout;
+    @BindView(R.id.profile_ViewPager)
+    ViewPager profileViewPager;
+    WebService service;
+    Unbinder unbinder;
+    ProfileModel profileData;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
+    @BindView(R.id.li_follow_list)
+    LinearLayout liFollowList;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.profile_fragment, container, false);
+        unbinder = ButterKnife.bind(this, view);
+
+//        btnEditProfile = (Button) view.findViewById(R.id.btn_edit_profile);
+
+        service = Global.WebServiceConstants.getRetrofitinstance();
+        createViewPager(profileViewPager);
+        profileTabLayout.setupWithViewPager(profileViewPager);
+        hideSearch();
+        getProfileData();
+        return view;
+
+    }
+
+//----------------------------------------------------Get profile Api-----------------------------------------
+
+    public void getProfileData() {
+        Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
+        dialog.show();
+        Call<ProfileModel> getProfileCall = service.getProfileApi(HelperPreferences.get(getActivity()).getString(UID));
+        getProfileCall.enqueue(new Callback<ProfileModel>() {
+            @Override
+            public void onResponse(Call<ProfileModel> call, Response<ProfileModel> response) {
+                if (response.isSuccessful()) {
+                    dismissDialog(dialog);
+                    HelperPreferences.get(getActivity()).saveString(USER_PROFILE_PIC, response.body().getResult().getImage());
+                    HelperPreferences.get(getActivity()).saveString(USER_EMAIL, response.body().getResult().getEmail());
+                    profileData = response.body();
+                    Log.e("profile_success", response.body().getMessage());
+                    setProfileData(response.body());
+                } else {
+                    dismissDialog(dialog);
+                    Snackbar.make(liProfileRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();
+                    try {
+                        Log.e("Profile_error", response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ProfileModel> call, Throwable t) {
+                dismissDialog(dialog);
+                Snackbar.make(liProfileRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
+                        .setAction("", null).show();
+            }
+        });
+    }
+
+    private void setProfileData(ProfileModel body) {
+
+        if (body != null) {
+            try {
+                if (!TextUtils.isEmpty(body.getResult().getUsername())) {
+                    tvProfileName.setText(body.getResult().getUsername());
+                } else {
+                    tvProfileName.setText("Sellah! user");
+                }
+
+                if (!TextUtils.isEmpty(body.getResult().getDescription())) {
+                    tvProffesion.setText(body.getResult().getDescription());
+                } else {
+                    tvProffesion.setText("NA");
+                }
+                RequestOptions requestOptions = Global.getGlideOptions();
+                Glide.with(getActivity())
+                        .load(body.getResult().getImage())
+                        .apply(requestOptions)
+                        .into(imgProfilePic);
+                tvFollowersCount.setText(profileData.getResult().getFollowers());
+                tvFollowingCount.setText(profileData.getResult().getFollowing());
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+    private void createViewPager(ViewPager viewPager) {
+        ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
+        adapter.addFrag(new ProfileSalesFragment(), "For Sale");
+        adapter.addFrag(new WishListFragment(), "WishList");
+        adapter.addFrag(new ProfileRecordFragment(), "Records");
+        viewPager.setAdapter(adapter);
+    }
+
+    public void hideSearch() {
+        ((MainActivity) getActivity()).rel_search.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).rlFilter.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).text_sell.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).text_sell.setText("Profile");
+//        ((MainActivity) getActivity()).rlBack.setVisibility("Profile");
+        ((MainActivity) getActivity()).rlBack.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rlMenu.setVisibility(View.GONE);
+//        ((MainActivity) getActivity()).profile.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).rloptions.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).view.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).changeOptionColor(4);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    private void dismissDialog(Dialog dialog) {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
+    @OnClick(R.id.img_profile_pic)
+    public void onViewClicked() {
+
+    }
+
+    @OnClick(R.id.btn_edit_profile)
+    public void onEditButtonClicked() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(SAConstants.Keys.PROFILE_DATA, profileData);
+        MyAccountFragment fragment = new MyAccountFragment();
+        fragment.setArguments(bundle);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(PROFILETAG).commit();
+    }
+
+    @Override
+    public void tabTextController(int count) {
+        try {
+            profileTabLayout.getTabAt(0).setText("For Sale (" + count + ")");
+        } catch (Exception e) {
+        }
+    }
+
+    @OnClick(R.id.li_follow_list)
+    public void onFollowListClicked() {
+
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new ViewFollowListFragment(HelperPreferences.get(getActivity()).getString(UID))).addToBackStack(PROFILETAG).commit();
+
+    }
+}
+
+
+
+
+

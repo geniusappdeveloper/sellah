@@ -50,7 +50,6 @@
             android:layout_below="@id/personHeading"
             android:text="Advertisng Outdoors"/>
         <TextView
-            android:layout_alignParentEnd="true"
             android:id="@+id/txt_time"
             android:layout_marginRight="@dimen/_3sdp"
             android:layout_width="wrap_content"
@@ -58,22 +57,7 @@
             android:textSize="@dimen/_11sdp"
             android:singleLine="true"
             android:textColor="@color/colorGrey"
-            android:layout_below="@id/personHeading"
             android:text="00:00"
-            android:layout_alignParentRight="true" />
-        <TextView
-            android:layout_alignParentEnd="true"
-            android:id="@+id/textOrder"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_18sdp"
-            android:text="Order Processing"
-            android:padding="@dimen/_2sdp"
-            android:textSize="@dimen/_10sdp"
-            android:gravity="center"
-            android:textColor="@color/colorWhite"
-            android:visibility="visible"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:background="#EEC12D"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
 

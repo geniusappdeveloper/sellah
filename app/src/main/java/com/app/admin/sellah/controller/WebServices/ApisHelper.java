@@ -55,7 +55,7 @@ public class ApisHelper {
             @Override
             public void onResponse(Call<GetCategoriesModel> call, Response<GetCategoriesModel> response) {
                 if (response.isSuccessful()) {
-                    Log.e("categories", "Success : " + response.body().getMessage());
+                    Log.e("categories_", "Success : " + response.body().getMessage());
                     ExpandableListData.setData(response.body());
                 } else {
                     ExpandableListData.setDataOnfaliur();

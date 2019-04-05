@@ -94,6 +94,78 @@ public class Result implements Parcelable, Cloneable {
     @Expose
     private String onlineStatus;
 
+    @SerializedName("product_video")
+    @Expose
+    private String productVideo;
+
+
+
+    @SerializedName("product_video_thumbnail")
+    @Expose
+    private String productVideoThumbnail;
+
+
+
+
+
+
+
+
+    public Result() {
+
+    }
+
+
+    protected Result(Parcel in) {
+        id = in.readString();
+        userId = in.readString();
+        name = in.readString();
+        catId = in.readString();
+        subCatId = in.readString();
+        paymentMode = in.readString();
+        delivery = in.readString();
+        sellInternationally = in.readString();
+        price = in.readString();
+        fixedPrice = in.readString();
+        productType = in.readString();
+        quantity = in.readString();
+        description = in.readString();
+        noOfClicks = in.readString();
+        budget = in.readString();
+        promoteProduct = in.readString();
+        isLive = in.readString();
+        isActive = in.readString();
+        isDeleted = in.readString();
+        updatedAt = in.readString();
+        createdAt = in.readString();
+        categoryName = in.readString();
+        subcategoryName = in.readString();
+        username = in.readString();
+        image = in.readString();
+        likeCount = in.readString();
+        onlineStatus = in.readString();
+        productVideo = in.readString();
+        productVideoThumbnail = in.readString();
+        lastSeenTime = in.readString();
+        wishlistTime = in.readString();
+        isLiked = in.readString();
+        isWishlist = in.readString();
+        tags = in.createTypedArrayList(Tag.CREATOR);
+        productImages = in.createTypedArrayList(ProductImage.CREATOR);
+    }
+
+    public static final Creator<Result> CREATOR = new Creator<Result>() {
+        @Override
+        public Result createFromParcel(Parcel in) {
+            return new Result(in);
+        }
+
+        @Override
+        public Result[] newArray(int size) {
+            return new Result[size];
+        }
+    };
+
     public String getProductVideo() {
         return productVideo;
     }
@@ -102,9 +174,13 @@ public class Result implements Parcelable, Cloneable {
         this.productVideo = productVideo;
     }
 
-    @SerializedName("product_video")
+
+
+
+
+    @SerializedName("promotes")
     @Expose
-    private String productVideo ;
+    private List<Promote> promotes = null;
 
     public List<Promote> getPromotes() throws NullPointerException {
         return promotes;
@@ -113,10 +189,6 @@ public class Result implements Parcelable, Cloneable {
     public void setPromotes(List<Promote> promotes) {
         this.promotes = promotes;
     }
-
-    @SerializedName("promotes")
-    @Expose
-    private List<Promote> promotes = null;
 
     public String getOnlineStatus() {
         return onlineStatus;
@@ -188,48 +260,8 @@ public class Result implements Parcelable, Cloneable {
     @Expose
     private List<ProductImage> productImages = null;
 
-    public Result() {
-    }
 
-    protected Result(Parcel in) {
-        id = in.readString();
-        userId = in.readString();
-        name = in.readString();
-        catId = in.readString();
-        subCatId = in.readString();
-        paymentMode = in.readString();
-        delivery = in.readString();
-        sellInternationally = in.readString();
-        price = in.readString();
-        fixedPrice = in.readString();
-        productType = in.readString();
-        quantity = in.readString();
-        description = in.readString();
-        noOfClicks = in.readString();
-        budget = in.readString();
-        promoteProduct = in.readString();
-        isLive = in.readString();
-        isActive = in.readString();
-        isDeleted = in.readString();
-        updatedAt = in.readString();
-        createdAt = in.readString();
-        categoryName = in.readString();
-        subcategoryName = in.readString();
-        username = in.readString();
-        image = in.readString();
-    }
 
-    public static final Creator<Result> CREATOR = new Creator<Result>() {
-        @Override
-        public Result createFromParcel(Parcel in) {
-            return new Result(in);
-        }
-
-        @Override
-        public Result[] newArray(int size) {
-            return new Result[size];
-        }
-    };
 
     public String getId() {
         return id;
@@ -423,6 +455,15 @@ public class Result implements Parcelable, Cloneable {
         this.username = username;
     }
 
+    public String getProductVideoThumbnail() {
+        return productVideoThumbnail;
+    }
+
+    public void setProductVideoThumbnail(String productVideoThumbnail) {
+        this.productVideoThumbnail = productVideoThumbnail;
+    }
+
+
     public String getImage() {
         return image;
     }
@@ -447,37 +488,48 @@ public class Result implements Parcelable, Cloneable {
         this.productImages = productImages;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(userId);
-        dest.writeString(name);
-        dest.writeString(catId);
-        dest.writeString(subCatId);
-        dest.writeString(paymentMode);
-        dest.writeString(delivery);
-        dest.writeString(sellInternationally);
-        dest.writeString(price);
-        dest.writeString(fixedPrice);
-        dest.writeString(productType);
-        dest.writeString(quantity);
-        dest.writeString(description);
-        dest.writeString(noOfClicks);
-        dest.writeString(budget);
-        dest.writeString(promoteProduct);
-        dest.writeString(isLive);
-        dest.writeString(isActive);
-        dest.writeString(isDeleted);
-        dest.writeString(updatedAt);
-        dest.writeString(createdAt);
-        dest.writeString(categoryName);
-        dest.writeString(subcategoryName);
-        dest.writeString(username);
-        dest.writeString(image);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(userId);
+        parcel.writeString(name);
+        parcel.writeString(catId);
+        parcel.writeString(subCatId);
+        parcel.writeString(paymentMode);
+        parcel.writeString(delivery);
+        parcel.writeString(sellInternationally);
+        parcel.writeString(price);
+        parcel.writeString(fixedPrice);
+        parcel.writeString(productType);
+        parcel.writeString(quantity);
+        parcel.writeString(description);
+        parcel.writeString(noOfClicks);
+        parcel.writeString(budget);
+        parcel.writeString(promoteProduct);
+        parcel.writeString(isLive);
+        parcel.writeString(isActive);
+        parcel.writeString(isDeleted);
+        parcel.writeString(updatedAt);
+        parcel.writeString(createdAt);
+        parcel.writeString(categoryName);
+        parcel.writeString(subcategoryName);
+        parcel.writeString(username);
+        parcel.writeString(image);
+        parcel.writeString(likeCount);
+        parcel.writeString(onlineStatus);
+        parcel.writeString(productVideo);
+        parcel.writeString(productVideoThumbnail);
+        parcel.writeString(lastSeenTime);
+        parcel.writeString(wishlistTime);
+        parcel.writeString(isLiked);
+        parcel.writeString(isWishlist);
+        parcel.writeTypedList(tags);
+        parcel.writeTypedList(productImages);
     }
 }

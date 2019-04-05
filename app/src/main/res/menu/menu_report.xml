@@ -8,5 +8,9 @@
         android:id="@+id/menu_block_user"
         android:title="Block User" />
 
+    <item
+        android:id="@+id/menu_dispute"
+        android:title="Dispute" />
+
 
 </menu>

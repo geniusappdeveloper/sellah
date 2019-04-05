@@ -6,8 +6,11 @@ public class SAConstants {
     public static class Keys{
 
         public static final String UID="sa.user.id";
+        public static final String UNAME="sa.user.name1";
         public static final String USER_PROFILE_PIC="sa.user.pic";
         public static final String USER_EMAIL="sa.user.email";
+        public static final String AVAILABLE_BALANCE="sa.user.AVAILAble";
+        public static final String PENDING_BALANCE="sa.user.PENDING";
         public static final String USER_STRIPE_ID="sa.user.stripe.id";
         public static final String PROFILESTATUS="sa.profile.status";
         public static final String KEY_VIBRATE = "sa.key.vibrate";
@@ -58,6 +61,7 @@ public class SAConstants {
         public static final String MAKE_OFFER_DATA= "sa.make.offer.data";
         public static final String EVENT_CREATEROOM= "createroom";
         public static final String EVENT_READMESSAGE= "readmsg";
+        public static final String EVENT_READMESSAGE_FOR_CHATLIST= "readmessage";
         public static final String EVENT_CREATEGROUP= "creatgroup";
 //        public static final String EVENT_JOIN= "creatgroup";
         public static final String EVENT_NEW_MESSAGE= "new_message";

@@ -59,6 +59,7 @@ public class LiveStreamChatAdapter extends RecyclerView.Adapter {
     private boolean isClicedR;
     private String sellerId="";
     OptionsClickCallBack makeOfferController;
+    private String productname_1 = "";
    /* public LiveStreamChatAdapter(Context activity, ArrayList<HashMap<String,String>> models) {
 
 
@@ -76,7 +77,7 @@ public class LiveStreamChatAdapter extends RecyclerView.Adapter {
         //  onBottomReachedListener = ;
         this.makeOfferController=controller;
         this.sellerId=sellerId;
-        Log.e("SAcwsedac ", messagelist + "  yeah");
+        Log.e("liveStreamChatApt_list:", messagelist + "");
         Log.e("seller_id ", sellerId + "  <-");
     }
 
@@ -186,9 +187,9 @@ public class LiveStreamChatAdapter extends RecyclerView.Adapter {
     }
 
 
-    @NonNull
+
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         switch (viewType) {
             case SAConstants.Keys.TYPE_SEND:
@@ -222,8 +223,10 @@ public class LiveStreamChatAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
+        Log.e("onBindViewHolderLive","count");
+
         if (messagelist.get(position).get("senderid").equalsIgnoreCase(HelperPreferences.get(context).getString(UID))) {
-            Log.e("Csdecsd", "vdfvrdfvd");
+
             if (messagelist.get(position).get("type").equalsIgnoreCase("o")) {
 
                 handleOfferData(holder, position);
@@ -240,7 +243,7 @@ public class LiveStreamChatAdapter extends RecyclerView.Adapter {
                 handleSentMessageData(holder, position);
             }
         } else {
-            Log.e("Csdecsd123", "vdfvrdfvd");
+
             if (messagelist.get(position).get("type").equalsIgnoreCase("o")) {
 //                handleRecievMessageData(holder, position);
                 handleOfferDataReceived(holder, position);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:fillViewport="true"
     android:layout_height="match_parent">
@@ -100,74 +101,153 @@
             </RelativeLayout>
             </RelativeLayout>
 
-
-            <TextView
-
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/_13sdp"
+            <RelativeLayout
                 android:layout_marginTop="@dimen/_40sdp"
-                android:textColor="@color/colorGrey"
-                android:text="Sellah Wallet"/>
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:padding="@dimen/_3sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/_13sdp"
+                    android:textColor="@color/colorGrey"
+                    android:text="Sellah Wallet"/>
+                <TextView
+                    android:id="@+id/withdraw"
+                    android:padding="@dimen/_3sdp"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/_13sdp"
+                    android:textColor="@color/colorGrey"
+                    android:text="Withdraw"/>
 
+
+            </RelativeLayout>
+
+
+            //-----------------------------------------------
 
             <RelativeLayout
                 android:id="@+id/rl_addnewstrpeaccount"
                 android:background="#ea4444"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_110sdp">
+
                 <RelativeLayout
-                    android:layout_marginLeft="@dimen/_15sdp"
                     android:background="@drawable/credit_card_back"
                     android:layout_width="match_parent"
+                    android:id="@+id/add_rel"
                     android:layout_height="@dimen/_130sdp">
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
 
-                    <TextView
+                        <LinearLayout
+                            android:layout_width="match_parent"
 
-                        android:layout_marginTop="@dimen/_15sdp"
-                        android:layout_marginBottom="@dimen/_10sdp"
-                        android:textStyle="bold"
-                        android:layout_marginLeft="@dimen/_15sdp"
-                        android:id="@+id/sel_txt_bal"
-                        android:textColorHint="#fff"
-                        android:textColor="@color/colorWhite"
-                        android:hint="Balance: "
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                    <TextView
-                        android:layout_marginTop="@dimen/_15sdp"
-                        android:layout_marginBottom="@dimen/_10sdp"
-                        android:layout_marginLeft="@dimen/_15sdp"
-                        android:textStyle="bold"
-                        android:id="@+id/sel_txt_bal1"
-                        android:textColorHint="#fff"
-                        android:textColor="@color/colorWhite"
-                        android:layout_toRightOf="@+id/sel_txt_bal"
-                        android:layout_width="wrap_content"
-                        android:text="$0.00"
-                        android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content">
+                            <TextView
 
-                    <TextView
-                        android:layout_below="@+id/sel_txt_bal"
-                        android:textStyle="bold"
-                        android:layout_marginLeft="@dimen/_15sdp"
-                        android:id="@+id/sel_txt_acc"
-                        android:textColorHint="#fff"
-                        android:textColor="@color/colorWhite"
-                        android:hint="Sellah Account Number: "
+                                android:layout_marginTop="@dimen/_15sdp"
+                                android:textStyle="bold"
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:id="@+id/sel_txt_bal"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:hint="Balance:"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                            <TextView
+                                android:layout_marginTop="@dimen/_15sdp"
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:textStyle="bold"
+                                android:id="@+id/sel_txt_bal1"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:layout_toRightOf="@+id/sel_txt_bal"
+                                android:layout_width="wrap_content"
+                                android:text="$0.00"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_marginTop="@dimen/_3sdp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:textStyle="bold"
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:id="@+id/sel_txt_pend"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:hint="Incoming funds:"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                            <TextView
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:textStyle="bold"
+                                android:id="@+id/sel_txt_pend1"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:layout_toRightOf="@+id/sel_txt_pend"
+                                android:layout_width="wrap_content"
+                                android:text="$0.00"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="@dimen/_3sdp"
+                            android:layout_width="match_parent"
+                            android:visibility="gone"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_below="@+id/sel_txt_bal"
+                                android:textStyle="bold"
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:id="@+id/sel_txt_acc"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:hint="Sellah Account Number: "
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                            <TextView
+                                android:layout_below="@+id/sel_txt_bal1"
+                                android:layout_marginLeft="@dimen/_15sdp"
+                                android:textStyle="bold"
+                                android:id="@+id/sel_txt_acc1"
+                                android:textColorHint="#fff"
+                                android:textColor="@color/colorWhite"
+                                android:layout_toRightOf="@+id/sel_txt_acc"
+                                android:layout_width="wrap_content"
+                                android:text="1-111-111"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+                    <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                    <TextView
-                        android:layout_below="@+id/sel_txt_bal1"
-                        android:layout_marginLeft="@dimen/_15sdp"
-                        android:textStyle="bold"
-                        android:id="@+id/sel_txt_acc1"
-                        android:textColorHint="#fff"
-                        android:textColor="@color/colorWhite"
-                        android:layout_toRightOf="@+id/sel_txt_acc"
-                        android:layout_width="wrap_content"
-                        android:text="1-111-111"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:id="@+id/rel_qr_scan"
+                        android:layout_marginRight="@dimen/_4sdp"
+                        android:layout_marginTop="@dimen/_4sdp"
+                        android:layout_alignParentRight="true">
+
+                     <ImageView
+                     android:layout_width="@dimen/_30sdp"
+                     android:layout_height="@dimen/_30sdp"
+                     android:background="@drawable/qr_scan"/>
+
+                     </RelativeLayout>
+
+
 
                     <ImageView
                         android:layout_alignParentBottom="true"
@@ -178,7 +258,101 @@
                         android:layout_height="@dimen/_30sdp" />
 
                 </RelativeLayout>
+
+
+                //---------------------------------------------
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:id="@+id/scan_rel"
+                    android:visibility="gone"
+                    android:layout_height="@dimen/_130sdp">
+
+
+                    <RelativeLayout
+                        android:layout_width="@dimen/_100sdp"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/_12sdp"
+                        android:layout_toLeftOf="@+id/rel_qr_id">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/qr_scan"
+                            android:layout_centerInParent="true"/>
+
+
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:layout_width="@dimen/_130sdp"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_5sdp"
+                        android:id="@+id/rel_qr_id"
+                        android:layout_alignParentRight="true">
+
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorWhite"
+                            android:layout_centerHorizontal="true"
+                            android:textSize="@dimen/_11sdp"
+                            android:id="@+id/txtview_wallet"
+                            android:text="Wallet Id"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorWhite"
+                            android:textSize="@dimen/_11sdp"
+                            android:singleLine="true"
+                            android:id="@+id/txtview_qr_code_id"
+                            android:layout_centerHorizontal="true"
+                            android:layout_below="@+id/txtview_wallet"
+                            android:text="aact_1EEHhkd_kdfk"/>
+
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/img_poweredStripe2"
+                            android:layout_below="@+id/txtview_qr_code_id">
+
+                            <ImageView
+                                android:layout_width="@dimen/_26sdp"
+                                android:layout_height="@dimen/_26sdp"
+                                android:layout_centerHorizontal="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginBottom="@dimen/_2sdp"
+                                android:background="@drawable/qr_code_mobile"
+                               />
+
+                        </RelativeLayout>
+
+
+
+
+                     <ImageView
+                        android:layout_alignParentBottom="true"
+                       android:layout_centerHorizontal="true"
+                         android:id="@+id/img_poweredStripe2"
+                        android:src="@drawable/powered_by_stripe"
+                        android:layout_width="@dimen/_90sdp"
+                        android:layout_height="@dimen/_30sdp" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+
             </RelativeLayout>
+
+
+            //---------------------------------------------------------
 
 
 

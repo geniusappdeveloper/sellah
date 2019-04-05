@@ -92,6 +92,18 @@
 
                         <TextView
                             android:paddingLeft="@dimen/_22sdp"
+                            android:id="@+id/nav_login"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center|left"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:layout_marginBottom="@dimen/_50sdp"
+                            android:text="Login"
+                            android:textColor="@color/colorWhite" />
+
+
+                        <TextView
+                            android:paddingLeft="@dimen/_22sdp"
                             android:id="@+id/nav_logout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -521,6 +533,8 @@
                         android:layout_weight="1">
 
                         <ImageView
+                            android:visibility="gone"
+
                             android:id="@+id/notification_img"
                             android:layout_width="@dimen/_10sdp"
                             android:layout_height="@dimen/_10sdp"

@@ -15,6 +15,7 @@ public class AddProductDatabase  {
   public static List<String> imageListG = new ArrayList<>();
   public static ArrayList<String> tagListG = new ArrayList<>();;
   public static String name="",price="",quantity="",tags="",description="",payment_method="",modes_of_delivery="",catid="",subcatid="";
+  public static String productid="",promoteproduct="";
 
 
 

@@ -22,12 +22,17 @@ public class PromotePackagesAdapter extends RecyclerView.Adapter<PromotePackages
     View view;
     List<Promote> packagesList;
     PromotePackagesAdapter.OfferCallBack callBack;
+    String no_of_clicks;
+    int totalCount;
 
-    public PromotePackagesAdapter(Context context, List<Promote> packagesList, OfferCallBack callBack) {
+    public PromotePackagesAdapter(Context context,String no_of_clicks,int totalCount, List<Promote> packagesList, OfferCallBack callBack) {
         mInflater=LayoutInflater.from(context);
         this.context=context;
+        this.no_of_clicks=no_of_clicks;
+        this.totalCount=totalCount;
         this.packagesList=packagesList;
         this.callBack=callBack;
+
     }
 
 
@@ -40,11 +45,16 @@ public class PromotePackagesAdapter extends RecyclerView.Adapter<PromotePackages
 
 
     @Override
-    public void onBindViewHolder(@NonNull PromotePackagesAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(PromotePackagesAdapter.ViewHolder holder, int position) {
 
         holder.txtOffer.setText("S$ "+packagesList.get(position).getAmount());
-        holder.txtOfferPrice.setText(packagesList.get(position).getClicks()+" clicks");
-        holder.txtDuration.setText(packagesList.get(position).getValidity()+" days");
+
+        if (no_of_clicks==null || no_of_clicks.equalsIgnoreCase(""))
+           holder.txtOfferPrice.setText("0/"+totalCount);
+        else
+           holder.txtOfferPrice.setText(no_of_clicks+"/"+totalCount);
+
+        holder.txtDuration.setText(packagesList.get(position).getDays_left()+" days");
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -147,4 +147,10 @@ public class Previewvideo extends AppCompatActivity {
         super.onStart();
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

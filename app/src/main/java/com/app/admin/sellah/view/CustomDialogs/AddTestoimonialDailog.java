@@ -38,6 +38,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UNAME;
 
 public class AddTestoimonialDailog extends DialogFragment {
 
@@ -75,6 +76,7 @@ public class AddTestoimonialDailog extends DialogFragment {
         getDialog().getWindow().setGravity(Gravity.BOTTOM);
         webService = Global.WebServiceConstants.getRetrofitinstance();
         textwatcher();
+        rateTxt.setText("On a scale of 1 to 5, how would you rate your experience when shopping with "+HelperPreferences.get(getActivity()).getString(UNAME));
         rtBRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {

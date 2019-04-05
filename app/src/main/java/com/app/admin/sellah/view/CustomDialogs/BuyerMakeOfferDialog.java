@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -50,11 +51,12 @@ public class BuyerMakeOfferDialog extends Dialog {
     protected BuyerMakeOfferDialog(Context context, String productPrice, String productQuantity, OnmakeOfferClick callback) {
         super(context);
         this.context = context;
+        Log.e( "onClick: ", productPrice);
+        Log.e( "onClick: ", productQuantity);
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
         this.callback = callback;
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +85,7 @@ public class BuyerMakeOfferDialog extends Dialog {
 //        ilAddQuantity.setError(productQuantity);
         txtTotalStroke.setText(String.valueOf((Integer.parseInt(productQuantity) - 1)));
         txtOriginalPrice.setText("$"+productPrice);
+        edtAddPrice.setText("$"+productPrice);
         ilAddPrice.setError("");
 
         edtAddPrice.addTextChangedListener(new TextWatcher() {

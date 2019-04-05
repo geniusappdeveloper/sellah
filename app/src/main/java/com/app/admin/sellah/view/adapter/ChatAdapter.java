@@ -213,7 +213,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_message_recieved, parent, false);
                 return new RecievedMessageViewHolder(view);
             case SAConstants.Keys.TYPE_MAKEOFFER:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_chat_make_offer, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_chat_make_offer, parent, false);  // Crash deteched by Manjot
                 return new MakeOfferViewHolder(view);
             case SAConstants.Keys.TYPE_IMAGE:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_send_image, parent, false);
@@ -235,7 +235,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
           friendname = ((ChatActivity)context).txtUserName.getText().toString();
         user_id = messagelist.get(position).getSenderId();
         reciever_d = messagelist.get(position).getReceiverId();
-
+          /* Conditon to add date messge  in the chat list  */
         if (messagelist.get(position).isToday_boolean())
         {
             ((TodayViewHolder)holder).today.setText(messagelist.get(position).getToday());
@@ -247,16 +247,17 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
                 if (messagelist.get(position).getType().equalsIgnoreCase("o")) {
 
+                    /*Handle data according to offer */
                     handleOfferData(holder, position);
 
                 } else if (messagelist.get(position).getType().equalsIgnoreCase("img")) {
-
+                      /* Handle data according to image */
                     handleSentImageData(holder, position);
 
                 } else {
 
 
-
+                    /* Handle messages data */
                     handleSentMessageData(holder, position);
                 }
             } else {
@@ -381,7 +382,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     private void handleSentMessageData(RecyclerView.ViewHolder holder, int position) {
 
-
+          /* Condition to show read unread ticks images*/
         if (messagelist.get(position).getMessage_read_status()!=null)
         {
 
@@ -404,7 +405,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
             else
             {
-
+                /* condition to check the last message */
                 if (position+1<messagelist.size())
                 {
                     if (!messagelist.get(position-1).getSenderId().equals(user_id))
@@ -459,7 +460,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     }
 
-    private void handleSentImageData(RecyclerView.ViewHolder holder, int position) {
+     private void handleSentImageData(RecyclerView.ViewHolder holder, int position) {
 
 
         Glide.with(context).load(messagelist.get(position).getImageUrl()).apply(Global.getGlideOptions())
@@ -570,7 +571,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
             ((MakeOfferViewHolder) holder).btnPay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PaymentDialog.create(context, messagelist.get(position).getOfferId(), messagelist.get(position).getReceiverId(), messagelist.get(position).getProductId(), "", "", new PaymentDialog.PaymentCallBack() {
+                    PaymentDialog.create(context,messagelist.get(position).getProductCost(), messagelist.get(position).getOfferId(), messagelist.get(position).getReceiverId(), messagelist.get(position).getProductId(), "", "", new PaymentDialog.PaymentCallBack() {
                         @Override
                         public void onPaymentSuccess() {
                             messagelist.get(position).setStatus("s");
@@ -607,7 +608,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
                     Log.e( "onClick: ","ff"+ HelperPreferences.get(context).getString(API_ACCESS_TOKEN));
 
-                    showpay.updateSubTotal("2");
+
+
                     if (HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("")||HelperPreferences.get(context).getString(STRIPE_VERIFIED).equals("N")) {
 
                         S_Dialogs.getStipeConnectDialog(context, ((dialog, which) -> {
@@ -633,7 +635,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
                         acceptDeclineApi(((MakeOfferViewHolder) holder), messagelist.get(position).getOfferId(), "a", position);
 
-                    }
+                }
                 }
             });
         }
@@ -813,6 +815,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         if (status.equalsIgnoreCase("p")) {
             showAcceptRejectoption(holder);
         } else if (status.equalsIgnoreCase("a")) {
+            showpay.updateSubTotal("offer");
             holder.aftertext_itemsendername.setText("You accepted "+friendname+"'s"+" offer");
             showStatus(holder, "Accepted", R.color.colorWhite);
         } else if (status.equalsIgnoreCase("s")) {
@@ -824,11 +827,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
         }
     }
 
+    /* Api for accept offers and declined offers*/
     private void acceptDeclineApi(MakeOfferViewHolder holder, String offerId, String status, int pos) {
-        Log.e("OfferId", "acceptDeclineApi: " + offerId + " : " + HelperPreferences.get(context).getString(UID));
+        Log.e("OfferId", "acceptDeclineApi: " + user_id + " : " + HelperPreferences.get(context).getString(UID));
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
         dialog.show();
-        Call<MakeOfferModel> acceptDeclineCall = service.acceptDeclineOfferApi(HelperPreferences.get(context).getString(UID), offerId, status);
+        Call<MakeOfferModel> acceptDeclineCall = service.acceptDeclineOfferApi(HelperPreferences.get(context).getString(UID),user_id, offerId, status);
         acceptDeclineCall.enqueue(new Callback<MakeOfferModel>() {
             @Override
             public void onResponse(Call<MakeOfferModel> call, Response<MakeOfferModel> response) {

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.model.wishllist_model.Wishlist;
 import com.app.admin.sellah.view.adapter.WishRecordAdapter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,6 +74,9 @@ public class ProfileRecordFragment extends Fragment {
     }
 
     private void setRecordsData(Wishlist body) {
+
+
+
         wishRecordAdapter = new WishRecordAdapter(body, getActivity());
         LinearLayoutManager birthHorizontalManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recordRecycler.setLayoutManager(birthHorizontalManager);

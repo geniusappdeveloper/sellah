@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,13 +37,22 @@ import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.ImageUploadHelper;
 import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
+import com.app.admin.sellah.model.AddProductDatabase;
 import com.app.admin.sellah.model.extra.EditProfileModel;
 import com.app.admin.sellah.model.extra.ProfileModel.ProfileModel;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,15 +63,23 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
 import static android.app.Activity.RESULT_OK;
+import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TOKEN;
+import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
+import static com.app.admin.sellah.controller.stripe.StripeSession.USERCITY;
+import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
 import static com.app.admin.sellah.controller.utils.Global.rotateImage;
 import static com.app.admin.sellah.controller.utils.ImageUploadHelper.REQUEST_CAPTURE_IMAGE;
 import static com.app.admin.sellah.controller.utils.ImageUploadHelper.createImageFile;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PROFILE_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PROFILE_EDIT_MODE_IMAGE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 import static org.webrtc.ContextUtils.getApplicationContext;
 
 public class MyAccountFragment extends Fragment {
@@ -88,7 +106,7 @@ public class MyAccountFragment extends Fragment {
     TextView txtDisplatpicture;
     @BindView(R.id.rl_displaypicture)
     RelativeLayout rlDisplaypicture;
-
+    MultipartBody.Part multipartimage;
 
     private int CAMERA_PIC_REQUEST = 1213;
     private int GALLERY = 1214;
@@ -105,6 +123,7 @@ public class MyAccountFragment extends Fragment {
         View view = inflater.inflate(R.layout.my_account_fragment_details, container, false);
         unbinder = ButterKnife.bind(this, view);
 
+
         profileData = getArguments().containsKey(PROFILE_DATA) ? getArguments().getParcelable(PROFILE_DATA) : null;
         service = Global.WebServiceConstants.getRetrofitinstance();
 
@@ -112,11 +131,20 @@ public class MyAccountFragment extends Fragment {
             setProfileData(profileData);
         }
 
+
+
         tabLayout = (TabLayout) view.findViewById(R.id.account_tabLayout);
         vpPager = (ViewPager) view.findViewById(R.id.account_viewPager);
         createViewPager(vpPager);
         tabLayout.setupWithViewPager(vpPager);
-
+        if(getArguments().getString("from").equalsIgnoreCase("wallet"))
+        {
+            vpPager.setCurrentItem(1);
+        }
+        else
+        {
+            vpPager.setCurrentItem(0);
+        }
 //        createTabIcons();
         hideSearch();
         return view;
@@ -133,7 +161,7 @@ public class MyAccountFragment extends Fragment {
         RequestOptions requestOptions = Global.getGlideOptions();
 //        requestOptions.override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL);
 
-        Log.e("my prosetProfileData: ", profileData.getResult().getImage());
+
         try {
             Picasso.with(getActivity()).load(profileData.getResult().getImage()).fit().centerCrop().
                     into(img_user_profile);
@@ -192,7 +220,7 @@ public class MyAccountFragment extends Fragment {
     private void createViewPager(ViewPager viewPager) {
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
         adapter.addFrag(new AccountTabFragment(profileData), "Account");
-        adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Payment");
+        adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Wallet");
 
         /* no need now */
        /* adapter.addFrag(new SocialFragment(), "Social");*/
@@ -322,7 +350,7 @@ public class MyAccountFragment extends Fragment {
                 pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         photoURI);
                 startActivityForResult(pictureIntent,
-                        REQUEST_CAPTURE_IMAGE);
+                        1005);
                 getActivity().grantUriPermission(
                         "com.google.android.GoogleCamera",
                         photoURI,
@@ -381,6 +409,7 @@ public class MyAccountFragment extends Fragment {
         if (requestCode == GALLERY) {
             if (data != null) {
                 Uri pickedImage = data.getData();
+
                 // Let's read picked image path using content resolver
                 String[] filePath = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getActivity().getContentResolver().query(pickedImage, filePath, null, null, null);
@@ -388,6 +417,7 @@ public class MyAccountFragment extends Fragment {
                 String imagePath = cursor.getString(cursor.getColumnIndex(filePath[0]));
 
                 profileImagePathEdit = imagePath;
+                Log.e( "onActivityResult: ", ""+imagePath);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                 Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
@@ -419,13 +449,9 @@ public class MyAccountFragment extends Fragment {
                     default:
                         rotatedBitmap = bitmap;
                 }*/
-                Log.e( "onActivityResult: ",""+bitmap);
-                Picasso.with(getActivity()).load(pickedImage).fit().centerCrop().
-                        into(img_user_profile);
+
 
                 updateProfile();
-
-
                 // Do something with the bitmap
 
 
@@ -482,12 +508,13 @@ public class MyAccountFragment extends Fragment {
                 default:
                     rotatedBitmap = bitmap;
             }
+            Log.e( "onActivityResult1: ",profileImagePathEdit );
             updateProfile();
-//            img_user_profile.setImageURI(tempUri);
+//            img_user_profile.setImageURI(tempUri) ;
             img_user_profile.setImageBitmap(rotatedBitmap);
 //            Toast.makeText(getActivity(), "Here " + getRealPathFromURI(tempUri), Toast.LENGTH_LONG).show();
         }
-        if (requestCode == REQUEST_CAPTURE_IMAGE && resultCode == RESULT_OK) {
+        if (requestCode == 1005 && resultCode == RESULT_OK) {
 
            /* Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -495,6 +522,11 @@ public class MyAccountFragment extends Fragment {
 
             profileImagePathEdit=getRealPathFromURI(tempUri);*/
             profileImagePathEdit = cameraImageFilepath;
+            Uri uri = Uri.parse(profileImagePathEdit);
+            Log.e( "onActivityResult2: ",""+uri );
+
+
+
       /*      ExifInterface ei = null;
             try {
                 ei = new ExifInterface(cameraImageFilepath);
@@ -525,9 +557,11 @@ public class MyAccountFragment extends Fragment {
                 default:
                     rotatedBitmap = bitmap;
             }*/
-            updateProfile();
+
+
+          updateProfile();
 //            img_user_profile.setImageURI(tempUri);
-            Glide.with(getActivity()).load(cameraImageFilepath).apply(Global.getGlideOptions()).into(img_user_profile);
+
 //            img_user_profile.setImageBitmap(rotatedBitmap);
 //            Toast.makeText(getActivity(), "Here " + getRealPathFromURI(tempUri), Toast.LENGTH_LONG).show();
         }
@@ -552,13 +586,19 @@ public class MyAccountFragment extends Fragment {
         model.setEdit_mode(RequestBody.create(MediaType.parse("text/plain"), PROFILE_EDIT_MODE_IMAGE));
         if (!TextUtils.isEmpty(profileImagePathEdit)) {
             Log.e("ImageUrl", "updateProfile: " + profileImagePathEdit);
-            model.setImage(ImageUploadHelper.convertImageTomultipart(profileImagePathEdit, "image"));
+
+            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(profileImagePathEdit));
+            multipartimage = MultipartBody.Part.createFormData("image", "profileimage.jpeg", image);
+            model.setImage(multipartimage);
         }
         new ApisHelper().updateProfileApi(model, getActivity(), new ApisHelper.UpdateProfileCallback() {
             @Override
             public void onProfileUpdateSuccess(String msg) {
+
                 Snackbar.make(li_myAccountRoot, "Profile picture updated.", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
+                getProfileData();
+
             }
 
             @Override
@@ -592,6 +632,83 @@ public class MyAccountFragment extends Fragment {
     public void onViewClicked() {
         getActivity().onBackPressed();
     }
+    public byte[] bytes(String path)
+    {
+
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        Bitmap bitmap = BitmapFactory.decodeFile(path,bmOptions);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, stream);
+        byte[] by= stream.toByteArray();
+        return by;
+    }
+
+    public void getProfileData() {
+
+        if (isLogined(getActivity()))// isLogined is a global method to get login status in app
+        {
+            //----------------------------------getProfileData API call------------------------------------
+
+
+            new ApisHelper().getProfileData(getActivity(), new ApisHelper.GetProfileCallback() {
+                @Override
+                public void onGetProfileSuccess(JsonObject msg) {
+                    Log.e("onGetProfileSuccess: ", msg
+                            .toString());
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(msg.toString());
+                        String status = jsonObject.getString("status");
+
+
+                        if (status.equalsIgnoreCase("1")) {
+                            JSONObject result = jsonObject.getJSONObject("result");
+                            HelperPreferences.get(getActivity()).saveString(STRIPE_VERIFIED, result.getString("stripe_verified"));
+                            HelperPreferences.get(getActivity()).saveString(USERCITY, result.getString("city"));
+                            HelperPreferences.get(getActivity()).saveString(USER_PROFILE_PIC, result.getString("image"));
+                            HelperPreferences.get(getActivity()).saveString(USER_EMAIL, result.getString("email"));
+                            ((MainActivity)getActivity()).navUsername.setText(result.getString("username"));
+                            RequestOptions requestOptions = Global.getGlideOptions();
+
+                            Picasso.with(getActivity()).load(result.getString("image")).fit().centerCrop().
+                                    into(((MainActivity)getActivity()).navHeader);
+
+                            Picasso.with(getActivity()).load(result.getString("image")).fit().centerCrop().
+                                    into(img_user_profile);
+
+                            Log.e( "stripe: ","d"+HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED) );
+                            if (result.optString("stripe_id").isEmpty()) {
+                                Log.e("onGetProfileSuccess: ", "yes");
+                                HelperPreferences.get(getActivity()).saveString(API_ACCESS_TOKEN, "");
+                            } else {
+                                HelperPreferences.get(getActivity()).saveString(API_ACCESS_TOKEN, result.getString("stripe_id"));
+                            }
+
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    /*Log.e( "onGetProfileSuccess: ",msg.getResult().getStripeId() );
+                    HelperPreferences.get(MainActivity.this).saveString(USER_PROFILE_PIC, msg.getResult().getImage());
+                    HelperPreferences.get(MainActivity.this).saveString(USER_EMAIL, msg.getResult().getEmail());
+                    HelperPreferences.get(MainActivity.this).saveString(API_ACCESS_TOKEN, msg.getResult().getStripeId());
+                    Log.e( "after: ",  HelperPreferences.get(MainActivity.this).getString(API_ACCESS_TOKEN ));*/
+                }
+
+                @Override
+                public void onGetProfileFailure() {
+
+                }
+            });
+        }
+
+    }
+
+
 }
 
 

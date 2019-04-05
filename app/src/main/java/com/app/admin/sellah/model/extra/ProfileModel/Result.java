@@ -59,6 +59,30 @@ public class Result {
     @Expose
     private String rating;
 
+    @SerializedName("pending_bal")
+    @Expose
+    private String pending_bal;
+
+    public String getPending_bal() {
+        return pending_bal;
+    }
+
+    public void setPending_bal(String pending_bal) {
+        this.pending_bal = pending_bal;
+    }
+
+    public String getAvailable_bal() {
+        return available_bal;
+    }
+
+    public void setAvailable_bal(String available_bal) {
+        this.available_bal = available_bal;
+    }
+
+    @SerializedName("available_bal")
+    @Expose
+    private String available_bal;
+
     public String getRating() {
         return rating;
     }

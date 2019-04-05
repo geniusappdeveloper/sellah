@@ -201,7 +201,7 @@ public class NotificationActivityAdapter extends RecyclerView.Adapter<Notificati
             imageView = view.findViewById(R.id.profileimage);
             headingText = view.findViewById(R.id.personHeading);
             subHeadingText = view.findViewById(R.id.personSubHeading);
-            order = view.findViewById(R.id.textOrder);
+
             imgNew = view.findViewById(R.id.img_new_entry);
             notiTime = view.findViewById(R.id.txt_time);
             view.setOnClickListener(new View.OnClickListener() {
