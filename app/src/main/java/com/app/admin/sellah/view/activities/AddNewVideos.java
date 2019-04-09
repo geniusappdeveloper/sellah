@@ -122,13 +122,18 @@ public class AddNewVideos extends AppCompatActivity implements SellProductInterf
 
         if (getIntent()!=null && getIntent().hasExtra("way_status"))
         {
+
           String _pos =  getIntent().getStringExtra("position");
           pos = Integer.parseInt(_pos);
+
 
         //    sales = getIntent().getParcelableArrayListExtra("modelProductList");
             Intent intent = getIntent();
             Bundle bundle = intent.getExtras();
             sales = bundle.getParcelableArrayList("modelProductList");
+        //    Log.e("fetchData",sales.get(pos).getProductImages().size()+"  size");
+
+
 
 
 

@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -70,6 +71,8 @@ import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
+import com.app.admin.sellah.view.activities.AddNewInfo;
+import com.app.admin.sellah.view.activities.AddNewVideos;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.activities.Previewvideo;
@@ -244,6 +247,10 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     String videourl;
     String prodct_id, package_id;
 
+    GetProductList getProductList;
+
+
+
 
     @Nullable
     @Override
@@ -321,6 +328,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
     private void setUpSuggestedPosts(GetProductList list) {
 
+        getProductList = list;
+        Log.e("fetchDataProduct",list.getResult().get(0).getCategoryName());
         List<Result> resultList = list.getResult();
         for (int i = 0; i < resultList.size(); i++) {
             Result row = resultList.get(i);
@@ -982,16 +991,17 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                                     return true;
                                 case R.id.menu_edit_product:
 
-                                  /*  ArrayList<Result> list = new ArrayList<>();
-                                    list.addAll(( productDetial.);
+                                   /* ArrayList<Result> list = new ArrayList<>();
+                                    list.addAll(getProductList.getResult());
 
+                                    Intent intentt = new Intent(getActivity(), AddNewVideos.class);
                                     Bundle bundle = new Bundle();
-                                    bundle.putParcelableArrayList("modelProductListFrag",list);
+                                    bundle.putParcelableArrayList("modelProductList",  list);
+                                    intentt.putExtra("way_status","SalesAdapter");
+                                    intentt.putExtra("position",String.valueOf(0));
+                                    intentt.putExtras(bundle);
+                                    getActivity().startActivity(intentt);*/
 
-                                    bundle.putParcelableArrayList(PRODUCT_DETAIL, list);
-                                    SellFragment fragment = new SellFragment();
-                                    fragment.setArguments(bundle);
-                                    loadFragment(fragment, ADDPRODUCTTAG, bundle);*/
 
 
                                     Bundle bundle = new Bundle();
@@ -999,6 +1009,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                                     SellFragment fragment = new SellFragment();
                                     fragment.setArguments(bundle);
                                     loadFragment(fragment, ADDPRODUCTTAG, bundle);
+
                                     return true;
                                 case R.id.menu_report:
                                     if (isLogined(getActivity())) {

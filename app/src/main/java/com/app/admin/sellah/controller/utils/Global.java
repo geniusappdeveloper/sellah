@@ -966,8 +966,9 @@ public class Global extends MultiDexApplication {
             double adminFee = 1*a/100 + 1;
             double totalDeductionAmount = cardFees + adminFee;
             double finalPrice = a - totalDeductionAmount;
+            String formattedStr = String.format("%.2f",finalPrice);
 
-            return String.valueOf(finalPrice);
+            return String.valueOf(formattedStr);
         }
         return "";
 

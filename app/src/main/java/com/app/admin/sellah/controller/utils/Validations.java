@@ -533,7 +533,7 @@ public class Validations {
 
 		}
 
-		if(price.length()==0 ){
+		if(price.length()==0 || price.equalsIgnoreCase("0.00") || price.equalsIgnoreCase("0")){
 
 			String message  = "Please enter Product Price!";
 			showtoast(context, message);

@@ -47,6 +47,7 @@ import static com.app.admin.sellah.controller.stripe.StripeSession.USERCITY;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.AVAILABLE_BALANCE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PENDING_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.QRCODE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_EMAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.USER_PROFILE_PIC;
@@ -115,10 +116,11 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
                     dismissDialog(dialog);
                     HelperPreferences.get(getActivity()).saveString(USER_PROFILE_PIC, response.body().getResult().getImage());
                     HelperPreferences.get(getActivity()).saveString(USER_EMAIL, response.body().getResult().getEmail());
-                    HelperPreferences.get(getActivity()).saveString(PENDING_BALANCE, response.body().getResult().getPending_bal());
-                    HelperPreferences.get(getActivity()).saveString(AVAILABLE_BALANCE, response.body().getResult().getAvailable_bal());
+                    HelperPreferences.get(getActivity()).saveString(PENDING_BALANCE, response.body().getResult().getAvailableBal());
+                    HelperPreferences.get(getActivity()).saveString(AVAILABLE_BALANCE, response.body().getResult().getAvailableBal());
+                    HelperPreferences.get(getActivity()).saveString(QRCODE, response.body().getResult().getQrCode());
                     try {
-                        profileAvailableBalTxt.setText("S$ " + response.body().getResult().getAvailable_bal());
+                        profileAvailableBalTxt.setText("S$ " + response.body().getResult().getAvailableBal());
                         profileData = response.body();
                         setProfileData(response.body());
                     }catch (Exception e){

@@ -45,86 +45,42 @@ public class Result {
     @SerializedName("address_2")
     @Expose
     private String address2;
+    @SerializedName("city")
+    @Expose
+    private String city;
     @SerializedName("postal_code")
     @Expose
     private String postalCode;
     @SerializedName("state")
     @Expose
     private String state;
-    @SerializedName("following")
-    @Expose
-    private String following;
-
-    @SerializedName("rating")
-    @Expose
-    private String rating;
-
-    @SerializedName("pending_bal")
-    @Expose
-    private String pending_bal;
-
-    public String getPending_bal() {
-        return pending_bal;
-    }
-
-    public void setPending_bal(String pending_bal) {
-        this.pending_bal = pending_bal;
-    }
-
-    public String getAvailable_bal() {
-        return available_bal;
-    }
-
-    public void setAvailable_bal(String available_bal) {
-        this.available_bal = available_bal;
-    }
-
-    @SerializedName("available_bal")
-    @Expose
-    private String available_bal;
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-
-    public String getStripeId() {
-        return stripeId;
-    }
-
-    public void setStripeId(String stripeId) {
-        this.stripeId = stripeId;
-    }
-
-    @SerializedName("stripe_id")
-    @Expose
-    private String stripeId;
-
-    public String getFollowing() {
-        return following;
-    }
-
-    public void setFollowing(String following) {
-        this.following = following;
-    }
-
-    public String getFollowers() {
-        return followers;
-    }
-
-    public void setFollowers(String followers) {
-        this.followers = followers;
-    }
-
-    @SerializedName("followers")
-    @Expose
-    private String followers;
     @SerializedName("address_city")
     @Expose
     private String addressCity;
+    @SerializedName("following")
+    @Expose
+    private Integer following;
+    @SerializedName("followers")
+    @Expose
+    private Integer followers;
+    @SerializedName("stripe_id")
+    @Expose
+    private String stripeId;
+    @SerializedName("stripe_verified")
+    @Expose
+    private String stripeVerified;
+    @SerializedName("available_bal")
+    @Expose
+    private String availableBal;
+    @SerializedName("pending_bal")
+    @Expose
+    private String pendingBal;
+    @SerializedName("rating")
+    @Expose
+    private String rating;
+    @SerializedName("qr_code")
+    @Expose
+    private String qrCode;
 
     public String getId() {
         return id;
@@ -230,6 +186,14 @@ public class Result {
         this.address2 = address2;
     }
 
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public String getPostalCode() {
         return postalCode;
     }
@@ -252,6 +216,70 @@ public class Result {
 
     public void setAddressCity(String addressCity) {
         this.addressCity = addressCity;
+    }
+
+    public Integer getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Integer following) {
+        this.following = following;
+    }
+
+    public Integer getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Integer followers) {
+        this.followers = followers;
+    }
+
+    public String getStripeId() {
+        return stripeId;
+    }
+
+    public void setStripeId(String stripeId) {
+        this.stripeId = stripeId;
+    }
+
+    public String getStripeVerified() {
+        return stripeVerified;
+    }
+
+    public void setStripeVerified(String stripeVerified) {
+        this.stripeVerified = stripeVerified;
+    }
+
+    public String getAvailableBal() {
+        return availableBal;
+    }
+
+    public void setAvailableBal(String availableBal) {
+        this.availableBal = availableBal;
+    }
+
+    public String getPendingBal() {
+        return pendingBal;
+    }
+
+    public void setPendingBal(String pendingBal) {
+        this.pendingBal = pendingBal;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
     }
 
 }

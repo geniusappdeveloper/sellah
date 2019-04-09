@@ -28,6 +28,7 @@ import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogf
 import com.app.admin.sellah.view.activities.AddNewVideos;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.activities.MainActivityLiveStream;
+import com.app.admin.sellah.view.activities.VideoWelcomeActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -144,9 +145,11 @@ public class SellFragment extends Fragment {
                 }
                 else
                 {
-                    Intent intent1 = new Intent(new Intent(getActivity(), MainActivityLiveStream.class));
-                    intent1.putExtra("value", "LiveStream");
-                    getActivity().startActivity(intent1);
+                    Intent intent = new Intent(getActivity(), VideoWelcomeActivity.class);
+                    startActivity(intent);
+
+
+
                 }
 
                 break;

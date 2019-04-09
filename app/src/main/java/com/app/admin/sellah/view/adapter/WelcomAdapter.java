@@ -5,12 +5,9 @@ import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatImageView;
-import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
@@ -59,11 +56,9 @@ public class WelcomAdapter extends PagerAdapter {
         if (position==0)
         {
             text_sellah.setTextColor(Color.parseColor("#aaaaaa"));
-
         }
         else
         {
-
             text_sellah.setTextColor(Color.parseColor("#e35252"));
         }
         text_sellah.setText(stringArray[position]);

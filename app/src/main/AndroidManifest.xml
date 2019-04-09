@@ -35,6 +35,14 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="allowBackup,supportsRtl">
+
+
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
+
+
         <receiver android:name=".controller.utils.SMSListener">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
@@ -62,6 +70,13 @@
             android:name=".view.activities.StreamedVideoDetail"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+
+        <activity
+            android:name=".view.activities.QrCodeActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
         <activity
             android:name=".view.activities.MainActivityLiveStream"
             android:screenOrientation="portrait"
@@ -121,7 +136,8 @@
                 <data android:host="www.sellahapp.com" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activities.WelcomeActivity">
+        <activity android:name=".view.activities.WelcomeActivity"> </activity>
+        <activity android:name=".view.activities.VideoWelcomeActivity">
 
 
         </activity>

@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:weightSum="3"
+
     android:background="?attr/selectableItemBackground"
     android:paddingLeft="@dimen/_3sdp">
     <de.hdodenhof.circleimageview.CircleImageView
@@ -17,6 +18,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         >
         <RelativeLayout
             android:id="@+id/card1"
@@ -34,6 +36,11 @@
             <LinearLayout
                 android:padding="@dimen/_8sdp"
                 android:layout_width="wrap_content"
+                android:layout_marginLeft="@dimen/_6sdp"
+                android:alpha=".8"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:background="@drawable/chat_round_grey"
                 android:layout_height="wrap_content">
                 <TextView
                     android:paddingRight="@dimen/_3sdp"

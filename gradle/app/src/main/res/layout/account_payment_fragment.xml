@@ -180,7 +180,6 @@
         android:layout_marginTop="@dimen/_5sdp"
         android:text="Sellah Wallet"
         android:textColor="@color/colorBlack"
-
         android:textSize="@dimen/_13sdp" />
 
     <TextView

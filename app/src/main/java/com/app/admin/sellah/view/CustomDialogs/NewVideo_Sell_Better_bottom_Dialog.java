@@ -33,7 +33,7 @@ public class NewVideo_Sell_Better_bottom_Dialog extends Dialog {
     Button excitedBtn;
     Context context;
 
-    public NewVideo_Sell_Better_bottom_Dialog(@NonNull Context context) {
+    public NewVideo_Sell_Better_bottom_Dialog( Context context) {
         super(context);
         this.context = context;
     }

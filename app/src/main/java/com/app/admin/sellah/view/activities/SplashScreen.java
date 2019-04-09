@@ -53,9 +53,12 @@ public class SplashScreen extends AppCompatActivity {
         makeTransperantStatusBar(this, true);
         setContentView(R.layout.splash_screen);
 //        permissions();
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
          welcomeScreenShown = mPrefs.getBoolean(welcomeScreenShownPref, false);
         Log.e("onCreate: ",""+welcomeScreenShown );
+
+
+
 
         PermissionCheckUtil.create(this, () -> {
 

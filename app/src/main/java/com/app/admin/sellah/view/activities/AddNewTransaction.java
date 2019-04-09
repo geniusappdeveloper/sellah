@@ -473,12 +473,14 @@ public class AddNewTransaction extends AppCompatActivity {
                     model.setNo_of_clicks(RequestBody.create(MediaType.parse("text/plain"), "0"));
 
 
-                    for (int i = 0; i < AddProductDatabase.imageListG.size(); i++) {
-
-/*                        if (i == 0) {
 
 
-                            try {
+/*                    for (int i = 0; i < AddProductDatabase.imageListG.size(); i++) {
+
+                        if (i == 0) {
+
+
+                           *//* try {
                                 URL url = new URL(AddProductDatabase.imageListG.get(0));
                                 Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 
@@ -492,12 +494,12 @@ public class AddNewTransaction extends AppCompatActivity {
 
                             } catch(IOException e) {
                                 System.out.println(e);
-                            }
+                            }*//*
 
 
 
-                            *//*RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(0)));
-                            multipartimage1 = MultipartBody.Part.createFormData("image1", "imageA.jpeg", image);*//*
+                            RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(AddProductDatabase.imageListG.get(0)));
+                            multipartimage1 = MultipartBody.Part.createFormData("image1", "imageA.jpeg", image);
 
                             //  model.setImage1(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image1"));
 
@@ -520,7 +522,6 @@ public class AddNewTransaction extends AppCompatActivity {
                             multipartimage5 = MultipartBody.Part.createFormData("image5", "imageE.jpeg", image);
                             //model.setImage5(ImageUploadHelper.convertImageTomultipart(AddProductDatabase.imageListG.get(i), "image5"));
                         }
-                        */
 
                         if (Global.videopath.equals("no_image")) {
 
@@ -540,13 +541,14 @@ public class AddNewTransaction extends AppCompatActivity {
                             model.setProductVideo(mulitpartvideo);
                         }
 
-                    }
+                    }*/
 
                     if (isEditing) {
 
                         // model.setProduct_id(RequestBody.create(MediaType.parse("text/plain"), productId));
                         // editProduct(model);
                         Log.e("EditProduct", "allDone");
+
 
                     } else {
 
@@ -563,6 +565,7 @@ public class AddNewTransaction extends AppCompatActivity {
                     addProduct(model);
                     Log.e("addProduct", "allDone");
                 } else {*/
+
 
                         if (productStatus.equalsIgnoreCase("add"))
                         {
@@ -862,7 +865,7 @@ public class AddNewTransaction extends AppCompatActivity {
     public void updateProduct(AddProductModel addProductModel) {
 
 
-
+        Log.e("updateProductStatus","pre");
 
        WebService service = Global.WebServiceConstants.getRetrofitinstance();
         Dialog dialog = S_Dialogs.getLoadingDialog(AddNewTransaction.this);
@@ -882,9 +885,11 @@ public class AddNewTransaction extends AppCompatActivity {
                 if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
+                Log.e("updateProductStatus","updated");
 
                 if (response.isSuccessful())
                 {
+                    Log.e("updateProductStatus","added");
                     try {
 
                         JSONObject jsonObject = new JSONObject(response.body().toString());

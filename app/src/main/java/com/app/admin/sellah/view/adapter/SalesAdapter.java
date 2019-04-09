@@ -250,11 +250,9 @@ public class SalesAdapter extends RecyclerView.Adapter<SalesAdapter.ViewHolder> 
                             ArrayList<Result> list = new ArrayList<>();
                             list.addAll(saleList.getResult());
 
+
                             Bundle bundle = new Bundle();
                             bundle.putParcelableArrayList("modelProductList",list);
-
-
-
                             Intent intent= new Intent(context,AddNewVideos.class);
                             intent.putExtra("way_status","SalesAdapter");
                             intent.putExtra("position",String.valueOf(position));

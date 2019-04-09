@@ -1,6 +1,7 @@
 package com.app.admin.sellah.view.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,14 +37,17 @@ import com.app.admin.sellah.model.extra.CardDetails.Card;
 import com.app.admin.sellah.model.extra.CardDetails.CardDetailModel;
 import com.app.admin.sellah.view.CustomAnimations.MyBounceInterpolator;
 import com.app.admin.sellah.view.CustomDialogs.AccountPreshowDialog1;
+import com.app.admin.sellah.view.CustomDialogs.PayDialog_QRScan;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
-import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
 import com.app.admin.sellah.view.activities.MainActivity;
+import com.bumptech.glide.Glide;
 import com.cooltechworks.creditcarddesign.CreditCardUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +69,9 @@ import static com.app.admin.sellah.controller.stripe.StripeSession.API_ACCESS_TO
 import static com.app.admin.sellah.controller.stripe.StripeSession.STRIPE_VERIFIED;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.AVAILABLE_BALANCE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PENDING_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.QRCODE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
+import static org.webrtc.ContextUtils.getApplicationContext;
 
 
 /**
@@ -108,6 +115,8 @@ public class PaymentFragment extends Fragment {
     TextView withdraw;
     @BindView(R.id.sel_txt_pend1)
     TextView selTxtPend1;
+    @BindView(R.id.imgview_qr_code)
+    ImageView imgviewQrCode;
     private Dialog progress;
     private Animation myAnim;
     HashMap<EditText, String> bankDetaildialogMessages;
@@ -126,6 +135,8 @@ public class PaymentFragment extends Fragment {
     private StripeApp StripeAppmApp;
     private Dialog dialog;
     WebService service;
+
+
 
     @SuppressLint("ValidFragment")
     public PaymentFragment() {
@@ -146,6 +157,8 @@ public class PaymentFragment extends Fragment {
         service = Global.WebServiceConstants.getRetrofitinstance();
         Log.e("onGetDataSuccess: ", "d" + (HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED)));
 
+
+
         if ((HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("") || HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED).equals("N"))) {
             rlSellahwalletClicklink.setVisibility(View.VISIBLE);
             Log.e("onCreateView: ", "1");
@@ -159,10 +172,11 @@ public class PaymentFragment extends Fragment {
             String acc = HelperPreferences.get(getActivity()).getString(API_ACCESS_TOKEN);
             String newacc = acc.substring(acc.length() - 4);
 
+            Glide.with(getActivity()).load(HelperPreferences.get(getActivity()).getString(QRCODE)).into(imgviewQrCode);
+
             selTxtAcc1.setText("* *** " + newacc);
 
-            }
-
+        }
 
 
         new ApisHelper().getCardApi(getActivity(), new ApisHelper.OnGetCardDataListners() {
@@ -388,6 +402,40 @@ public class PaymentFragment extends Fragment {
 
         }
 
+        //-----------qr code onActivity----------------------------------------
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            //if qrcode has nothing in it
+            if (result.getContents() == null) {
+                Toast.makeText(getActivity(), "Result Not Found", Toast.LENGTH_LONG).show();
+            } else {
+                //if qr contains data
+                try {
+                    //converting the data to json
+                    JSONObject obj = new JSONObject(result.getContents());
+                    //setting values to textviews
+                  //  Log.e("contentVal",obj.getString("name"));
+                  //  Log.e("contentVal",obj.getString("address"));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    //if control comes here
+                    //that means the encoded format not matches
+                    //in this case you can display whatever data is available on the qrcode
+                    //to a toast
+                  //  Toast.makeText(getActivity(), result.getContents(), Toast.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
+
+
+        //---------------------------------------------------------------
+
+
+
     }
 
 
@@ -433,12 +481,19 @@ public class PaymentFragment extends Fragment {
     }
 
 
-    @OnClick({R.id.withdraw, R.id.rl_sellahwallet_clicklink, R.id.rel_qr_scan,R.id.scan_rel})
+    @OnClick({R.id.withdraw, R.id.rl_sellahwallet_clicklink, R.id.rel_qr_scan, R.id.scan_rel, R.id.phone_qrScan})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.withdraw:
                 wirhdraw_api();
                 break;
+
+            case R.id.phone_qrScan:
+
+          //      scanFromFragment();
+                new PayDialog_QRScan(getActivity(),HelperPreferences.get(getActivity()).getString(AVAILABLE_BALANCE)).show();
+                break;
+
             case R.id.rl_sellahwallet_clicklink:
 
                 AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(getActivity());
@@ -453,8 +508,8 @@ public class PaymentFragment extends Fragment {
                 break;
 
             case R.id.scan_rel:
-               flip();
-               break;
+                flip();
+                break;
 
         }
     }
@@ -475,6 +530,12 @@ public class PaymentFragment extends Fragment {
         rootLayout.startAnimation(flipAnimation);
 
     }
+
+
+
+
+
+
 
 
 }

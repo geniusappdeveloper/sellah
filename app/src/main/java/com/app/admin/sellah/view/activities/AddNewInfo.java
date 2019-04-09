@@ -176,6 +176,8 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                                 Log.e("updateException",e.getMessage());
                             }
 
+                         //   Log.e("valueFetch",list.get(pos).getCategoryName());
+
 
                         }
 
@@ -726,6 +728,21 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                try {
+
+
+
+                if (edtPrice.getText().toString().trim().contains("."))
+                {
+                    totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
+                }
+                else
+                {
+                    totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
+                }
+
+                }catch (Exception e) { }
 
             }
 

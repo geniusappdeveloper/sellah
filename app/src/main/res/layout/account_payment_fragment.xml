@@ -139,6 +139,7 @@
                     android:background="@drawable/credit_card_back"
                     android:layout_width="match_parent"
                     android:id="@+id/add_rel"
+
                     android:layout_height="@dimen/_130sdp">
                     <LinearLayout
                         android:orientation="vertical"
@@ -279,7 +280,8 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/qr_scan"
+                            android:id="@+id/imgview_qr_code"
+
                             android:layout_centerInParent="true"/>
 
 
@@ -327,6 +329,7 @@
                                 android:layout_height="@dimen/_26sdp"
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
+                                android:id="@+id/phone_qrScan"
                                 android:layout_marginBottom="@dimen/_2sdp"
                                 android:background="@drawable/qr_code_mobile"
                                />

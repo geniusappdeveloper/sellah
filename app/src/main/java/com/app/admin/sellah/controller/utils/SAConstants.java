@@ -10,6 +10,7 @@ public class SAConstants {
         public static final String USER_PROFILE_PIC="sa.user.pic";
         public static final String USER_EMAIL="sa.user.email";
         public static final String AVAILABLE_BALANCE="sa.user.AVAILAble";
+        public static final String QRCODE="sa.user.QRCODE";
         public static final String PENDING_BALANCE="sa.user.PENDING";
         public static final String USER_STRIPE_ID="sa.user.stripe.id";
         public static final String PROFILESTATUS="sa.profile.status";
@@ -112,11 +113,18 @@ public class SAConstants {
         public static String SCREEN_STATUS="";
     }
     public static class Urls{
-        public static final String SOCKETURL = "http://54.251.140.9:3000/";
+
+
+        public static final String SOCKETURL = "http://18.138.43.45:3000";
 //        public static final String SOCKETURL = "http://168.63.243.19:3000/";
 //        public static String BASEURL = "http://168.63.243.19/Sellah/api/";
-        public static String BASEURL = "http://54.251.140.9/Sellah/api/";
+      //  public static String BASEURL = "http://54.251.140.9/Sellah/api/";
+        public static String BASEURL = "http://18.138.43.45//Sellah/api/";
         public static String AUTHKEY = "authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh";
+
+
+
+
     }
 
 }
