@@ -84,6 +84,10 @@ import com.app.admin.sellah.view.adapter.SuggestedPostAdapter;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -111,6 +115,7 @@ import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PR
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
 import static com.app.admin.sellah.controller.utils.Global.makeTextViewResizable;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.DEEP_LINKING;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.MAKE_OFFER_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -261,7 +266,20 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         unbinder = ButterKnife.bind(this, view);
         hideSearch();
         service = Global.WebServiceConstants.getRetrofitinstance();
-        productDetial = getArguments().getParcelable(SAConstants.Keys.PRODUCT_DETAIL);
+
+        if (getArguments().containsKey(SAConstants.Keys.PRODUCT_DETAIL))
+        {
+            productDetial = getArguments().getParcelable(SAConstants.Keys.PRODUCT_DETAIL);
+
+        }
+
+
+       /* if (getArguments().containsKey(DEEP_LINKING))
+        {
+
+            Log.e("valProduct",getArguments().getString("ProductId"));
+            getProductDetailsApi(getArguments().getString("ProductId"));
+        }*/
         dialog = S_Dialogs.getLoadingDialog(getActivity());
 
         initViews(view);
@@ -270,6 +288,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         if (productDetial != null) {
             Log.e("onPaymentSuccess:1 ", productDetial.getId());
             getProductDetailsApi(productDetial.getId());
+            getProductUrlApi(productDetial.getId());
             //  dummcheck(productDetial.getId());
 //            setUpData(productDetial);
         } else {
@@ -299,7 +318,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
         listeners();
         txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        getSuggestedPostList();
+        if (productDetial.getCatId()!=null)
+         getSuggestedPostList();
         productback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1890,6 +1910,43 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         Intent previewintent = new Intent(getActivity(), Previewvideo.class);
         previewintent.putExtra("video", videourl);
         startActivity(previewintent);
+    }
+
+
+
+    public void getProductUrlApi(String productId) {
+        Call<JsonObject> productUrl;
+        productUrl = service.getProductUrl(HelperPreferences.get(getActivity()).getString(UID), productId,"p");
+        productUrl.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+
+                if (response.isSuccessful())
+                {
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response.body().toString());
+                        String status = jsonObject.getString("status");
+                        if (status.equalsIgnoreCase("1"))
+                        {
+                            String url = jsonObject.getString("url");
+                           // Log.e("getUrlPrint",url);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
     }
 
 

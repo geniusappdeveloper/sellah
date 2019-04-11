@@ -136,6 +136,8 @@ public class PaymentFragment extends Fragment {
     private Dialog dialog;
     WebService service;
 
+    public static String card_id="",customer_id="",qr_scan_id="";
+
 
 
     @SuppressLint("ValidFragment")
@@ -156,6 +158,8 @@ public class PaymentFragment extends Fragment {
         progress = S_Dialogs.getLoadingDialog(getActivity());
         service = Global.WebServiceConstants.getRetrofitinstance();
         Log.e("onGetDataSuccess: ", "d" + (HelperPreferences.get(getActivity()).getString(STRIPE_VERIFIED)));
+
+
 
 
 
@@ -187,6 +191,9 @@ public class PaymentFragment extends Fragment {
 
                 if (body != null) {
                     setUpcards(body.getCards());//set card list adapter
+
+                 customer_id = body.getCards().get(0).getCustomer();
+                 card_id = body.getCards().get(0).getId();
                 }
 
 
@@ -489,9 +496,7 @@ public class PaymentFragment extends Fragment {
                 break;
 
             case R.id.phone_qrScan:
-
-          //      scanFromFragment();
-                new PayDialog_QRScan(getActivity(),HelperPreferences.get(getActivity()).getString(AVAILABLE_BALANCE)).show();
+                //  new PayDialog_QRScan(getActivity(),HelperPreferences.get(getActivity()).getString(AVAILABLE_BALANCE)).show();
                 break;
 
             case R.id.rl_sellahwallet_clicklink:
@@ -530,6 +535,7 @@ public class PaymentFragment extends Fragment {
         rootLayout.startAnimation(flipAnimation);
 
     }
+
 
 
 

@@ -50,6 +50,10 @@ public class Pay_offer_adapter extends RecyclerView.Adapter<Pay_offer_adapter.Pa
         this.cardOptionSelection = cardOptionSelection;
         this.cross_status = cross_status;
 
+        Log.e("printList",list.size()+"");
+        Log.e("printList",list+"");
+
+
     }
 
     public Pay_offer_adapter(Context activity,  ArrayList<Map<String,String>> list ,OnCardOptionSelection cardOptionSelection) {
@@ -78,11 +82,16 @@ public class Pay_offer_adapter extends RecyclerView.Adapter<Pay_offer_adapter.Pa
                 .into(holder.offerimage);
 
 
-        if (list.get(position).get("order_status").equalsIgnoreCase("A")) {
+        if (list.get(position).get("order_status").equalsIgnoreCase("A"))
+        {
             holder.cancel_offer.setVisibility(View.GONE);
+            holder.paid_status.setVisibility(View.GONE);
         }
         else
-        {holder.cancel_offer.setVisibility(View.VISIBLE);}
+        {
+            holder.cancel_offer.setVisibility(View.VISIBLE);
+            holder.paid_status.setVisibility(View.VISIBLE);
+        }
 
         if (cross_status.isEmpty())
         {
@@ -99,6 +108,8 @@ public class Pay_offer_adapter extends RecyclerView.Adapter<Pay_offer_adapter.Pa
 
 
         }
+
+
 
         holder.cancel_offer.setOnClickListener(new View.OnClickListener() {
             @Override

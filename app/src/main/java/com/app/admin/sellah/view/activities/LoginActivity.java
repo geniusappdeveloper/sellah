@@ -305,6 +305,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
+                    Log.e("errorPrint",t.getMessage());
                     Snackbar.make(rel_root, "Something went's wrong", Snackbar.LENGTH_SHORT)
                             .setAction("", null).show();
                 }

@@ -114,6 +114,7 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
     }
 
     private void getProfiledata(String otherUserId) {
+        Log.e("printUserId",otherUserId);
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
         Call<ProfileModel> getProfileCall = service.getProfileApi(otherUserId);
@@ -141,6 +142,7 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
             @Override
             public void onFailure(Call<ProfileModel> call, Throwable t) {
                 dismissDialog(dialog);
+                Log.e("errorPrint",t.getMessage());
                 Snackbar.make(liPersonalProfileRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
                         .setAction("", null).show();
             }
@@ -174,8 +176,16 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
                     .apply(requestOptions)
                     .into(imgUserProfile);
 
-            tvFollowers.setText(profileData.getResult().getFollowers());
-            tvFollowing.setText(profileData.getResult().getFollowing());
+
+            try {
+                  tvFollowers.setText(String.valueOf(profileData.getResult().getFollowers()));
+                   tvFollowing.setText(String.valueOf(profileData.getResult().getFollowing()));
+
+            }catch (Exception e){
+
+            }
+
+
 
             setUpViewPagger();
         }

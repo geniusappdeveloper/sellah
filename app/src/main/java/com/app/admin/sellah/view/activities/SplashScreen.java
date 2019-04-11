@@ -23,6 +23,7 @@ import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
 
 import static com.app.admin.sellah.controller.utils.PermissionCheckUtil.PERMISSION_REQUEST_CODE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.DEEP_LINKING;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 import static com.app.admin.sellah.controller.utils.Global.makeTransperantStatusBar;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_ACCEPT_REJECT;
@@ -33,6 +34,8 @@ import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_OFFER_MAKE;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PAYMENT;
 import static com.app.admin.sellah.controller.utils.SAConstants.NotificationKeys.NT_PRODUCT_ADDED;
+
+
 
 public class SplashScreen extends AppCompatActivity {
     // Splash screen timer
@@ -402,7 +405,36 @@ public class SplashScreen extends AppCompatActivity {
                 }
                 else
                 {
-                    handleNotificationData();
+
+
+                    Intent in = getIntent();
+                    Uri data = in.getData();
+                    if (data!=null)
+                    {
+                        String action = in.getAction();
+                        String data1 = in.getDataString();
+
+
+                        if (Intent.ACTION_VIEW.equals(action) && data != null) { }
+                      //  Log.e("valueDeepLink",action+"");
+                     //   Log.e("valueDeepLink",data1+"");
+
+
+                        Intent intent = new Intent(SplashScreen.this, MainActivity.class);
+                        intent.putExtra(DEEP_LINKING,"deeplink");
+                        startActivity(intent);
+                        finish();
+
+                    }
+                    else
+                    {
+
+                        handleNotificationData();
+                    }
+
+
+
+
                 }
 
 

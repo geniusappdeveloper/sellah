@@ -219,13 +219,15 @@ public class MyAccountFragment extends Fragment {
 
     private void createViewPager(ViewPager viewPager) {
         ProfilePagerAdapter adapter = new ProfilePagerAdapter(getChildFragmentManager());
-        adapter.addFrag(new AccountTabFragment(profileData), "Account");
-        adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Wallet");
+        if (profileData!=null)
+        {
 
-        /* no need now */
+
+        adapter.addFrag(new AccountTabFragment(profileData), "Account");
+        adapter.addFrag(new PaymentFragment(profileData.getResult().getStripeId()), "Wallet");/* no need now */
        /* adapter.addFrag(new SocialFragment(), "Social");*/
         viewPager.setAdapter(adapter);
-
+        }
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

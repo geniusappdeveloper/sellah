@@ -30,7 +30,11 @@ import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.ProfilePagerAdapter;
 import com.app.admin.sellah.view.adapter.SalesAdapter;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -94,11 +98,16 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
 
 //        btnEditProfile = (Button) view.findViewById(R.id.btn_edit_profile);
 
+
+
         service = Global.WebServiceConstants.getRetrofitinstance();
         createViewPager(profileViewPager);
         profileTabLayout.setupWithViewPager(profileViewPager);
         hideSearch();
         getProfileData();
+
+
+
         return view;
 
     }
@@ -119,11 +128,13 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
                     HelperPreferences.get(getActivity()).saveString(PENDING_BALANCE, response.body().getResult().getAvailableBal());
                     HelperPreferences.get(getActivity()).saveString(AVAILABLE_BALANCE, response.body().getResult().getAvailableBal());
                     HelperPreferences.get(getActivity()).saveString(QRCODE, response.body().getResult().getQrCode());
+                    HelperPreferences.get(getActivity()).saveString(QRCODE, response.body().getResult().getQrCode());
                     try {
                         profileAvailableBalTxt.setText("S$ " + response.body().getResult().getAvailableBal());
                         profileData = response.body();
                         setProfileData(response.body());
                     }catch (Exception e){
+                        Log.e("errorPrint",e.getMessage());
                     }
 
                 } else {
@@ -168,10 +179,20 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
                 Picasso.with(getActivity()).load(body.getResult().getImage()).fit().centerCrop().
                         into(imgProfilePic);
 
-                tvFollowersCount.setText(profileData.getResult().getFollowers());
-                tvFollowingCount.setText(profileData.getResult().getFollowing());
-            } catch (Exception e) {
+             //   tvFollowersCount.setText(profileData.getResult().getFollowers());
+             //   tvFollowingCount.setText(profileData.getResult().getFollowing());
 
+
+                try {
+                    tvFollowersCount.setText(String.valueOf(profileData.getResult().getFollowers()));
+                    tvFollowingCount.setText(String.valueOf(profileData.getResult().getFollowing()));
+
+                }catch (Exception e){
+
+                }
+
+            } catch (Exception e) {
+                Log.e("errorPrint",e.getMessage());
             }
         }
     }
@@ -254,6 +275,10 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
 
 
     }
+
+
+
+
 }
 
 

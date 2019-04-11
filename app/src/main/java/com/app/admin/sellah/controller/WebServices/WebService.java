@@ -484,4 +484,16 @@ public interface WebService {
     @POST("withdrawal_money")
     Call<JsonObject> withdrawal_money(@Field("user_id") String userId);
 
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("qr_payment")
+    Call<JsonObject> pay_money_scan(@Field("user_id") String userId,@Field("other_user_id") String other_user_id,@Field("amount") String amount,@Field("currency_type") String currency_type,@Field("token") String token,@Field("customer_id") String customer_id);
+
+
+    @FormUrlEncoded
+    @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
+    @POST("generate_url")
+    Call<JsonObject> getProductUrl(@Field("user_id") String userId, @Field("url_id") String url_id,@Field("url_type") String url_type);
+
+
 }

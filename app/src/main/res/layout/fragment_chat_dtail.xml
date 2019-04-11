@@ -197,7 +197,7 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_8sdp"
                     android:layout_weight="1.6"
-                    android:background="@drawable/edittextb_back"
+                    android:background="@drawable/roundcorners_white"
                     android:hint="Type a message here"
                     android:inputType="textMultiLine"
                     android:maxHeight="@dimen/_100sdp"

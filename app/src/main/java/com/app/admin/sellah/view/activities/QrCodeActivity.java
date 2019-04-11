@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.app.admin.sellah.view.fragments.PaymentFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -15,7 +18,10 @@ public class QrCodeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PaymentFragment.qr_scan_id="";
+
         scanBarcodeCustomLayout();
+
 
     }
 
@@ -29,7 +35,13 @@ public class QrCodeActivity extends Activity {
         integrator.setOrientationLocked(false);
         integrator.setBeepEnabled(false);
         integrator.initiateScan();
-        finish();
+      //  finish();
+
+      /*  new IntentIntegrator(this).initiateScan();
+        finish();*/
+
+      //  new IntentIntegrator(this).initiateScan();
+
     }
 
 
@@ -38,13 +50,17 @@ public class QrCodeActivity extends Activity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
-              //  toast = "Cancelled from fragment";
+
+              //  Log.e("ResultPrint: ","Null");
+                finish();
             } else {
-             //   toast = "Scanned from fragment: " + result.getContents();
+
+             //   Log.e("ResultPrint: ",result.getContents());
+                PaymentFragment.qr_scan_id = result.getContents();
+                finish();
             }
 
-            // At this point we may or may not have a reference to the activity
-         //   displayToast();
         }
     }
+
 }

@@ -26,6 +26,7 @@ public class SAConstants {
         public static final int TYPE_PINED_RECEIVED_MSG=7376;
         public static final int USER_RESULT=1213;
         public static final String Chat_User_Data="sa.chat.user.data";
+        public static final String DEEP_LINKING="sa.deep.link";
         public static final String CAT_POS="sa.cat.pos";
         public static final String SUB_CAT_POS="sa.sub.cat.pos";
         public static final String CAT_ID="sa.cat.id";
@@ -115,11 +116,12 @@ public class SAConstants {
     public static class Urls{
 
 
-        public static final String SOCKETURL = "http://18.138.43.45:3000";
-//        public static final String SOCKETURL = "http://168.63.243.19:3000/";
-//        public static String BASEURL = "http://168.63.243.19/Sellah/api/";
-      //  public static String BASEURL = "http://54.251.140.9/Sellah/api/";
-        public static String BASEURL = "http://18.138.43.45//Sellah/api/";
+     //   public static final String SOCKETURL = "http://18.138.43.45:3000";
+        public static final String SOCKETURL = "https://sellah.dev:3000";
+   //     public static String BASEURL = "http://18.138.43.45//Sellah/api/";
+        public static String BASEURL = "https://sellah.dev/Sellah/api/";
+
+
         public static String AUTHKEY = "authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh";
 
 

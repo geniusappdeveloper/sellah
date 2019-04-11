@@ -62,8 +62,6 @@ import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogf
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.adapter.ChatAdapter;
 import com.app.admin.sellah.view.adapter.Pay_offer_adapter;
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -89,6 +87,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -443,9 +443,12 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e("connection_error", args.toString());
+
+                  Log.e("errorValue",args[0]+" exception");
+
                     Toast.makeText(getActivity(),
                             "error_connect", Toast.LENGTH_LONG).show();
+
                 }
             });
         }
@@ -951,6 +954,12 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                         for (int i = 0; i < extra_list.size(); i++) {
 
                             if (extra_list.get(0).get("order_status").equalsIgnoreCase("A")) {
+                                if (extra_list.get(i).get("price_cost").contains("$"))
+                                {
+                                    String amt =  extra_list.get(i).get("price_cost").replace("$","");
+                                    amount = Integer.parseInt(amt);
+                                }
+                                else
                                 amount = Integer.parseInt(extra_list.get(i).get("price_cost"));
 
                                 total_amount += amount;
@@ -1285,6 +1294,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
     private void setupoffer(ArrayList<Map<String, String>> list) {
 
+
         try {
             payoffer_adapter = new Pay_offer_adapter(getActivity(), list,this,"yes");
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
@@ -1319,10 +1329,9 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
     private void getofferlist(String otherUserId) {
 
-        Log.e("getofferlist: ", "fff" + otherUserId);
+        Log.e("getofferlist: ", "" + otherUserId);
+
         chatoffercall = service.chat_offer_list(HelperPreferences.get(getActivity()).getString(UID), otherUserId);
-
-
         chatoffercall.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -1423,6 +1432,9 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                             }
 
 
+
+
+
                             markasCompleteBtnCollapsedItems.setOnClickListener(view1 -> {
 
 
@@ -1444,7 +1456,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
                         }
 
-
+                        Log.e("sizePrint",list.size()+"");
                         if (!list.isEmpty()) {
                             extra_list.clear();
                             extra_list.addAll(list);
@@ -1452,9 +1464,11 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                             payLayout.setVisibility(View.VISIBLE);
                             mainofferliststatus_btn(extra_list);
 
+
+
                             if (list.size() <= 1) {
 
-
+                                Log.e("sizePrint","111");
                                 Log.e("ccccc: ", "ccc");
                                 btnCollapsedItems.setVisibility(View.GONE);
                                 main_offer_list.add(list.get(0));
@@ -1462,6 +1476,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
 
                             } else {
+                                Log.e("sizePrint","222");
                                 Log.e("ccccc: ", "ccc1");
                                 main_offer_list.add(list.get(0));
                                 setupoffer(main_offer_list);
@@ -1470,6 +1485,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
                             }
                         } else {
+                            Log.e("sizePrint","Else");
                             payLayout.setVisibility(View.GONE);
                         }
 
@@ -1611,8 +1627,18 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                 for (int i = 0; i < t.size(); i++) {
 
                     if (t.get(0).get("order_status").equalsIgnoreCase("A")) {
-                        amount = Integer.parseInt(t.get(i).get("price_cost"));
-                        total_amount += amount;
+                        if (t.get(i).get("price_cost").contains("$"))
+                        {
+                            String amt = t.get(i).get("price_cost").replace("$","");
+                            amount = Integer.parseInt(amt);
+                            total_amount += amount;
+                        }
+                        else
+                        {
+                            amount = Integer.parseInt(t.get(i).get("price_cost"));
+                            total_amount += amount;
+                        }
+
                     }
 
 
