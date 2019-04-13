@@ -115,6 +115,12 @@ public class Global extends MultiDexApplication {
     public static boolean from_register = false;
     public static boolean deleted_account = false;
 
+    public static  String DEEP_LINKING_STATUS="disable";
+    public static  String DEEP_LINKING_PRODUCT_ID="";
+    public static  String DEEP_LINKING_PRODUCT_TYPE="";
+    public static  String DEEP_LINKING_PRODUCT_URL="";
+
+
 
     private Socket mSocket;
     {
@@ -127,6 +133,7 @@ public class Global extends MultiDexApplication {
                     return true;
                 }
             };
+
             TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
                 @Override
                 public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {

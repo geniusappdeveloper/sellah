@@ -10,9 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.model.extra.PromotePackages.PackagesList;
+import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 
 import java.util.List;
 
@@ -27,11 +29,15 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
     int pos=-1;
     int nottoselect_pos;
 
+
+
     public PromoteOfferAdapter(Context context, List<PackagesList> packagesList, OfferCallBack callBack) {
        mInflater=LayoutInflater.from(context);
        this.context=context;
        this.packagesList=packagesList;
        this.callBack=callBack;
+
+
     }
 
 
@@ -47,6 +53,10 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
 
 
         Log.e( "onBindViewHolder: ",packagesList.get(position).getAmount());
+
+        if (position>=0 && PromoteDialog.promote_selected_id.equalsIgnoreCase(""))
+            PromoteDialog.promote_selected_id=packagesList.get(0).getId();
+
 
         /*for dark background */
 
@@ -92,15 +102,23 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
 
         holder.txtOfferPrice.setText(packagesList.get(position).getClicks()+" clicks");
         holder.txtDuration.setText(packagesList.get(position).getValidity()+" days");
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 pos = holder.getAdapterPosition();
 
-                notifyDataSetChanged();
+                PromoteDialog.promote_selected_id = packagesList.get(position).getId();
+
                 callBack.onOfferSelect(packagesList.get(position).getId());
+
+                notifyDataSetChanged();
+
             }
         });
+
+
+
 
 
        /* if (position==packagesList.size()-1){
@@ -126,10 +144,11 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        LinearLayout cardView,main_cd;
+        LinearLayout cardView,main_cd,lin_promote_package;
         TextView txtOffer,txtOfferPrice,txtDuration,dummy_val,dummy_offer;
         public ViewHolder(View v) {
             super(v);
+            lin_promote_package=view.findViewById(R.id.lin_promote_package);
             cardView=view.findViewById(R.id.cd_root);
             main_cd=view.findViewById(R.id.mian_cd_root);
             txtOffer=view.findViewById(R.id.txt_offer);

@@ -259,7 +259,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
         view = inflater.inflate(R.layout.product_fragment, container, false);
@@ -273,13 +273,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
         }
 
+        //--------------clearing deep linking status-----------------
+        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+            Global.DEEP_LINKING_STATUS="disable";
 
-       /* if (getArguments().containsKey(DEEP_LINKING))
-        {
 
-            Log.e("valProduct",getArguments().getString("ProductId"));
-            getProductDetailsApi(getArguments().getString("ProductId"));
-        }*/
+
         dialog = S_Dialogs.getLoadingDialog(getActivity());
 
         initViews(view);
@@ -318,7 +317,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
         listeners();
         txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        if (productDetial.getCatId()!=null)
+        if (productDetial!=null && productDetial.getCatId()!=null)
          getSuggestedPostList();
         productback.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -994,7 +993,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                                 case R.id.menu_share:
                                     Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                                     sharingIntent.setType("text/plain");
-                                    String shareBodyText = "Check it out. Your message goes here";
+                                    String shareBodyText = Global.DEEP_LINKING_PRODUCT_URL;
                                     sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
                                     sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
                                     startActivity(Intent.createChooser(sharingIntent, "Sharing Option"));
@@ -1913,16 +1912,14 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     }
 
 
-
+   //------------------generate product url---------------------
     public void getProductUrlApi(String productId) {
         Call<JsonObject> productUrl;
         productUrl = service.getProductUrl(HelperPreferences.get(getActivity()).getString(UID), productId,"p");
         productUrl.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
 
                 if (response.isSuccessful())
                 {
@@ -1932,8 +1929,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                         String status = jsonObject.getString("status");
                         if (status.equalsIgnoreCase("1"))
                         {
-                            String url = jsonObject.getString("url");
-                           // Log.e("getUrlPrint",url);
+                            Global.DEEP_LINKING_PRODUCT_URL = jsonObject.getString("url");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

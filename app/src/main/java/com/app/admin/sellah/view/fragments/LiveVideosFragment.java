@@ -1,5 +1,6 @@
 package com.app.admin.sellah.view.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +29,7 @@ import com.app.admin.sellah.model.extra.LiveVideoModel.VideoList;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.view.CustomViews.TouchDetectableScrollView;
 import com.app.admin.sellah.view.activities.MainActivity;
+import com.app.admin.sellah.view.activities.MainActivityLiveStream;
 import com.app.admin.sellah.view.adapter.Live_featureViewPagerAdapter;
 import com.app.admin.sellah.view.adapter.SubCategoryLive1Adapter;
 import com.app.admin.sellah.view.adapter.VideoCategoriesAdptTwo;
@@ -350,20 +352,49 @@ public class LiveVideosFragment extends Fragment implements SubCategoryControlle
     }
 
     public void getVideoListOther(String cat) {
+
         new ApisHelper().getLiveVideoData(getActivity(), String.valueOf(currentPage), ExpandableListData.getCatId(cat), new ApisHelper.GetLiveVideoCallback() {
             @Override
             public void onGetLiveVideoSuccess(LiveVideoModel msg) {
                 if (TOTAL_PAGES == 0) {
                     TOTAL_PAGES = Integer.parseInt(msg.getTotalPages());
                 }
-                Log.e(TAG, "onGetLiveVideoSuccess: " + msg.getTotalPages());
+                Log.e("getPagesSize", "onGetLiveVideoSuccess: " + msg.getTotalPages());
 //                TOTAL_PAGES = Integer.parseInt(msg.getTotalPages());
                 videoLists.addAll(msg.getList());
 
-                Log.e("csdvcsd", list.size() + "");
+                Log.e("getListSize", videoLists.size() + "");
                 if (pbHome!=null) {
                     pbHome.setVisibility(View.GONE);
                 }
+
+                //---------Deep linking---------------------------------------
+                if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+                {
+
+                for (int i = 0; i <videoLists.size() ; i++)
+                  {
+                   if (videoLists.get(i).getGroupId().equalsIgnoreCase(Global.DEEP_LINKING_PRODUCT_ID))
+                   {
+                       Intent intent = new Intent(new Intent(getActivity(), MainActivityLiveStream.class));
+                       intent.putExtra("value", "noLiveStream");
+                       intent.putExtra("id",videoLists.get(i).getVideoId());
+                       intent.putExtra("group_id",videoLists.get(i).getGroupId());
+                       intent.putExtra("product_id",videoLists.get(i).getProductId());
+                       intent.putExtra("product_name",videoLists.get(i).getProductName());
+                       intent.putExtra("seller_id",videoLists.get(i).getSellerId());
+                       intent.putExtra("start_time",videoLists.get(i).getStartTime());
+                       intent.putExtra("views",videoLists.get(i).getViews());
+                       getActivity().startActivity(intent);
+                   }
+                  }
+                 }
+
+
+                //-----------------------------------------------------------
+
+
+
 
                 if (videoLists.size() == 0) {
                     if (llNoProduct!=null)  llNoProduct.setVisibility(View.VISIBLE);

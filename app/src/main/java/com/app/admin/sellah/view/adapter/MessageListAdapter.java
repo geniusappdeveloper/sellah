@@ -137,6 +137,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
            holder.imageView.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
+
+
+
                    if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
 
                        if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){

@@ -8,6 +8,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.Gravity;
@@ -104,15 +106,15 @@ public class Stripe_dialogfragment extends DialogFragment {
     List<String> list= new ArrayList<>();
     int selected_routingpositioin;
 
+    public static   boolean dialogInIt=true;
+    int count = 0;
 
-    @Nullable
+
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.stripe_new_ui, container, false);
-
-       /* AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(getActivity());
-        accountPreshowDialog1.show();*/
 
 
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
@@ -120,6 +122,8 @@ public class Stripe_dialogfragment extends DialogFragment {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setGravity(Gravity.BOTTOM);
         unbinder = ButterKnife.bind(this, view);
+
+
         service = Global.WebServiceConstants.getRetrofitinstance();
         getLocalIpAddress();
         list.add("Select your bank");
@@ -134,7 +138,33 @@ public class Stripe_dialogfragment extends DialogFragment {
         focuslisteneres();
         routing_spinner_method();
 
+        strEdtRoutingnumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (count <= strEdtRoutingnumber.getText().toString().length()
+                        &&(strEdtRoutingnumber.getText().toString().length()==4)){
+                    strEdtRoutingnumber.setText(strEdtRoutingnumber.getText().toString()+"-");
+                    int pos = strEdtRoutingnumber.getText().length();
+                    strEdtRoutingnumber.setSelection(pos);
+                }else if (count >= strEdtRoutingnumber.getText().toString().length()
+                        &&(strEdtRoutingnumber.getText().toString().length()==4)){
+                    strEdtRoutingnumber.setText(strEdtRoutingnumber.getText().toString().substring(0,strEdtRoutingnumber.getText().toString().length()-1));
+                    int pos = strEdtRoutingnumber.getText().length();
+                    strEdtRoutingnumber.setSelection(pos);
+                }
+                count = strEdtRoutingnumber.getText().toString().length();
+            }
+        });
 
 
         return view;
@@ -145,6 +175,17 @@ public class Stripe_dialogfragment extends DialogFragment {
         super.onResume();
 
         getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+
+        if (dialogInIt)
+        {
+            AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(((MainActivity)getActivity()));
+            accountPreshowDialog1.show();
+            dialogInIt=false;
+        }
+
+
+
 
     }
 
@@ -157,6 +198,7 @@ public class Stripe_dialogfragment extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        dialogInIt=true;
         unbinder.unbind();
     }
 

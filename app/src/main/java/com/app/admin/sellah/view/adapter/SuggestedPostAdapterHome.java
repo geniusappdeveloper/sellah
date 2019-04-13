@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,10 +77,22 @@ public class SuggestedPostAdapterHome extends RecyclerView.Adapter<SuggestedPost
             holder.rootLayout.setBackgroundColor(context.getResources().getColor(R.color.colorOddCardColor));
 
         }
-        Glide.with(context)
+/*        Glide.with(context)
                 .load(!add_items.getResult().get(position).getProductImages().isEmpty() ? add_items.getResult().get(position).getProductImages().get(0).getImage() : "")
                 .apply(Global.getGlideOptions())
+                .into(holder.add_image);*/
+
+        if (add_items.getResult().get(position).getProductImages().size()>0)
+        {
+
+            Glide.with(context)
+                .load(add_items.getResult().get(position).getProductImages().get(0).getImage())
+              //  .apply(Global.getGlideOptions())
                 .into(holder.add_image);
+
+
+        }
+
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

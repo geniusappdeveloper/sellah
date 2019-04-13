@@ -39,6 +39,7 @@ import com.app.admin.sellah.view.CustomAnimations.MyBounceInterpolator;
 import com.app.admin.sellah.view.CustomDialogs.AccountPreshowDialog1;
 import com.app.admin.sellah.view.CustomDialogs.PayDialog_QRScan;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.bumptech.glide.Glide;
@@ -501,11 +502,9 @@ public class PaymentFragment extends Fragment {
 
             case R.id.rl_sellahwallet_clicklink:
 
-                AccountPreshowDialog1 accountPreshowDialog1 = new AccountPreshowDialog1(getActivity());
-                accountPreshowDialog1.show();
 
-                /*Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
-                stripe_dialogfragment.show(getActivity().getFragmentManager(), "");*/
+                Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+                stripe_dialogfragment.show(getActivity().getFragmentManager(), "");
                 break;
 
             case R.id.rel_qr_scan:

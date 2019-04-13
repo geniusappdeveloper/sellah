@@ -92,6 +92,8 @@ public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentC
     String productId = "";
     String selected_id="";
 
+    public static String promote_selected_id="";
+
     public PromoteDialog(Context context, String productId, PromoteCallback callback) {
         super(context);
         this.context = context;
@@ -257,6 +259,7 @@ public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentC
                 PromoteOfferAdapter adapter = new PromoteOfferAdapter(context, packagesList, (id) -> {
 
                     selected_id = id;
+
          /*   bottomSheetDialog.show();
             getCardApi();*/
                 });
@@ -285,7 +288,10 @@ public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentC
                 else
                 {
 
-                    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, selected_id);
+
+
+                //    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, selected_id);    // Manjot
+                    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, promote_selected_id);
                     dismiss();
 
                     /*Intent intent = new Intent(context,ShowCreditCardDetailFragment.class);

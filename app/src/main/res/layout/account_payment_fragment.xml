@@ -375,6 +375,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="+"
+                    android:visibility="invisible"
                     android:layout_toLeftOf="@+id/dummylive3_text"
                     android:gravity="center_vertical"
                     android:textColor="#9e9e9e"
@@ -391,7 +392,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:paddingLeft="@dimen/_5sdp"
-                    android:text="Link with Stripe account..."
+                    android:text="Create Sellah Wallet"
                     android:textSize="@dimen/_12sdp"
                     />
 

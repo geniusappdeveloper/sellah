@@ -616,20 +616,16 @@
                 </RelativeLayout>
 
 
-
-
-
-
-            <ImageView
-                android:id="@+id/share_chat"
-                android:layout_width="@dimen/_22sdp"
-                android:layout_height="@dimen/_22sdp"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:padding="@dimen/_4sdp"
-                android:src="@drawable/share_live_caht"
-                android:tint="#fff" />
+                <ImageView
+                    android:id="@+id/share_chat"
+                    android:layout_width="@dimen/_22sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/_4sdp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/share_live_caht"
+                    android:tint="#fff" />
 
             </RelativeLayout>
         </RelativeLayout>

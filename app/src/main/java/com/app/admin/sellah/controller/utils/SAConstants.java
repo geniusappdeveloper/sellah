@@ -95,6 +95,9 @@ public class SAConstants {
         public static final String NT_DATA="sa.notification.data";
         public static final String NT_ORDER="orderstatus";
 
+
+
+
     }
 
     public static class FilterKeys{
@@ -107,6 +110,7 @@ public class SAConstants {
         public static final String FLTR_PRICE_MIN="fltr.price.min";
         public static final String FLTR_PRICE_MAX="fltr.price.max";
         public static final String FLTR_DELIVERY="fltr.delivery";
+
 
     }
 

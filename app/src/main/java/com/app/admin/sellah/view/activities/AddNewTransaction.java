@@ -475,12 +475,12 @@ public class AddNewTransaction extends AppCompatActivity {
 
 
 
-/*                    for (int i = 0; i < AddProductDatabase.imageListG.size(); i++) {
+                   for (int i = 0; i < AddProductDatabase.imageListG.size(); i++) {
 
                         if (i == 0) {
 
 
-                           *//* try {
+                           /*try {
                                 URL url = new URL(AddProductDatabase.imageListG.get(0));
                                 Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 
@@ -494,7 +494,7 @@ public class AddNewTransaction extends AppCompatActivity {
 
                             } catch(IOException e) {
                                 System.out.println(e);
-                            }*//*
+                            }*/
 
 
 
@@ -541,7 +541,7 @@ public class AddNewTransaction extends AppCompatActivity {
                             model.setProductVideo(mulitpartvideo);
                         }
 
-                    }*/
+                    }
 
                     if (isEditing) {
 

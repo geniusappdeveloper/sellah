@@ -36,7 +36,7 @@ public class AccountPreshowDialog3 extends Dialog {
     @OnClick(R.id.gotit_btn_dialog3)
     public void onViewClicked() {
         dismiss();
-        Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
-        stripe_dialogfragment.show(((Activity)context).getFragmentManager(), "");
+       /* Stripe_dialogfragment stripe_dialogfragment = new Stripe_dialogfragment();
+        stripe_dialogfragment.show(((Activity)context).getFragmentManager(), "");*/
     }
 }

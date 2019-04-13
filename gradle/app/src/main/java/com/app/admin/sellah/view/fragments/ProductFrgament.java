@@ -733,7 +733,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener {
                                 case R.id.menu_share:
                                     Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                                     sharingIntent.setType("text/plain");
-                                    String shareBodyText = "Check it out. Your message goes here";
+                                    String shareBodyText = Global.;
                                     sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
                                     sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
                                     startActivity(Intent.createChooser(sharingIntent, "Sharing Option"));

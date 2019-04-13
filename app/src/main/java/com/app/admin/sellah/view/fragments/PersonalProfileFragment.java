@@ -1,6 +1,7 @@
 package com.app.admin.sellah.view.fragments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +36,10 @@ import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.PersonalProfilePagerAdapter;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,6 +97,10 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         service = Global.WebServiceConstants.getRetrofitinstance();
+
+
+        Global.DEEP_LINKING_STATUS="disable";
+
         if (getArguments() != null) {
             otherUserId = getArguments().containsKey(SAConstants.Keys.OTHER_USER_ID) ? getArguments().getString(SAConstants.Keys.OTHER_USER_ID) : "";
         } else {
@@ -109,12 +118,15 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
         unbinder = ButterKnife.bind(this, view);
         hideSearch();
 
+       //---------generate url----------------
+        getProductUrlApi(otherUserId);
+
 
         return view;
     }
 
     private void getProfiledata(String otherUserId) {
-        Log.e("printUserId",otherUserId);
+
         Dialog dialog = S_Dialogs.getLoadingDialog(getActivity());
         dialog.show();
         Call<ProfileModel> getProfileCall = service.getProfileApi(otherUserId);
@@ -125,8 +137,11 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
                     dismissDialog(dialog);
                     profileData = response.body();
                     Log.e("profile_success", response.body().getMessage());
-                    setProfileData(profileData);
-                    getFollowStatusApi(profileData.getResult().getId());
+                    try {
+                        setProfileData(profileData);
+                        getFollowStatusApi(profileData.getResult().getId());
+                    }catch (Exception e){ }
+
                 } else {
                     dismissDialog(dialog);
                     Snackbar.make(liPersonalProfileRoot, "Something went's wrong", Snackbar.LENGTH_SHORT)
@@ -353,6 +368,7 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
 //        ((MainActivity) getActivity()).rlTitle.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).rlMenu.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).changeOptionColor(0);
+
         ((MainActivity) getActivity()).rloptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -407,6 +423,14 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
                                 });
 
 
+                            case R.id.menu_share:
+
+                                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                                sharingIntent.setType("text/plain");
+                                String shareBodyText = Global.DEEP_LINKING_PRODUCT_URL;
+                                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
+                                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
+                                startActivity(Intent.createChooser(sharingIntent, "Share via"));
                         }
                         return true;
                     }
@@ -455,5 +479,39 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
     @OnClick(R.id.li_follow)
     public void onFollowClicked() {
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new ViewFollowListFragment(profileData.getResult().getId())).addToBackStack(PROFILETAG).commit();
+    }
+
+    public void getProductUrlApi(String productId) {
+        Call<JsonObject> productUrl;
+        productUrl = service.getProductUrl(HelperPreferences.get(getActivity()).getString(UID), productId,"u");
+        productUrl.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+
+                if (response.isSuccessful())
+                {
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response.body().toString());
+                        String status = jsonObject.getString("status");
+                        if (status.equalsIgnoreCase("1"))
+                        {
+                            Global.DEEP_LINKING_PRODUCT_URL = jsonObject.getString("url");
+
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
     }
 }

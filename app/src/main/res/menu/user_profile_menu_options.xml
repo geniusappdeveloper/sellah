@@ -4,5 +4,10 @@
         android:id="@+id/menu_report"
         android:title="Report User" />
 
+    <item
+        android:id="@+id/menu_share"
+        android:title="Share" />
+
+
 
 </menu>

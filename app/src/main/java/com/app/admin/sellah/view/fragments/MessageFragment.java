@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.utils.Global;
+import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.Record;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
@@ -431,7 +432,31 @@ public class MessageFragment extends Fragment {
                     if (body.getStatus().equals("1")) {
                         relRootNoti.setVisibility(View.VISIBLE);
                         llNochat.setVisibility(View.GONE);
-                        setupOldMessageList(body);
+
+                        Log.e("idPrint",body.getRecord().get(0).getFriendId());
+
+                        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+                        {
+                            for (int i = 0; i <body.getRecord().size() ; i++)
+                            {
+                                if (body.getRecord().get(i).getFriendId().equalsIgnoreCase(Global.DEEP_LINKING_PRODUCT_ID))
+                                {
+                                    PersonalProfileFragment fragment = new PersonalProfileFragment();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(SAConstants.Keys.OTHER_USER_ID, body.getRecord().get(i).getFriendId());
+                                    fragment.setArguments(bundle);
+                                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
+
+                                    break;
+                                }
+                            }
+
+                            }
+                        else
+                        {
+                            setupOldMessageList(body);
+                        }
+
                     } else {
                         relRootNoti.setVisibility(View.GONE);
                         llNochat.setVisibility(View.VISIBLE);

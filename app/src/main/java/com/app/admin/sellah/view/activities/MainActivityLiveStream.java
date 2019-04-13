@@ -72,7 +72,6 @@ import com.app.admin.sellah.model.extra.UploadChatImage.UploadChatImageModel;
 import com.app.admin.sellah.view.CustomDialogs.LiveProductDetailDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomDialogs.SendOffer;
-import com.app.admin.sellah.view.adapter.CheckoutProductAdapter;
 import com.app.admin.sellah.view.adapter.LiveStreamChatAdapter;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -223,6 +222,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     ImageButton flipCamera;
     @BindView(R.id.txt_offer_from_seller)
     TextView txtOfferFromSeller;
+    @BindView(R.id.share_chat)
+    ImageView shareChat;
     private CallFragment callFragment;
     private WebRTCClient webRTCClient;
     Socket mSocket;
@@ -294,6 +295,13 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         videoViews = intent.hasExtra("views") ? intent.getStringExtra("views") : "";
 
 
+        if (!groupId.equalsIgnoreCase(""))
+            getProductUrlApi(groupId);
+
+        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+            Global.DEEP_LINKING_STATUS="disable";
+
+
         handler = new Handler();
         try {
             txtViews.setText(videoViews);
@@ -354,6 +362,20 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
                 });
             }
         });
+
+        shareChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBodyText = Global.DEEP_LINKING_PRODUCT_URL;
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+            }
+        });
+
+
         relLay_back_live.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -559,7 +581,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
                     switch (message.getNotiType()) {
                         case NT_STOP_LIVE_VIDEO:
                             if (webRTCClient != null) {
-                                isbackPressed=true;
+                                isbackPressed = true;
                                 webRTCClient.stopStream();
                                 S_Dialogs.getLiveVideoStopedDialog(MainActivityLiveStream.this, "Video has been stopped by admin ", new MaterialDialog.SingleButtonCallback() {
                                     @Override
@@ -898,8 +920,6 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     public void closeGroup() {
 
 
-
-
         JSONObject jsonObject = new JSONObject();
         try {
 
@@ -1035,7 +1055,10 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.e("connection_error", args[0]+"");
                     Log.e("connection_error", args.toString());
+
+
                     Toast.makeText(MainActivityLiveStream.this,
                             "error_connect", Toast.LENGTH_LONG).show();
                 }
@@ -1065,6 +1088,11 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
                         Log.e("CreateGroupId", groupId);
 //                        attemptJoin();
                         attemptToSendPinMessage();
+
+                        //-----------create video url--------------------
+                        if (!groupId.equalsIgnoreCase(""))
+                            getProductUrlApi(groupId);
+
 //                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1094,8 +1122,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         Dialog dialog = S_Dialogs.getLoadingDialog(MainActivityLiveStream.this);
         dialog.show();
         RequestBody image = RequestBody.create(MediaType.parse("image/*"), bytes(imageUri));
-      MultipartBody.Part  multipartimage = MultipartBody.Part.createFormData("cover_image", "livecoverimage.jpeg", image);
-      Call<LiveVideoDescModel> getProfileCall = service.addLiveVideoDesc(
+        MultipartBody.Part multipartimage = MultipartBody.Part.createFormData("cover_image", "livecoverimage.jpeg", image);
+        Call<LiveVideoDescModel> getProfileCall = service.addLiveVideoDesc(
                 RequestBody.create(MediaType.parse("text/plain"), groupId), RequestBody.create(MediaType.parse("text/plain"), catId), RequestBody.create(MediaType.parse("text/plain"), title), RequestBody.create(MediaType.parse("text/plain"), desc), RequestBody.create(MediaType.parse("text/plain"), HelperPreferences.get(MainActivityLiveStream.this).getString(UID)), multipartimage);
         getProfileCall.enqueue(new Callback<LiveVideoDescModel>() {
             @Override
@@ -1594,7 +1622,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
 
     }
 
-    private void sendOfferApi(String name ,String price, String recieverId) {
+    private void sendOfferApi(String name, String price, String recieverId) {
         new ApisHelper().sendOfferApi(MainActivityLiveStream.this, recieverId, groupId, productId, name, price, new ApisHelper.SendOfferCallback() {
             @Override
             public void onSendOfferSuccess(String msg) {
@@ -1977,21 +2005,19 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     @Override
     public void onMakeOfferClicked(String comment_id, String senderId) {
         Log.e("MakeOffer", "onMakeOfferClicked: ");
-      //   alertsendoffer(senderId);
+        //   alertsendoffer(senderId);
 
         SendOffer sendOffer = new SendOffer(MainActivityLiveStream.this);
         sendOffer.send(MainActivityLiveStream.this, senderId, new SendOffer.onSendOffer() {
             @Override
             public void onSendOfferSuccess(String name, String price) {
 
-                Log.e("response_sendOffer","here: "+name+"  "+price);
-                sendOfferApi(name,price, senderId);
+                Log.e("response_sendOffer", "here: " + name + "  " + price);
+                sendOfferApi(name, price, senderId);
 
             }
         });
         sendOffer.show();
-
-
 
 
     }
@@ -2212,7 +2238,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         catId = cat_Id;
         loadingDialog.show();
 
-        Log.e( "onUpdateVideoValues: ", coverImagePath);
+        Log.e("onUpdateVideoValues: ", coverImagePath);
         streamId = "stream" + (int) (Math.random() * 999);
         // streamId = "stream438";
         webRTCClient = new WebRTCClient(MainActivityLiveStream.this, MainActivityLiveStream.this);
@@ -2264,8 +2290,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     }
 
 
-    public void alertsendoffer(String senderid)
-    {
+    public void alertsendoffer(String senderid) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -2277,10 +2302,10 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         two.setHint("Enter Price");//optional
         Global.CheckPriceDecimal(two);
         one.setInputType(InputType.TYPE_CLASS_TEXT);
-        two.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        two.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         LinearLayout lay = new LinearLayout(this);
-        lay.setPadding(12,0,12,0);
+        lay.setPadding(12, 0, 12, 0);
         lay.setOrientation(LinearLayout.VERTICAL);
         lay.addView(one);
         lay.addView(two);
@@ -2296,13 +2321,12 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
                 } else {
 //                makeOfferApi(input.toString().trim(), sellerId, dialog, productId);
 
-                    if (one.getText().toString().trim().isEmpty())
-                    {
-                       productname_1 = productName;
+                    if (one.getText().toString().trim().isEmpty()) {
+                        productname_1 = productName;
+                    } else {
+                        productname_1 = one.getText().toString();
                     }
-                    else
-                    {productname_1= one.getText().toString();}
-                    sendOfferApi(productname_1,two.getText().toString().trim(), senderid);
+                    sendOfferApi(productname_1, two.getText().toString().trim(), senderid);
                 }
 
             }
@@ -2317,18 +2341,50 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
 
     }
 
-    public byte[] bytes(String path)
-    {
+    public byte[] bytes(String path) {
 
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        Bitmap bitmap = BitmapFactory.decodeFile(path,bmOptions);
+        Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] by= stream.toByteArray();
+        byte[] by = stream.toByteArray();
         return by;
     }
 
 
+    //------------------generate live video url---------------------
+    public void getProductUrlApi(String productId) {
+        Call<JsonObject> productUrl;
+        productUrl = service.getProductUrl(HelperPreferences.get(this).getString(UID), productId,"v");
+        productUrl.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+
+                if (response.isSuccessful())
+                {
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response.body().toString());
+                        String status = jsonObject.getString("status");
+                        if (status.equalsIgnoreCase("1"))
+                        {
+                            Global.DEEP_LINKING_PRODUCT_URL = jsonObject.getString("url");
+                         //   Log.e("printVideoUrl",Global.DEEP_LINKING_PRODUCT_URL);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
+    }
 
 
 }

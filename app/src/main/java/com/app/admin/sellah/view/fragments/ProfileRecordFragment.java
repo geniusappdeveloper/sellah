@@ -4,22 +4,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
-import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.model.wishllist_model.Wishlist;
 import com.app.admin.sellah.view.adapter.WishRecordAdapter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +38,8 @@ public class ProfileRecordFragment extends Fragment {
     ImageView imgNoData;
     Unbinder unbinder;
     Call<Wishlist> recordsCall;
+    @BindView(R.id.ll_no_product)
+    LinearLayout llNoProduct;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,7 +52,7 @@ public class ProfileRecordFragment extends Fragment {
     }
 
     private void getRecordsData() {
-         recordsCall = service.getRecordsApi(HelperPreferences.get(getActivity()).getString(UID));
+        recordsCall = service.getRecordsApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<Wishlist>() {
             @Override
             public void onResponse(Call<Wishlist> call, Response<Wishlist> response) {
@@ -62,7 +61,7 @@ public class ProfileRecordFragment extends Fragment {
                         setRecordsData(response.body());
                     }
                 } else {
-                        showErrorMsg();
+                    showErrorMsg();
                 }
             }
 
@@ -76,15 +75,14 @@ public class ProfileRecordFragment extends Fragment {
     private void setRecordsData(Wishlist body) {
 
 
-
         wishRecordAdapter = new WishRecordAdapter(body, getActivity());
         LinearLayoutManager birthHorizontalManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         recordRecycler.setLayoutManager(birthHorizontalManager);
         recordRecycler.setAdapter(wishRecordAdapter);
 
-        if(!(body.getResult().size()>0)){
+        if (!(body.getResult().size() > 0)) {
             showErrorMsg();
-        }else{
+        } else {
             hideErrorMsg();
         }
     }
@@ -92,8 +90,9 @@ public class ProfileRecordFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (recordsCall!=null)
-        {recordsCall.cancel();}
+        if (recordsCall != null) {
+            recordsCall.cancel();
+        }
     }
 
     @Override
@@ -101,13 +100,15 @@ public class ProfileRecordFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
-    public void showErrorMsg(){
+
+    public void showErrorMsg() {
         txtHeading.setVisibility(View.GONE);
-        imgNoData.setVisibility(View.VISIBLE);
+        llNoProduct.setVisibility(View.VISIBLE);
     }
-    public void hideErrorMsg(){
+
+    public void hideErrorMsg() {
         txtHeading.setVisibility(View.VISIBLE);
-        imgNoData.setVisibility(View.GONE);
+        llNoProduct.setVisibility(View.GONE);
     }
 }
 

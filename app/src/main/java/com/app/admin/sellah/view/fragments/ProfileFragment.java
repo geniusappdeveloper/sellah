@@ -50,6 +50,7 @@ import retrofit2.Response;
 import static com.app.admin.sellah.controller.stripe.StripeSession.USERCITY;
 import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PROFILETAG;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.AVAILABLE_BALANCE;
+import static com.app.admin.sellah.controller.utils.SAConstants.Keys.DEEP_LINKING;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PENDING_BALANCE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.QRCODE;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
@@ -105,6 +106,11 @@ public class ProfileFragment extends Fragment implements SalesAdapter.TabTextCon
         profileTabLayout.setupWithViewPager(profileViewPager);
         hideSearch();
         getProfileData();
+
+/*        if (getArguments().containsKey(DEEP_LINKING))
+        {
+            Log.e("valProduct",getArguments().getString("product_id"));
+        }*/
 
 
 

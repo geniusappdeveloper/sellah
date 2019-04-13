@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.MainActivityInterface;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
 import com.app.admin.sellah.controller.utils.PermissionCheckUtil;
@@ -406,28 +407,53 @@ public class SplashScreen extends AppCompatActivity {
                 else
                 {
 
-
+                   //----------deep linking data-----------------------
                     Intent in = getIntent();
                     Uri data = in.getData();
                     if (data!=null)
                     {
                         String action = in.getAction();
-                        String data1 = in.getDataString();
+                        String data_ = in.getDataString();
+
+
+
 
 
                         if (Intent.ACTION_VIEW.equals(action) && data != null) { }
-                      //  Log.e("valueDeepLink",action+"");
-                     //   Log.e("valueDeepLink",data1+"");
 
+
+                        try {
+
+
+                        String product_id="",product_type="";
+                        String[] val = data_.split("/");
+                        int len = val.length;
+                        if (val.length>1)
+                        {
+                            product_id =val[len-1];
+                            product_type = val[len-2];
+                        }
+
+                            Global.DEEP_LINKING_STATUS = "enable";
+                            Global.DEEP_LINKING_PRODUCT_ID = product_id;
+                            Global.DEEP_LINKING_PRODUCT_TYPE = product_type;
 
                         Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                         intent.putExtra(DEEP_LINKING,"deeplink");
+                        intent.putExtra("product_id",product_id);
+                        intent.putExtra("product_type",product_type);
                         startActivity(intent);
                         finish();
+
+                        }catch (Exception e){ }
 
                     }
                     else
                     {
+
+                        Global.DEEP_LINKING_STATUS = "disable";
+                        Global.DEEP_LINKING_PRODUCT_ID = "";
+                        Global.DEEP_LINKING_PRODUCT_TYPE = "";
 
                         handleNotificationData();
                     }

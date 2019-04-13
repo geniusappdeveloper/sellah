@@ -132,8 +132,8 @@
                 <!-- Allows the deep link to be used without specifying the app name -->
                 <category android:name="android.intent.category.DEFAULT" />
                 <!-- URI http://www.sellahapp.com -->
-                <data android:scheme="http" />
-                <data android:host="sellah.dev.com" />
+                <data android:scheme="https" />
+                <data android:host="sellah.dev" />
                <!-- <data android:host="www.sellahapp.com" />-->
             </intent-filter>
         </activity>

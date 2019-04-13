@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingLeft="@dimen/_5sdp"
-                android:text="Capture video cover image"
+                android:text="Browse Photo"
                 android:textSize="@dimen/_12sdp"
                 />
 

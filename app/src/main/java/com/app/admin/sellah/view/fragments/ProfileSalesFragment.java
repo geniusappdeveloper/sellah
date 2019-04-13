@@ -19,10 +19,12 @@ import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.SaleModelClass;
 import com.app.admin.sellah.model.extra.commonResults.Common;
 import com.app.admin.sellah.model.extra.getProductsModel.GetProductList;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
+import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.SalesAdapter;
 
 import java.util.ArrayList;
@@ -132,15 +134,45 @@ public class ProfileSalesFragment extends Fragment {
     private void getSaledata() {
 //        Dialog dialog=S_Dialogs.getLoadingDialog(getActivity());
 
+      //  Log.e("printUser_id","No value");
+      //  Log.e("printUser_id",HelperPreferences.get(getActivity()).getString(UID)+"");
+
         recordsCall = service.getForSalelistApi(HelperPreferences.get(getActivity()).getString(UID));
         recordsCall.enqueue(new Callback<GetProductList>() {
             @Override
             public void onResponse(Call<GetProductList> call, Response<GetProductList> response) {
+
                 if (response.isSuccessful()) {
+
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         forSaleProducts = response.body();
                         if (getActivity()!=null)
-                        setSalesData(forSaleProducts);
+
+                            //----------------to open specific product from deep link----------------------
+                            if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+                            {
+                                for (int i = 0; i <forSaleProducts.getResult().size() ; i++)
+                                {
+
+                                    if (forSaleProducts.getResult().get(i).getId().equalsIgnoreCase(Global.DEEP_LINKING_PRODUCT_ID))
+                                    {
+                                        Bundle bundle = new Bundle();
+                                        bundle.putParcelable(SAConstants.Keys.PRODUCT_DETAIL, forSaleProducts.getResult().get(i));
+                                        ProductFrgament fragment = new ProductFrgament();
+                                        fragment.setArguments(bundle);
+                                        ((MainActivity)getActivity()).getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, fragment).addToBackStack(null).commit();
+
+                                        break;
+                                    }
+
+                                }
+
+                            }
+                            else
+                            {
+                                setSalesData(forSaleProducts);
+                            }
+
 
                     }
                 } else {
@@ -150,7 +182,7 @@ public class ProfileSalesFragment extends Fragment {
 
             @Override
             public void onFailure(Call<GetProductList> call, Throwable t) {
-
+                Log.e("successMethod",t.getMessage()+"  error");
             }
         });
     }
