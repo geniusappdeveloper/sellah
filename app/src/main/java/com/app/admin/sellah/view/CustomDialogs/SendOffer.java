@@ -5,7 +5,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -40,6 +42,7 @@ public class SendOffer extends Dialog {
     TextView priceRecSendDialog;
 
 
+
     public SendOffer(Context con) {
         super(con);
 
@@ -63,11 +66,30 @@ public class SendOffer extends Dialog {
         ButterKnife.bind(this);
 
 
+        edtAddPriceSend.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                priceRecSendDialog.setText("You will received S$ " + Global.gettotalamount(edtAddPriceSend.getText().toString().trim()));
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
 
     }
 
-    @OnClick({R.id.btn_cancel, R.id.btn_sendOffer,R.id.lin_send_offer_dialog})
+    @OnClick({R.id.btn_cancel, R.id.btn_sendOffer, R.id.lin_send_offer_dialog})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_cancel:
@@ -89,7 +111,7 @@ public class SendOffer extends Dialog {
                 break;
 
             case R.id.lin_send_offer_dialog:
-                priceRecSendDialog.setText("You will receive S$ " + Global.gettotalamount(edtAddPriceSend.getText().toString().trim()));
+                priceRecSendDialog.setText("You will received S$ " + Global.gettotalamount(edtAddPriceSend.getText().toString().trim()));
                 break;
         }
     }

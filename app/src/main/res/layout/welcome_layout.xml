@@ -18,10 +18,20 @@
                 android:textSize="@dimen/_18sdp"
                 android:layout_marginTop="@dimen/_50sdp"
                 android:textColor="#7d7d7d"
+                android:id="@+id/sellah_txtview"
                 android:text="Sellah"
+               android:layout_marginLeft="@dimen/_4sdp"
                 android:layout_centerHorizontal="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <ImageView
+                android:layout_width="@dimen/_28sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_48sdp"
+                android:id="@+id/sellahIcon"
+                android:layout_toLeftOf="@+id/sellah_txtview"
+                android:background="@drawable/sellah_icon_red"/>
 
             <TextView
                 android:id="@+id/wlcm_skip"

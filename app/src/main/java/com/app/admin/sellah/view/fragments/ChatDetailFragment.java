@@ -691,7 +691,8 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
 
                         /* Socket to read all the message for the first time  while user open the screen */
-                        if (!models.get(models.size() - 1).getSenderId().equalsIgnoreCase((HelperPreferences.get(getActivity()).getString(UID)))) {
+                        if (!models.get(models.size() - 1).getSenderId().equalsIgnoreCase((HelperPreferences.get(getActivity()).getString(UID))))
+                        {
 
                             Log.e("onResponse: ", models.get(models.size() - 1).getReceiverId());
                             Log.e("onResponse: ", models.get(models.size() - 1).getMsgId());
@@ -1048,6 +1049,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
                         })).show();
                     } else {
+
                         setUpBottomView();
                     }
 
@@ -1450,6 +1452,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                                     mark_adapter.notifyDataSetChanged();
                                     btnCollapsedItems.setText("Collapse products");
                                 }
+                                acceptLayout.setVisibility(View.VISIBLE);
 
                             });
 
@@ -1513,7 +1516,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
                         btnCollapsedItems.setOnClickListener(view1 -> {
 
-
+                            Log.e("printLog","Runnn____");
                             if (btnCollapsedItems.getText().toString().equalsIgnoreCase("Collapse products")) {
                                 main_offer_list.clear();
                                 main_offer_list.add(list.get(0));
@@ -1522,10 +1525,10 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                             } else {
                                 main_offer_list.clear();
                                 main_offer_list.addAll(list);
-
                                 payoffer_adapter.notifyDataSetChanged();
                                 btnCollapsedItems.setText("Collapse products");
                             }
+                          //  acceptLayout.setVisibility(View.VISIBLE);
 
                         });
 

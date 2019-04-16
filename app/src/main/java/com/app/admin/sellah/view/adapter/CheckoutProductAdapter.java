@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,22 +15,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.ChatActivityController;
-import com.app.admin.sellah.model.extra.MakeOffer.MakeOfferModel;
-import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.model.extra.MakeOffer.MakeOfferModel;
+import com.app.admin.sellah.model.extra.getProductsModel.Result;
 import com.app.admin.sellah.view.CustomDialogs.BuyerMakeOfferDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.bumptech.glide.Glide;
 
-import java.lang.reflect.Executable;
 import java.util.List;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,6 +37,7 @@ import retrofit2.Response;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.UID;
 
 public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProductAdapter.CheckOutItemHolder> {
+
 
     private List<Result> recordList;
     Context context;
@@ -49,14 +48,14 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
     WebService service;
     ActionCallback actionCallback;
     Button txtsend_offer;
-    int pos=-1;
+    int pos = -1;
     boolean check;
-    String price,qty;
+    String price, qty;
 
-    public CheckoutProductAdapter(List<Result> itemList, Context context,Button txt_sendoffer, ActionCallback checkSelection) {
+    public CheckoutProductAdapter(List<Result> itemList, Context context, Button txt_sendoffer, ActionCallback checkSelection) {
         this.recordList = itemList;
         this.context = context;
-        this.txtsend_offer =txt_sendoffer;
+        this.txtsend_offer = txt_sendoffer;
         isCheckList = new boolean[itemList.size()];
         controller = new ChatActivity();
 //        this.dialog = dialog;
@@ -80,8 +79,17 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
     @Override
     public void onBindViewHolder(CheckOutItemHolder holder, final int position) {
         holder.chkSelect.setChecked(isCheckList[position]);
-//        if(dialog.){}
-//        txtSubTotal.setText(subTotal);
+
+        Log.e("getQuantityHere123", recordList.get(position).getName());
+
+      /*  if (recordList.get(position).getQuantity().isEmpty()  || Integer.parseInt(recordList.get(position).getQuantity())<=0)
+        {
+         Log.e("_printEmpty","data is fetched");
+            holder.topRelCheckout.setVisibility(View.GONE);
+        }
+        else
+        {
+            holder.topRelCheckout.setVisibility(View.VISIBLE);*/
 
         holder.txtProductName.setText(recordList.get(position).getName());
         holder.txtProductCost.setText("S$ " + recordList.get(position).getPrice());
@@ -90,51 +98,48 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
                 .load(!recordList.get(position).getProductImages().isEmpty() ? recordList.get(position).getProductImages().get(0).getImage() : "")
                 .apply(Global.getGlideOptions())
                 .into(holder.imgProduct);
+       //    }
 
-        holder.chkSelect.setTag(position);
+
+        //    holder.chkSelect.setTag(position);
 
         holder.checkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (recordList.get(position).getQuantity().isEmpty() || Integer.parseInt(recordList.get(position).getQuantity())<=0)
-                {
+                if (recordList.get(position).getQuantity().isEmpty() || Integer.parseInt(recordList.get(position).getQuantity()) <= 0) {
                     Toast.makeText(context, "Product is out of stock", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    pos =position;
+                } else {
+                    pos = position;
                     notifyDataSetChanged();
                 }
-
-
 
 
             }
         });
 
-        if (pos ==position)
-        {
-            actionCallback.onCheckclicked(recordList.get(pos).getName(), recordList.get(pos).getId(), recordList.get(position).getPrice(),recordList.get(position).getQuantity());
+        if (pos == position) {
+            actionCallback.onCheckclicked(recordList.get(pos).getName(), recordList.get(pos).getId(), recordList.get(position).getPrice(), recordList.get(position).getQuantity());
 
             holder.checkout.setBackgroundColor(Color.parseColor("#dbdbdb"));
 
-            price =recordList.get(position).getPrice();
-            qty =recordList.get(position).getQuantity();
+            price = recordList.get(position).getPrice();
+            qty = recordList.get(position).getQuantity();
 
 
-        }
-        else
-        {
+        } else {
             holder.checkout.setBackgroundColor(Color.parseColor("#ffffff"));
-
         }
 
         txtsend_offer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                holder.imgMakeOffer.performClick();
+
+                if (price != null && qty != null)
+                    holder.imgMakeOffer.performClick();
+                else
+                    Toast.makeText(context, "Please select product", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -144,9 +149,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             public void onClick(View v) {
 
 
-
-
-                BuyerMakeOfferDialog.create(context,price, qty, new BuyerMakeOfferDialog.OnmakeOfferClick() {
+                BuyerMakeOfferDialog.create(context, price, qty, new BuyerMakeOfferDialog.OnmakeOfferClick() {
                     @Override
                     public void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog) {
 //                        makeOfferApi(position,recordList.get(position).getId(), price, recordList.get(position).getName(), buyerMakeOfferDialog);
@@ -215,9 +218,10 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
 
     public class CheckOutItemHolder extends RecyclerView.ViewHolder {
         CheckBox chkSelect;
-        TextView txtProductName, txtProductCost,qty;
+        TextView txtProductName, txtProductCost, qty;
         ImageView imgProduct, imgMakeOffer;
         RelativeLayout checkout;
+        RelativeLayout topRelCheckout;
 
         public CheckOutItemHolder(View view) {
             super(view);
@@ -228,6 +232,7 @@ public class CheckoutProductAdapter extends RecyclerView.Adapter<CheckoutProduct
             imgMakeOffer = view.findViewById(R.id.img_btn_make_offer);
             checkout = view.findViewById(R.id.root_checkout);
             qty = view.findViewById(R.id.txt_product_qty);
+            topRelCheckout = view.findViewById(R.id.top_rel_checkout);
         }
     }
 

@@ -30,6 +30,10 @@ import com.app.admin.sellah.view.CustomDialogs.OTPVerificationDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.hbb20.CountryCodePicker;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -358,26 +362,53 @@ public class SignupActivity extends AppCompatActivity {
 //                        response.errorBody()
                         if (response.errorBody() != null) {
                             try {
-                                Log.e("response error", response.errorBody().string());
-                                Converter<ResponseBody, RegisterResult> errorConverter =
+                                Log.e("response_error", response.errorBody().string());
+                                /*Converter<ResponseBody, RegisterResult> errorConverter =
                                         Global.WebServiceConstants.getRetrofit().responseBodyConverter(RegisterResult.class, new Annotation[0]);
                                 RegisterResult error = errorConverter.convert(response.errorBody());
-//                                JSONObject jsonObject = new JSONObject(response.errorBody().string());
-//                                 String status = jsonObject.getString("status");
-//                                Log.e("Dcedvced",status);
-//                                 String message = jsonObject.getString("message");
-                                Log.e("Dcedvced111", error.getStatus());
+*/
+                                String errorResponse = response.errorBody().string();
+                                if (errorResponse.contains(",\"status\":\"0\""))
+                                {
+                                    Log.e("fffrfr","1111111111");
+                                    String errMsg =  errorResponse.replace(",\"status\":\"0\"","");
+
+
+                                    JSONObject jsonObject = new JSONObject(errMsg);
+                                    Log.e("vvvvv1", jsonObject + "");
+                                    if (jsonObject.has("message"))
+                                    {
+                                        JSONObject jsonObject1 = jsonObject.getJSONObject("message");
+                                        Log.e("vvvvv2",jsonObject1+"");
+                                        if (jsonObject1.has("email"))
+                                        {
+                                            JSONArray jsonArray = jsonObject1.getJSONArray("email");
+                                            Log.e("vvvvv3",jsonArray+"");
+                                        }
+                                    }
+
+
+
+
+                                }
+                               /* else
+                                {
+                                    Log.e("fffrfr","222222222");
+                                }*/
+
 
                                 // if (jsonObject.has(""))
 
                             } catch (IOException e) {
 
                                 e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         }
 
-                        Snackbar.make(rel_root, "Please try with different credentials", Snackbar.LENGTH_SHORT)
-                                .setAction("", null).show();
+                       /* Snackbar.make(rel_root, "Please try with different credentials", Snackbar.LENGTH_SHORT)
+                                .setAction("", null).show();*/
                     }
                 }
 

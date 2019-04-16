@@ -132,12 +132,20 @@
         android:textColor="#adadad"
         android:textSize="@dimen/_12sdp" />
 
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/stock_spinner">
+
+    </Spinner>
+
     <com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout
         android:id="@+id/il_add_quantity"
         android:layout_width="match_parent"
         android:layout_marginLeft="@dimen/_10sdp"
         android:layout_height="wrap_content"
         android:layout_marginRight="@dimen/_3sdp"
+        android:visibility="gone"
         app:hintEnabled="false">
 
         <EditText
@@ -146,12 +154,16 @@
             android:layout_height="@dimen/_30sdp"
             android:background="@drawable/live_product_detail_grey_background"
             android:hint="i.e. 1"
+            android:visibility="gone"
             android:inputType="number"
             android:singleLine="true"
             android:text="1"
             android:paddingLeft="@dimen/_3sdp"
             android:textColorHint="@color/colorLGrey"
             android:textSize="@dimen/_12sdp" />
+
+
+
     </com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout>
 
     <LinearLayout

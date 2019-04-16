@@ -38,6 +38,7 @@ import android.widget.TextView;
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
+import com.app.admin.sellah.controller.utils.EndlessRecyclerOnScrollListener;
 import com.app.admin.sellah.controller.utils.ExpandableListData;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
@@ -178,6 +179,7 @@ public class HomeFragment extends Fragment {
     Call<GetProductList> addCommentCall;
     Call<GetProductList> getProductsCall;
     Call<NotificationListModel> notificationListCall;
+    GridLayoutManager gridLayoutManager;
 
 
     public HomeFragment() {
@@ -305,6 +307,29 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
         String first = " Sellah";
         String next = "<font color='#EE0000'>Search</font>";
         txtSearchSella.setText(Html.fromHtml(next + first));
+
+
+
+        //---------------------------------------------------
+
+
+/*
+        rvProducts.setOnScrollListener(new EndlessRecyclerOnScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int current_page,int posItem) {
+                // do something...
+
+
+
+            }
+        });
+*/
+
+
+
+
+
+        //---------------------------------------------------
 
         unbinder1 = ButterKnife.bind(this, view);
 
@@ -992,7 +1017,9 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
         try {
             setSearchData();
             searchSuggessionAdapter.notifyDataSetChanged();
-            rvProducts.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
+            gridLayoutManager = new GridLayoutManager(getActivity(),numberOfColumns);
+            rvProducts.setLayoutManager(gridLayoutManager);
+          //  rvProducts.setLayoutManager(new GridLayoutManager(getActivity(), numberOfColumns));
             mainCategoriesAdapter = new HomeProductAdapter(getActivity(), productList);
             rvProducts.setAdapter(mainCategoriesAdapter);
             imgDataError.setVisibility(View.GONE);

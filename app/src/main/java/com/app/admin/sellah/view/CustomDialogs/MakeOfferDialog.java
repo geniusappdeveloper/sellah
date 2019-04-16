@@ -73,7 +73,7 @@ public class MakeOfferDialog extends Dialog {
     String otherUserId;
     MakeOfferModel makeOfferModel;
     String productName;
-    String productId;
+    String productId="";
 
 
     protected MakeOfferDialog(Context context, OfferController controller, String otherUserId) {
@@ -99,6 +99,7 @@ public class MakeOfferDialog extends Dialog {
 
         ButterKnife.bind(this);
         getForsaleList(otherUserId);
+
 
     }
 
@@ -141,11 +142,22 @@ public class MakeOfferDialog extends Dialog {
                 break;
             case R.id.txt_send_offer:
 
-                if (txtSubtotal.getText().toString().equalsIgnoreCase("S$ 0")) {
-                    controller.onErrorSelection();
-                } else {
-                    makeOfferApi(productId, txtSubtotal.getText().toString().replace("S$", ""), productName, "1");
+
+                // does not execute
+                if (productId.equalsIgnoreCase(""))
+                {
+                    Toast.makeText(context,  "Please select product", Toast.LENGTH_SHORT).show();
                 }
+                else
+                {
+                    if (txtSubtotal.getText().toString().equalsIgnoreCase("S$ 0")) {
+                        controller.onErrorSelection();
+                    } else {
+                        makeOfferApi(productId, txtSubtotal.getText().toString().replace("S$", ""), productName, "1");
+                    }
+                }
+
+
                 break;
         }
     }
@@ -160,6 +172,7 @@ public class MakeOfferDialog extends Dialog {
     }
     Call<GetProductList> recordsCall;
     private void getForsaleList(String otherUserId) {
+
         dialog.show();
          recordsCall = webService.getForSalelistApi(otherUserId);
         recordsCall.enqueue(new Callback<GetProductList>() {
@@ -173,6 +186,8 @@ public class MakeOfferDialog extends Dialog {
                         Gson gson = new GsonBuilder().create();
                         Log.e("ForSaleData", gson.toJson(response.body()));
                         checkOutProductList(response.body());
+                        Log.e("sizeGet",response.body().getResult().size()+"");
+
                     }
                 } else {
                     dismiss();

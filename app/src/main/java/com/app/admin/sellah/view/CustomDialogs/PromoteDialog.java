@@ -260,6 +260,7 @@ public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentC
 
                     selected_id = id;
 
+
          /*   bottomSheetDialog.show();
             getCardApi();*/
                 });
@@ -290,8 +291,8 @@ public class PromoteDialog extends AlertDialog implements PaymentDialog.PaymentC
 
 
 
-                //    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, selected_id);    // Manjot
-                    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, promote_selected_id);
+                    ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, selected_id);
+                 //   ShowCreditCardDetailFragment.paymentCallBack(context,this,productId, promote_selected_id);
                     dismiss();
 
                     /*Intent intent = new Intent(context,ShowCreditCardDetailFragment.class);

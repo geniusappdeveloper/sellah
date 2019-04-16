@@ -120,7 +120,7 @@
             android:layout_height="@dimen/_33sdp"
             android:drawSelectorOnTop="true"
             android:id="@+id/price_rec_send_dialog"
-            android:hint="You will recieve S$ 1718.35"
+            android:hint="You will recieved S$ 1718.35"
             android:gravity="center_vertical"
             android:inputType="text"
             android:textColor="@color/colorBlack"

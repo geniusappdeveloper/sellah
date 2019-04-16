@@ -11,14 +11,21 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.view.CustomViews.NoChangingBackgroundTextInputLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +48,8 @@ public class BuyerMakeOfferDialog extends Dialog {
     Button btnMakeOffer;
     @BindView(R.id.txt_total_stroke)
     TextView txtTotalStroke;
+    @BindView(R.id.stock_spinner)
+    Spinner stockSpinner;
     private WebService webService;
     private Dialog dialog;
 
@@ -48,15 +57,20 @@ public class BuyerMakeOfferDialog extends Dialog {
     private String productPrice = "";
     OnmakeOfferClick callback;
 
+    List<String> arrayListStock;
+    String stock_sel ="0";
+    int stck=1;
+
     protected BuyerMakeOfferDialog(Context context, String productPrice, String productQuantity, OnmakeOfferClick callback) {
         super(context);
         this.context = context;
-        Log.e( "onClick: ", productPrice);
-        Log.e( "onClick: ", productQuantity);
+        Log.e("onClick: ", productPrice);
+        Log.e("onClick: ", productQuantity);
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
         this.callback = callback;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +86,46 @@ public class BuyerMakeOfferDialog extends Dialog {
         //setUpViews();
         steTextWacher();
 
+
+
+        //------------stock spinner------------------------
+
+        arrayListStock = new ArrayList<>();
+        try {
+
+
+            if (productQuantity!=null && !productQuantity.equalsIgnoreCase(""))
+            stck = Integer.parseInt(productQuantity);
+
+            for (int i = 0; i <stck ; i++) {
+                arrayListStock.add(String.valueOf(i+1));
+            }
+
+        }catch (Exception e){ }
+
+        ArrayAdapter<String> adptStock = new ArrayAdapter<String>(context,
+                android.R.layout.simple_list_item_1, arrayListStock);
+        adptStock.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stockSpinner.setAdapter(adptStock);
+        stockSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {
+                // TODO Auto-generated method stub
+            //    Toast.makeText(getBaseContext(), list.get(position), Toast.LENGTH_SHORT).show();
+                stock_sel = arrayListStock.get(position);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+
+        //--------------------------------------------------
+
     }
 
     private void setUpViews() {
@@ -83,9 +137,10 @@ public class BuyerMakeOfferDialog extends Dialog {
 
     private void steTextWacher() {
 //        ilAddQuantity.setError(productQuantity);
-        txtTotalStroke.setText(String.valueOf((Integer.parseInt(productQuantity) - 1)));
-        txtOriginalPrice.setText("$"+productPrice);
-        edtAddPrice.setText("$"+productPrice);
+      //  txtTotalStroke.setText(String.valueOf((Integer.parseInt(productQuantity) - 1)));
+        txtTotalStroke.setText(productQuantity);
+        txtOriginalPrice.setText("$" + productPrice);
+        edtAddPrice.setText("$" + productPrice);
         ilAddPrice.setError("");
 
         edtAddPrice.addTextChangedListener(new TextWatcher() {
@@ -177,12 +232,30 @@ public class BuyerMakeOfferDialog extends Dialog {
                 dismiss();
                 break;
             case R.id.btn_makeOffer:
+
+
+
+
                 if (Global.getText(edtAddPrice).equalsIgnoreCase("")) {
                     ilAddPrice.setError("Please enter offering price");
                 } else if (Global.getText(edtAddPrice).equalsIgnoreCase("")) {
                     ilAddQuantity.setError("Please add product quantity.");
                 } else {
-                    callback.onMakeOfferClick(Global.getText(edtAddPrice).replace("S$", ""), Global.getText(edtAddQuantity), BuyerMakeOfferDialog.this);
+
+                    if (edtAddPrice.getText().toString().trim().contains("S$")) {
+                        String val = edtAddPrice.getText().toString().trim().replace("S$", "");
+                        float f = Float.parseFloat(val);
+                        if (f < 1) {
+                            Toast.makeText(context, "Enter valid amount", Toast.LENGTH_SHORT).show();
+                        } else {
+                            callback.onMakeOfferClick(Global.getText(edtAddPrice).replace("S$", ""), stock_sel, BuyerMakeOfferDialog.this);
+
+                        }
+                    }
+                    else
+                        callback.onMakeOfferClick(Global.getText(edtAddPrice).replace("S$", ""), stock_sel, BuyerMakeOfferDialog.this);
+
+
                 }
                 break;
         }

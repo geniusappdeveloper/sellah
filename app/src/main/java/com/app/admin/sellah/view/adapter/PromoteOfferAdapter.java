@@ -28,6 +28,7 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
     OfferCallBack callBack;
     int pos=-1;
     int nottoselect_pos;
+    String sel_id="";
 
 
 
@@ -57,6 +58,9 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
         if (position>=0 && PromoteDialog.promote_selected_id.equalsIgnoreCase(""))
             PromoteDialog.promote_selected_id=packagesList.get(0).getId();
 
+      //  if (sel_id.equalsIgnoreCase(""))
+
+
 
         /*for dark background */
 
@@ -64,8 +68,11 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
         {
             nottoselect_pos = holder.getAdapterPosition();
 
+            if (sel_id.equalsIgnoreCase(""))
             callBack.onOfferSelect(packagesList.get(holder.getAdapterPosition()).getId());
-            holder.main_cd.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+
+          //  holder.main_cd.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+            holder.main_cd.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.red_filled_rounded_corners));
             holder.txtOffer.setTextColor(context.getResources().getColor(R.color.colorWhite));
             holder.txtDuration.setTextColor(context.getResources().getColor(R.color.colorWhite));
             holder.dummy_offer.setTextColor(context.getResources().getColor(R.color.colorWhite));
@@ -90,7 +97,8 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
             }
             else
             {
-                holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
+               holder.cardView.setBackgroundResource(R.drawable.live_product_detail_red_background);
+
             }
 
         }
@@ -111,6 +119,9 @@ public class PromoteOfferAdapter extends RecyclerView.Adapter<PromoteOfferAdapte
                 PromoteDialog.promote_selected_id = packagesList.get(position).getId();
 
                 callBack.onOfferSelect(packagesList.get(position).getId());
+                sel_id = packagesList.get(position).getId();
+
+
 
                 notifyDataSetChanged();
 

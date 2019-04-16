@@ -160,7 +160,8 @@ public interface WebService {
 
     @FormUrlEncoded
     @Headers("authkey:4a12cd5y8-9ffe-8ub5-7124-bc7d62789f2gh")
-    @POST("get_product")
+    @POST("get_product_v2")
+  //  @POST("get_product")
     Call<GetProductList> getProductListApi(@Field("user_id") String user_id, @Field("cat_id") String cat_id, @Field("sub_cat_id") String sub_cat_id, @Field("page_no") String page_no);
 
     @FormUrlEncoded
