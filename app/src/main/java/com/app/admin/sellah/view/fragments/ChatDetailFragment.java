@@ -1220,6 +1220,7 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
 
                     Log.e("onReceive: ", "ssss");
                     markascomplete.setText("Review Pending");
+                    getofferlist(otherUserId);
                 }
                 if (message.getNotiType().equalsIgnoreCase(SAConstants.NotificationKeys.NT_ACCEPT_REJECT)) {
                     getofferlist(otherUserId);
@@ -1444,13 +1445,15 @@ public class ChatDetailFragment extends Fragment implements ChatActivityControll
                                     mark_main_offer_list.clear();
                                     mark_main_offer_list.add(mark_list.get(0));
                                     setup_accepted(mark_main_offer_list);
-                                    btnCollapsedItems.setText("+ " + String.valueOf(mark_list.size() - 1) + " more products");
+                                    markasCompleteBtnCollapsedItems.setText("+ " + String.valueOf(mark_list.size() - 1) + " more products");
+                                  //  btnCollapsedItems.setText("+ " + String.valueOf(mark_list.size() - 1) + " more products");
                                 } else {
                                     mark_main_offer_list.clear();
                                     mark_main_offer_list.addAll(mark_list);
 
                                     mark_adapter.notifyDataSetChanged();
-                                    btnCollapsedItems.setText("Collapse products");
+                                    markasCompleteBtnCollapsedItems.setText("Collapse products");
+                                 //   btnCollapsedItems.setText("Collapse products");
                                 }
                                 acceptLayout.setVisibility(View.VISIBLE);
 

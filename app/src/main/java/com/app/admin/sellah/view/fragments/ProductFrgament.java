@@ -264,18 +264,16 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
         view = inflater.inflate(R.layout.product_fragment, container, false);
         unbinder = ButterKnife.bind(this, view);
+
         hideSearch();
         service = Global.WebServiceConstants.getRetrofitinstance();
 
-        if (getArguments().containsKey(SAConstants.Keys.PRODUCT_DETAIL))
+        if (getArguments()!=null && getArguments().containsKey(SAConstants.Keys.PRODUCT_DETAIL))
         {
             productDetial = getArguments().getParcelable(SAConstants.Keys.PRODUCT_DETAIL);
 
         }
 
-        //--------------clearing deep linking status-----------------
-        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
-            Global.DEEP_LINKING_STATUS="disable";
 
 
 
@@ -285,15 +283,41 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
 
         if (productDetial != null) {
-            Log.e("onPaymentSuccess:1 ", productDetial.getId());
+
             getProductDetailsApi(productDetial.getId());
             getProductUrlApi(productDetial.getId());
             //  dummcheck(productDetial.getId());
 //            setUpData(productDetial);
         } else {
 
-            getActivity().onBackPressed();
+            //----------------to open specific product from deep link----------------------
+            if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+            {
+
+                getProductDetailsApi(Global.DEEP_LINKING_PRODUCT_ID);
+                getProductUrlApi(Global.DEEP_LINKING_PRODUCT_ID);
+
+                //--------------clearing deep linking status-----------------
+                if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
+                    Global.DEEP_LINKING_STATUS="disable";
+
+            }
+
+            //----------------------------------------------
+            else
+            {
+
+                getActivity().onBackPressed();
+            }
+
         }
+
+
+
+
+
+
+
         return view;
     }
 
@@ -323,6 +347,11 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             @Override
             public void onClick(View view) {
                 Bundle bundle = getArguments();
+
+                if (bundle!=null)
+                {
+
+
                 String myString = bundle.containsKey("from_add") ? bundle.getString("from_add") : "default";
 
                 Log.e("onClick: ", myString);
@@ -333,6 +362,11 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 } else {
                     Log.e("onClick: ", "esl");
                     getActivity().onBackPressed();
+                }
+                }
+                else
+                {
+                    ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
                 }
             }
         });

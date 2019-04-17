@@ -91,6 +91,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/colorGrey"
             android:text="Read"
+            android:visibility="gone"
             android:textSize="@dimen/_8sdp"/>
         <ImageView
             android:src="@drawable/grey_tick"

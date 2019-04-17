@@ -438,6 +438,8 @@ public class SplashScreen extends AppCompatActivity {
                             Global.DEEP_LINKING_PRODUCT_ID = product_id;
                             Global.DEEP_LINKING_PRODUCT_TYPE = product_type;
 
+
+
                         Intent intent = new Intent(SplashScreen.this, MainActivity.class);
                         intent.putExtra(DEEP_LINKING,"deeplink");
                         intent.putExtra("product_id",product_id);

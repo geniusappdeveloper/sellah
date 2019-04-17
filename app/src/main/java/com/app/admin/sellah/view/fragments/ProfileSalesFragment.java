@@ -148,7 +148,7 @@ public class ProfileSalesFragment extends Fragment {
                         forSaleProducts = response.body();
                         if (getActivity()!=null)
 
-                            //----------------to open specific product from deep link----------------------
+                           /* //----------------to open specific product from deep link----------------------
                             if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
                             {
                                 for (int i = 0; i <forSaleProducts.getResult().size() ; i++)
@@ -169,9 +169,9 @@ public class ProfileSalesFragment extends Fragment {
 
                             }
                             else
-                            {
+                            {*/
                                 setSalesData(forSaleProducts);
-                            }
+                      //      }
 
 
                     }

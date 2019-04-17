@@ -865,6 +865,16 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                             if (productList.getResult().size() > 0) {
                                 getTotalHeightofGridRecyclerView(getActivity(), rvProducts, R.layout.main_categories_adapter, 1);
                             }
+
+                            //--------------------------------------------
+                            Log.e("successsss",Global.DEEP_LINKING_PRODUCT_ID+"   outer");
+
+
+
+
+
+
+
                             setSearchData();
                         } catch (Exception e) {
 

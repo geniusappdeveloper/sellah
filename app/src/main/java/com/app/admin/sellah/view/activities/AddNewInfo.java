@@ -396,7 +396,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                 _dialog.setArguments(bundle);
                 _dialog.show(getFragmentManager(), "");
 
-                totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
                 break;
             case R.id.faqicon:
 
@@ -409,7 +409,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                 dialog_.setArguments(_bundle);
                 dialog_.show(getFragmentManager(), "");
 
-                totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
                 break;
 
             case R.id.cat_rl:
@@ -595,7 +595,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                    try {
                        Double prc = Double.parseDouble(edtPrice.getText().toString().trim());
                        edtPrice.setText(String.format("%.2f", prc));
-                       totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                       totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
                        }catch (Exception e){
                    }
 
@@ -610,7 +610,7 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
                             try {
                             Double prc = Double.parseDouble(edtPrice.getText().toString().trim());
                             edtPrice.setText(String.format("%.2f", prc));
-                            totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                            totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
                             }catch (Exception e){
                             }
                         }
@@ -735,11 +735,11 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
 
                 if (edtPrice.getText().toString().trim().contains("."))
                 {
-                    totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
+                    totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
                 }
                 else
                 {
-                    totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
+                    totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString().trim()));
                 }
 
                 }catch (Exception e) { }
@@ -875,13 +875,13 @@ public class AddNewInfo extends AppCompatActivity implements SellProductInterfac
         { try {
                 Double prc = Double.parseDouble(edtPrice.getText().toString().trim());
                 edtPrice.setText(String.format("%.2f", prc));
-                totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
             }catch (Exception e){ } } else {
             if (!edtPrice.getText().toString().trim().equalsIgnoreCase(""))
             { try {
                     Double prc = Double.parseDouble(edtPrice.getText().toString().trim());
                     edtPrice.setText(String.format("%.2f", prc));
-                    totalRecieve.setText("You will receive S$ "+Global.gettotalamount(edtPrice.getText().toString()));
+                    totalRecieve.setText("You will received S$ "+Global.gettotalamount(edtPrice.getText().toString()));
                 }catch (Exception e){
             } } }
        }
