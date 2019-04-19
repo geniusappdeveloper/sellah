@@ -1,6 +1,7 @@
 package com.app.admin.sellah.controller.WebServices;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,20 +20,24 @@ public class ReportApi {
 
     //    ReportCallback callback;
     public void reportItemApi(Context context, String reason, String otherUserId, String itemProductId, ReportCallback callback,ReportErrorCallBack errorCallBack) {
+
         WebService service = Global.WebServiceConstants.getRetrofitinstance();
         Call<Common> reportCall = service.reportApi(HelperPreferences.get(context).getString(UID), reason, itemProductId, otherUserId);
         reportCall.enqueue(new Callback<Common>() {
             @Override
             public void onResponse(Call<Common> call, Response<Common> response) {
                 if (response.isSuccessful()) {
+
                     callback.onReportSubmit(response.body().getMessage());
                 }else{
                     errorCallBack.onReportError();
+
                 }
             }
             @Override
             public void onFailure(Call<Common> call, Throwable t) {
                 errorCallBack.onReportError();
+
             }
         });
     }

@@ -46,6 +46,7 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.WebServices.ReportApi;
 import com.app.admin.sellah.controller.WebServices.WebService;
 import com.app.admin.sellah.controller.utils.CenterZoomLayoutManager;
 import com.app.admin.sellah.controller.utils.ChatActivityController;
@@ -339,6 +340,71 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                         LinearLayout l7_irrelevant = filterDialog.findViewById(R.id.l7_irrelevant);
                         LinearLayout l8_counterfeit = filterDialog.findViewById(R.id.l8_counterfeit);
                         LinearLayout l9_cancel = filterDialog.findViewById(R.id.l9_cancel);
+                        filterDialog.show();
+                        //------------------------------------------------------------------------
+                        ll_reporting_item.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                 hitReportApi(ll_reporting_item);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l2_prohibited.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l2_prohibited);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l3_mispriced.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l3_mispriced);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l4_wrongCategroy.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l4_wrongCategroy);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l5_duplicate.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l5_duplicate);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l6_offensive.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l6_offensive);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l7_irrelevant.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l7_irrelevant);
+                                filterDialog.dismiss();
+                            }
+                        });
+
+                        l8_counterfeit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                hitReportApi(l8_counterfeit);
+                                filterDialog.dismiss();
+                            }
+                        });
 
                         l9_cancel.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -346,7 +412,8 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                                 filterDialog.dismiss();
                             }
                         });
-                        filterDialog.show();
+                        //--------------------------------------------------------------------------
+
                         break;
                     case R.id.menu_block_user:
                         S_Dialogs.getBlockUnblockConfirmation(ChatActivity.this, getResources().getString(R.string.dialog_title_block_user), ((dialog, which) -> {
@@ -633,6 +700,24 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
     }*/
+
+    public void hitReportApi(LinearLayout layout)
+    {
+
+        new ReportApi().hitReportApi(ChatActivity.this, layout
+                , otherUserId, "", (msg) -> {
+
+                    Toast.makeText(this,  msg+"", Toast.LENGTH_SHORT).show();
+                   /* Snackbar.make(layout, msg, Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();*/
+                }, () -> {
+                    Toast.makeText(this,  "Please try again later", Toast.LENGTH_SHORT).show();
+                   /* Snackbar.make(layout, "Please try again later", Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();*/
+                });
+
+    }
+
 }
 
 

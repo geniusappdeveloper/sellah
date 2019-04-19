@@ -76,7 +76,7 @@ public class LiveVideoPaggerAdapter extends PagerAdapter {
         if (videoList != null && videoList.size() > 0) {
             Glide.with(context)
                     .load(videoList.get(position).getCoverImage())
-                    .apply(Global.getGlideOptions()/*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*/)
+                //    .apply(Global.getGlideOptions()/*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*/)
                     .into(imageView);
         } else {
             imageView.setImageResource(R.drawable.logo_new);

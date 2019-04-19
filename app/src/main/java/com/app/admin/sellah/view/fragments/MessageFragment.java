@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -18,19 +19,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
+import com.app.admin.sellah.controller.WebServices.ReportApi;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.Record;
 import com.app.admin.sellah.model.extra.Notification.NotificationModel;
 import com.app.admin.sellah.model.extra.SwipeHelper;
-import com.app.admin.sellah.view.CustomDialogs.ReportUserDialog;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.adapter.MessageListAdapter;
 
@@ -66,6 +68,8 @@ public class MessageFragment extends Fragment {
     Unbinder unbinder;
     @BindView(R.id.ll_nochat)
     LinearLayout llNochat;
+    @BindView(R.id.rel_top_messageFrag)
+    LinearLayout relTopMessageFrag;
 
     private View view;
     private MessageListAdapter oldMsgAdapter;
@@ -74,6 +78,9 @@ public class MessageFragment extends Fragment {
     private ChattedListModel oldMsgList;
     private String TAG = MessageFragment.class.getSimpleName();
     CardView actionButton;
+
+    public static String post_selId = "";
+
 
     public MessageFragment() {
         // Required empty public constructor
@@ -178,6 +185,134 @@ public class MessageFragment extends Fragment {
         ongoingrecycler.setAdapter(ongoingadapter);
 
         getChatedListApi();
+
+
+        new SwipeHelper(getActivity(), messRecycler) {
+            @Override
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                underlayButtons.add(new UnderlayButton(
+                        "Delete",
+                        0,
+                        Color.parseColor("#666666"),
+                        new UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+
+                            }
+                        }
+                ));
+                underlayButtons.add(new UnderlayButton(
+                        "Report",
+                        0,
+                        Color.parseColor("#ffc53e"),
+                        new UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                // TODO: onDelete
+
+
+                                Log.e(TAG, "onClick: Report");
+/*                                ReportUserDialog.create(getActivity(),post_selId, new ReportUserDialog.ReportUserCallback() {
+                                    @Override
+                                    public void onReportUserSuccess(String msg) {
+                                        Log.e("valePrint",msg+" here");
+                                        Toast.makeText(getActivity(), msg+"", Toast.LENGTH_SHORT).show();
+                                      *//*  Snackbar.make(getActivity().getWindow().getDecorView(), msg, Snackbar.LENGTH_SHORT)
+                                                .setAction("", null).show();*//*
+                                    }
+
+                                    @Override
+                                    public void onReportUserFailure() {
+                                        Toast.makeText(getActivity(), "Something went's wrong", Toast.LENGTH_SHORT).show();
+                                        *//*Snackbar.make(getActivity().getWindow().getDecorView(), "Something went's wrong", Snackbar.LENGTH_SHORT)
+                                                .setAction("", null).show();*//*
+                                    }
+                                }).show();*/
+
+
+                                //------------------------------------------------------
+                                BottomSheetDialog filterDialog = new BottomSheetDialog(getActivity());
+
+                                filterDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+                                filterDialog.setContentView(R.layout.filter_dialog);
+                                LinearLayout ll_reporting_item = filterDialog.findViewById(R.id.ll_reporting_item);
+                                LinearLayout l2_prohibited = filterDialog.findViewById(R.id.l2_prohibited);
+                                LinearLayout l3_mispriced = filterDialog.findViewById(R.id.l3_mispriced);
+                                LinearLayout l4_wrongCategroy = filterDialog.findViewById(R.id.l4_wrongCategroy);
+                                LinearLayout l5_duplicate = filterDialog.findViewById(R.id.l5_duplicate);
+                                LinearLayout l6_offensive = filterDialog.findViewById(R.id.l6_offensive);
+                                LinearLayout l7_irrelevant = filterDialog.findViewById(R.id.l7_irrelevant);
+                                LinearLayout l8_counterfeit = filterDialog.findViewById(R.id.l8_counterfeit);
+                                LinearLayout l9_cancel = filterDialog.findViewById(R.id.l9_cancel);
+                                filterDialog.show();
+
+                                l2_prohibited.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l2_prohibited);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l3_mispriced.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l3_mispriced);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l4_wrongCategroy.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l4_wrongCategroy);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l5_duplicate.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l5_duplicate);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l6_offensive.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l6_offensive);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l7_irrelevant.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l7_irrelevant);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l8_counterfeit.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        hitReportApi(l8_counterfeit);
+                                        filterDialog.dismiss();
+                                    }
+                                });
+                                l9_cancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        filterDialog.dismiss();
+                                    }
+                                });
+
+
+                                //--------------------------------------------------------
+                            }
+                        }
+                ));
+
+            }
+        };
+
+        //------------------------------------------------------
 
 
         return view;
@@ -433,14 +568,11 @@ public class MessageFragment extends Fragment {
                         relRootNoti.setVisibility(View.VISIBLE);
                         llNochat.setVisibility(View.GONE);
 
-                        Log.e("idPrint",body.getRecord().get(0).getFriendId());
+                        Log.e("idPrint", body.getRecord().get(0).getFriendId());
 
-                        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
-                        {
-                            for (int i = 0; i <body.getRecord().size() ; i++)
-                            {
-                                if (body.getRecord().get(i).getFriendId().equalsIgnoreCase(Global.DEEP_LINKING_PRODUCT_ID))
-                                {
+                        if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable")) {
+                            for (int i = 0; i < body.getRecord().size(); i++) {
+                                if (body.getRecord().get(i).getFriendId().equalsIgnoreCase(Global.DEEP_LINKING_PRODUCT_ID)) {
                                     PersonalProfileFragment fragment = new PersonalProfileFragment();
                                     Bundle bundle = new Bundle();
                                     bundle.putString(SAConstants.Keys.OTHER_USER_ID, body.getRecord().get(i).getFriendId());
@@ -451,9 +583,7 @@ public class MessageFragment extends Fragment {
                                 }
                             }
 
-                            }
-                        else
-                        {
+                        } else {
                             setupOldMessageList(body);
                         }
 
@@ -463,10 +593,10 @@ public class MessageFragment extends Fragment {
                     }
 
                 } catch (Exception e) {
-                     if (relRootNoti!=null)
-                    relRootNoti.setVisibility(View.GONE);
-                    if (llNochat!=null)
-                    llNochat.setVisibility(View.VISIBLE);
+                    if (relRootNoti != null)
+                        relRootNoti.setVisibility(View.GONE);
+                    if (llNochat != null)
+                        llNochat.setVisibility(View.VISIBLE);
                     e.printStackTrace();
                 }
             }
@@ -495,10 +625,12 @@ public class MessageFragment extends Fragment {
         }
         if (newMsgList != null && newMsgList.size() > 0) {
             ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.VISIBLE);
-           if ( ((MainActivity)getActivity()).activityImage!=null)((MainActivity)getActivity()).notificationImg.setVisibility(View.VISIBLE);
+            if (((MainActivity) getActivity()).activityImage != null)
+                ((MainActivity) getActivity()).notificationImg.setVisibility(View.VISIBLE);
 
         } else {
-            if ( ((MainActivity)getActivity()).activityImage!=null)((MainActivity)getActivity()).notificationImg.setVisibility(View.GONE);
+            if (((MainActivity) getActivity()).activityImage != null)
+                ((MainActivity) getActivity()).notificationImg.setVisibility(View.GONE);
 
             ((NotificationFragment) getParentFragment()).messageImage.setVisibility(View.GONE);
         }
@@ -507,61 +639,32 @@ public class MessageFragment extends Fragment {
         } else {
             txtMessage.setVisibility(View.GONE);
         }
-        oldMsgAdapter = new MessageListAdapter(oldMsgList1, getActivity(), 0, getActivity().getSupportFragmentManager());
+        oldMsgAdapter = new MessageListAdapter(oldMsgList1, getActivity(), 0, getActivity().getSupportFragmentManager(), messRecycler, new MessageListAdapter.onSwipeLeft() {
+            @Override
+            public void onSwipeLeftSuccess(int postion) {
+
+
+            }
+
+            @Override
+            public void onSwipeLeftFailure() {
+
+            }
+        });
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         messRecycler.setLayoutManager(horizontalLayoutManager);
         messRecycler.setAdapter(oldMsgAdapter);
         Global.getTotalHeightofLinearRecyclerView(getActivity(), messRecycler, R.layout.notification_mess_adapter, 10);
-        new SwipeHelper(getActivity(), messRecycler) {
-            @Override
-            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
-                underlayButtons.add(new UnderlayButton(
-                        "Delete",
-                        0,
-                        Color.parseColor("#666666"),
-                        new UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                // TODO: onDelete
-                                Log.e(TAG, "onClick: Delete");
-                            }
-                        }
-                ));
-                underlayButtons.add(new UnderlayButton(
-                        "Report",
-                        0,
-                        Color.parseColor("#ffc53e"),
-                        new UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                // TODO: onDelete
-                                Log.e(TAG, "onClick: Report");
-                                ReportUserDialog.create(getActivity(), oldMsgList1.get(pos).getFriendId(), new ReportUserDialog.ReportUserCallback() {
-                                    @Override
-                                    public void onReportUserSuccess(String msg) {
-                                        Snackbar.make(getActivity().getWindow().getDecorView(), msg, Snackbar.LENGTH_SHORT)
-                                                .setAction("", null).show();
-                                    }
 
-                                    @Override
-                                    public void onReportUserFailure() {
-                                        Snackbar.make(getActivity().getWindow().getDecorView(), "Something went's wrong", Snackbar.LENGTH_SHORT)
-                                                .setAction("", null).show();
-                                    }
-                                }).show();
-                            }
-                        }
-                ));
 
-            }
-        };
-
-        newMsgAdapter = new MessageListAdapter(newMsgList, getActivity(), 0, getActivity().getSupportFragmentManager());
+       /* newMsgAdapter = new MessageListAdapter(newMsgList, getActivity(), 0, getActivity().getSupportFragmentManager(),messRecycler);
 //        notificationMessAdapter = new NotificationActivityAdapter(notificationMessList, getActivity(), 0);
         LinearLayoutManager horizontalLayoutManager1 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         newMessRecycler.setLayoutManager(horizontalLayoutManager1);
         newMessRecycler.setAdapter(newMsgAdapter);
         Global.getTotalHeightofLinearRecyclerView(getActivity(), newMessRecycler, R.layout.notification_mess_adapter, 0);
+       */
+
         if (newMsgList != null && newMsgList.size() > 0) {
             txtNewMessage.setVisibility(View.VISIBLE);
             ((MainActivity) getActivity()).notificationImg.setVisibility(View.VISIBLE);
@@ -570,7 +673,7 @@ public class MessageFragment extends Fragment {
             txtNewMessage.setVisibility(View.GONE);
             ((MainActivity) getActivity()).notificationImg.setVisibility(View.GONE);
         }
-        new SwipeHelper(getActivity(), newMessRecycler) {
+/*        new SwipeHelper(getActivity(), newMessRecycler) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
                 underlayButtons.add(new UnderlayButton(
@@ -596,6 +699,7 @@ public class MessageFragment extends Fragment {
                                 ReportUserDialog.create(getActivity(), newMsgList.get(pos).getFriendId(), new ReportUserDialog.ReportUserCallback() {
                                     @Override
                                     public void onReportUserSuccess(String msg) {
+                                        Log.e("ggggg",msg);
                                         Snackbar.make(getActivity().getWindow().getDecorView(), msg, Snackbar.LENGTH_SHORT)
                                                 .setAction("", null).show();
                                     }
@@ -611,12 +715,24 @@ public class MessageFragment extends Fragment {
                 ));
 
             }
-        };
+        };*/
     }
 
     @Override
     public void onStop() {
         super.onStop();
         new ApisHelper().cancel_chatlist();
+    }
+
+    private void hitReportApi(LinearLayout layout) {
+
+        new ReportApi().hitReportApi(getActivity(), layout
+                , post_selId, "", (msg) -> {
+                    Snackbar.make(relTopMessageFrag, msg, Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();
+                }, () -> {
+                    Snackbar.make(relTopMessageFrag, "Please try again later", Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();
+                });
     }
 }

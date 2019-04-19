@@ -170,6 +170,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<Result> resultList;
     private boolean isSearching;
     private int dotscount;
+    private int dotscount_;
     private ImageView[] dots;
     private Timer timer;
     int timerDelay = 5000;
@@ -638,9 +639,9 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
     }
 
     private void setLiveVideos(LiveVideoModel body) {
-        LiveVideoPaggerAdapter viewPagerAdapter = new LiveVideoPaggerAdapter(getActivity(), body.getList());
+         LiveVideoPaggerAdapter viewPagerAdapter = new LiveVideoPaggerAdapter(getActivity(), body.getList());
          vpLive.setAdapter(viewPagerAdapter);
-        viewPagerAdapter.notifyDataSetChanged();
+         viewPagerAdapter.notifyDataSetChanged();
 
         Gson gson = new GsonBuilder().create();
         Log.e( "setLiveVideos: ", gson.toJson(body));
@@ -658,6 +659,10 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+                if (vpLive!=null)
+                {
+
+
                 vpLive.post(new Runnable() {
                     @Override
                     public void run() {
@@ -671,6 +676,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                         }
                     }
                 });
+
+                }
             }
         };
         timer = new Timer();
@@ -686,8 +693,8 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
             params.setMargins(5, 0, 8, 0);
             vpLiveDots.addView(dotsLive[i], params);
         }
-//      dots[0].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
-        vpLive.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+ //      dots[0].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
+         vpLive.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -721,17 +728,22 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
 //           .setVisibility(View.VISIBLE);
             ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity(), bannerAddList);
             viewPager.setAdapter(viewPagerAdapter);
-            dotscount = viewPagerAdapter.getCount();
-            dots = new ImageView[dotscount];
+            viewPagerAdapter.notifyDataSetChanged();
+
+            dotscount_ = viewPagerAdapter.getCount();
+            dots = new ImageView[dotscount_];
             //automatic slide
-           /* TimerTask timerTask = new TimerTask() {
+           TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
+                    if (viewPager!=null)
+                    {
+
                     viewPager.post(new Runnable() {
                         @Override
                         public void run() {
 
-                            if (viewPager.getCurrentItem() == viewPager.getChildCount()) {
+                            if (viewPager.getCurrentItem() == dotscount_-1) {
                                 viewPager.setCurrentItem(0);
 //                            Log.e("pagger","pos"+vPBannerAdd.getCurrentItem());
                             } else {
@@ -740,13 +752,15 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                             }
                         }
                     });
+
+                    }
                 }
             };
             timer = new Timer();
-            timer.schedule(timerTask, timerDelay, timerDelay);*/
+            timer.schedule(timerTask, timerDelay, timerDelay);
 
 
-            for (int i = 0; i < dotscount; i++) {
+            for (int i = 0; i < dotscount_; i++) {
                 dots[i] = new ImageView(getActivity());
                 dots[i].setImageResource(R.drawable.dot_icon);
 
@@ -765,7 +779,7 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                 @Override
                 public void onPageSelected(int position) {
                     try {
-                        for (int i = 0; i < dotscount; i++) {
+                        for (int i = 0; i < dotscount_; i++) {
                             dots[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon));
                         }
                         dots[position].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
@@ -841,7 +855,7 @@ if (((MainActivity) getActivity()).rlResetSearch!=null)
                 dialog.dismiss();
             }
         } else {
-            Log.e(TAG, "getProductlist: " + currentPage);
+            Log.e(TAG, "getProductlist_ID: " + HelperPreferences.get(getActivity()).getString(UID)+"");
             getProductsCall = service.getProductListApi(HelperPreferences.get(getActivity()).getString(UID), "", "", String.valueOf(currentPage));
             getProductsCall.enqueue(new Callback<GetProductList>() {
                 @Override

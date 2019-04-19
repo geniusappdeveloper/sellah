@@ -359,14 +359,15 @@ public class SignupActivity extends AppCompatActivity {
                                     .setAction("", null).show();
                         }
                     } else {
-//                        response.errorBody()
-                        if (response.errorBody() != null) {
+
+
+/*                        if (response.errorBody() != null) {
                             try {
                                 Log.e("response_error", response.errorBody().string());
-                                /*Converter<ResponseBody, RegisterResult> errorConverter =
+                                *//*Converter<ResponseBody, RegisterResult> errorConverter =
                                         Global.WebServiceConstants.getRetrofit().responseBodyConverter(RegisterResult.class, new Annotation[0]);
                                 RegisterResult error = errorConverter.convert(response.errorBody());
-*/
+*//*
                                 String errorResponse = response.errorBody().string();
                                 if (errorResponse.contains(",\"status\":\"0\""))
                                 {
@@ -391,13 +392,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
                                 }
-                               /* else
-                                {
-                                    Log.e("fffrfr","222222222");
-                                }*/
 
-
-                                // if (jsonObject.has(""))
 
                             } catch (IOException e) {
 
@@ -405,10 +400,10 @@ public class SignupActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                        }
+                        }*/
 
-                       /* Snackbar.make(rel_root, "Please try with different credentials", Snackbar.LENGTH_SHORT)
-                                .setAction("", null).show();*/
+                        Snackbar.make(rel_root, "Please try with different credentials", Snackbar.LENGTH_SHORT)
+                                .setAction("", null).show();
                     }
                 }
 

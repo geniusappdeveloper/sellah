@@ -33,6 +33,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,6 +76,8 @@ public class MakeOfferDialog extends Dialog {
     String productName;
     String productId="";
 
+    ArrayList<HashMap<String,String>> arrayList = new ArrayList<>();
+
 
     protected MakeOfferDialog(Context context, OfferController controller, String otherUserId) {
         super(context);
@@ -103,13 +106,13 @@ public class MakeOfferDialog extends Dialog {
 
     }
 
-    private void checkOutProductList(GetProductList body) {
+    private void checkOutProductList(GetProductList body, ArrayList<HashMap<String, String>> arrayList_) {
 
 
         pbLoading.setVisibility(View.GONE);
         recProduct.setVisibility(View.VISIBLE);
         card1.setVisibility(View.GONE);
-        checkoutProductAdapter = new CheckoutProductAdapter(body.getResult(), context,txtSendOffer, new CheckoutProductAdapter.ActionCallback() {
+        checkoutProductAdapter = new CheckoutProductAdapter(body.getResult(),arrayList_, context,txtSendOffer, new CheckoutProductAdapter.ActionCallback() {
             @Override
             public void onCheckclicked(String name, String id, String subtotal, String quantity) {
                 txtSubtotal.setText("S$ " + subtotal);
@@ -172,7 +175,7 @@ public class MakeOfferDialog extends Dialog {
     }
     Call<GetProductList> recordsCall;
     private void getForsaleList(String otherUserId) {
-
+     Log.e("idGetHere",otherUserId);
         dialog.show();
          recordsCall = webService.getForSalelistApi(otherUserId);
         recordsCall.enqueue(new Callback<GetProductList>() {
@@ -185,7 +188,55 @@ public class MakeOfferDialog extends Dialog {
                     if (response.body().getStatus().equalsIgnoreCase("1")) {
                         Gson gson = new GsonBuilder().create();
                         Log.e("ForSaleData", gson.toJson(response.body()));
-                        checkOutProductList(response.body());
+
+                        //---------------------------------------------------------
+
+                        arrayList.clear();
+
+                        for (int i = 0; i <response.body().getResult().size() ; i++)
+                        {
+                            HashMap<String,String> hashMap = new HashMap<>();
+
+                            hashMap.put("name",response.body().getResult().get(i).getName());
+                            hashMap.put("quantity",response.body().getResult().get(i).getQuantity());
+                            hashMap.put("price",response.body().getResult().get(i).getPrice());
+                            hashMap.put("id",response.body().getResult().get(i).getId());
+                            hashMap.put("user_id",response.body().getResult().get(i).getUserId());
+
+                            if (response.body().getResult().get(i).getProductImages().size()>0)
+                                hashMap.put("image",response.body().getResult().get(i).getProductImages().get(0).getImage());
+                            else
+                                hashMap.put("image","");
+
+                            String quantity = response.body().getResult().get(i).getQuantity();
+
+                            try {
+
+                                if (!quantity.isEmpty())
+                                {
+                                    int pric = Integer.parseInt(quantity);
+                                    if (pric>0)
+                                        arrayList.add(hashMap);
+
+                                }
+
+                            }catch (Exception e){
+
+                            }
+
+
+
+
+
+
+                        }
+
+
+
+                        //----------------------------------------------------------
+
+
+                        checkOutProductList(response.body(),arrayList);
                         Log.e("sizeGet",response.body().getResult().size()+"");
 
                     }

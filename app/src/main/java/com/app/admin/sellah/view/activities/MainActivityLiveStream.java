@@ -309,6 +309,10 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         } catch (Exception e) {
 
         }
+
+
+
+
         Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         Global.setStatusBarColor(MainActivityLiveStream.this, R.color.colorBlack);
         ButterKnife.bind(this);
@@ -326,6 +330,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         arrayList = new ArrayList<>();
         setupChatList();
         relLayOptionLive = findViewById(R.id.relLay_more_live);
+
         relLayOptionLive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -366,6 +371,9 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         shareChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 String shareBodyText = Global.DEEP_LINKING_PRODUCT_URL;
@@ -606,6 +614,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+
 //        closeGroup();
         dismissDialog();
         closeGroup();
@@ -701,6 +711,7 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         this.getIntent().putExtra(EXTRA_CAPTURETOTEXTURE_ENABLED, true);
 
         if (showPublishPlay.equalsIgnoreCase("LiveStream")) {
+
             flipCamera.setVisibility(View.VISIBLE);
             liveProductDetailDialog = LiveProductDetailDialog.create(MainActivityLiveStream.this, this);
             liveProductDetailDialog.show();
@@ -2249,6 +2260,10 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
         webRTCClient.setVideoRenderers(pipViewRenderer, cameraViewRenderer);
         webRTCClient.init(SERVER_URL, streamId, IWebRTCClient.MODE_PUBLISH, tokenId);
         webRTCClient.startStream();
+
+
+
+
     }
 
     @Override
@@ -2385,6 +2400,8 @@ public class MainActivityLiveStream extends Activity implements IWebRTCListener,
             }
         });
     }
+
+
 
 
 }

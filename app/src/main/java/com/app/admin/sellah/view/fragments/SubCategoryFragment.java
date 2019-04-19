@@ -181,7 +181,9 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
     private AppBarLayout.OnOffsetChangedListener offsetListner;
     private long timeVisibleDelay = 500;
     TextView txt;
+    int dotscount_;
     public SubCategoryFragment() {
+
         // Required empty public constructor
     }
 
@@ -818,30 +820,36 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 //            .setVisibility(View.VISIBLE);
             ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity(), bannerAds);
             viewPagerSubCat.setAdapter(viewPagerAdapter);
-            dotscount = viewPagerAdapter.getCount();
-            dots = new ImageView[dotscount];
+              dotscount_ = viewPagerAdapter.getCount();
+            dots = new ImageView[dotscount_];
             //automatic slide
-           /* TimerTask timerTask = new TimerTask() {
+            TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    vPBannerAdds.post(new Runnable() {
+
+                    if (viewPagerSubCat!=null)
+                    {
+                      viewPagerSubCat.post(new Runnable() {
                         @Override
                         public void run() {
 
-                            if (vPBannerAdds.getCurrentItem() == vPBannerAdds.getChildCount()) {
-                                vPBannerAdds.setCurrentItem(0);
+
+                            if (viewPagerSubCat.getCurrentItem() == dotscount_-1) {
+                                viewPagerSubCat.setCurrentItem(0);
                             } else {
-                                vPBannerAdds.setCurrentItem((vPBannerAdds.getCurrentItem() + 1));
+                                viewPagerSubCat.setCurrentItem((viewPagerSubCat.getCurrentItem() + 1));
                             }
                         }
                     });
+
+                    }
                 }
             };
             timer = new Timer();
-            timer.schedule(timerTask, 2000, 2000);*/
+            timer.schedule(timerTask, 5000, 5000);
 
 
-            for (int i = 0; i < dotscount; i++) {
+            for (int i = 0; i < dotscount_; i++) {
                 dots[i] = new ImageView(getActivity());
                 dots[i].setImageResource(R.drawable.dot_icon);
 
@@ -861,7 +869,7 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
 
                 @Override
                 public void onPageSelected(int position) {
-                    for (int i = 0; i < dotscount; i++) {
+                    for (int i = 0; i < dotscount_; i++) {
                         dots[i].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon));
                     }
                     dots[position].setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.dot_icon2));
@@ -901,12 +909,18 @@ public class SubCategoryFragment extends Fragment implements SubCategoryControll
                         @Override
                         public void run() {
 
+                            if (vpLive!=null)
+                            {
+
+
+
                             if (vpLive.getCurrentItem() == dotscount - 1) {
                                 vpLive.setCurrentItem(0);
 //                            Log.e("pagger","pos"+vPBannerAdd.getCurrentItem());
                             } else {
                                 vpLive.setCurrentItem((vpLive.getCurrentItem() + 1));
 //                            Log.e("pagger_else","pos"+vPBannerAdd.getCurrentItem());
+                            }
                             }
                         }
                     });

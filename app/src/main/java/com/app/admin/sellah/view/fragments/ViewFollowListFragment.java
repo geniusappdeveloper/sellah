@@ -110,7 +110,7 @@ public class ViewFollowListFragment extends Fragment {
         btnFollowings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity) getActivity()).text_sell.setText("Followings");
+                ((MainActivity) getActivity()).text_sell.setText("Following");
                 btnFolloers.setBackgroundResource(R.drawable.noti_button_bg_normal_left);
                 btnFollowings.setBackgroundResource(R.drawable.noti_button_bg_selected_right);
                 viewPager.setCurrentItem(1);

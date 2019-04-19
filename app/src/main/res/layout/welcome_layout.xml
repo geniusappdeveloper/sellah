@@ -8,13 +8,38 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/_26sdp"
         android:layout_height="wrap_content">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <ImageView
+                    android:layout_width="@dimen/_28sdp"
+                    android:layout_height="@dimen/_22sdp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/sellah_icon_red"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorBlack"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/_4sdp"
+                    android:textSize="@dimen/_22sdp"
+                    android:text="sellah!"/>
+
+            </LinearLayout>
+
+
+
+            <!--<TextView
                 android:textSize="@dimen/_18sdp"
                 android:layout_marginTop="@dimen/_50sdp"
                 android:textColor="#7d7d7d"
@@ -31,13 +56,13 @@
                 android:layout_marginTop="@dimen/_48sdp"
                 android:id="@+id/sellahIcon"
                 android:layout_toLeftOf="@+id/sellah_txtview"
-                android:background="@drawable/sellah_icon_red"/>
+                android:background="@drawable/sellah_icon_red"/>-->
 
             <TextView
                 android:id="@+id/wlcm_skip"
                 android:clickable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"                android:layout_marginRight="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_55sdp"
+                android:layout_marginTop="@dimen/_12sdp"
                 android:textColor="#949494"
                 android:text="Skip"
                 android:layout_alignParentRight="true"
@@ -51,7 +76,7 @@
                 android:clickable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:layout_marginRight="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_55sdp"
+                android:layout_marginTop="@dimen/_12sdp"
                 android:textColor="#e66565"
                 android:text="Next"
                 android:layout_alignParentRight="true"

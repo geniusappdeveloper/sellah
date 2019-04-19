@@ -41,6 +41,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.admin.sellah.controller.WebServices.ReportApi;
+
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.WebServices.ApisHelper;
 import com.app.admin.sellah.controller.WebServices.WebService;
@@ -195,6 +197,10 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
         chatedListRecord = new ArrayList<>();
         setUpchatHeaderList();
         getChatListApi();
+
+
+
+
     }
 
     private void getIntentData() {
@@ -319,6 +325,8 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                         l9_cancel.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+
+                                hitReportApi(l9_cancel);
                                 filterDialog.dismiss();
                             }
                         });
@@ -600,6 +608,22 @@ public class ChatActivity extends AppCompatActivity implements RecyclerViewClick
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
     }*/
+
+    public void hitReportApi(LinearLayout layout) {
+
+
+        new ReportApi().hitReportApi(this, layout
+                , otherUserId, "", (msg) -> {
+                    Snackbar.make(liPersonalProfileRoot, msg, Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();
+                }, () -> {
+                    Snackbar.make(liPersonalProfileRoot, "Please try again later", Snackbar.LENGTH_SHORT)
+                            .setAction("", null).show();
+                });
+
+
+    }
+
 }
 
 

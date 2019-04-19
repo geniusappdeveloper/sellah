@@ -198,9 +198,8 @@
                             android:layout_height="@dimen/_40sdp"
                             android:layout_alignParentRight="true"
                             android:layout_gravity="right"
-                            android:layout_marginRight="@dimen/_12sdp"
-
-                            >
+                            android:id="@+id/rel_likeFav"
+                            android:layout_marginRight="@dimen/_12sdp">
 
 
                             <ImageView
@@ -228,6 +227,14 @@
                                 android:textSize="@dimen/_8sdp"
                                 tools:text="9" />
                         </RelativeLayout>
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_centerVertical="true"
+                            android:id="@+id/shareBlackIcon"
+                            android:layout_toLeftOf="@+id/rel_likeFav"
+                            android:src="@drawable/share_black"/>
 
 
                     </RelativeLayout>
@@ -287,6 +294,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
                             android:numStars="5"
+                            android:visibility="gone"
                             android:progressTint="@color/colorDyellow"
                             android:rating="3" />
 
@@ -296,6 +304,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_marginLeft="@dimen/_2sdp"
                             android:layout_marginRight="@dimen/_10sdp"
+                            android:visibility="gone"
                             android:layout_marginBottom="@dimen/_1sdp"
                             android:text="141 ratings"
                             android:textColor="@color/light_grey" />

@@ -6,12 +6,15 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:layout_margin="@dimen/_3sdp"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:scaleType="centerCrop"
         android:adjustViewBounds="true"
-        android:src="@drawable/logo_new"
-        android:id="@+id/imageView" />
+        android:id="@+id/image_View" />
 </LinearLayout>
+
+<!--     android:layout_margin="@dimen/_3sdp"
+ android:layout_gravity="center"
+    android:scaleType="centerCrop"
+    android:adjustViewBounds="true"-->
+

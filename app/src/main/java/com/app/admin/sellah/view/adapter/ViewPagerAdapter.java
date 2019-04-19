@@ -1,12 +1,18 @@
 package com.app.admin.sellah.view.adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.Global;
@@ -23,6 +29,9 @@ public class ViewPagerAdapter extends PagerAdapter {
     //    private Integer [] images = {R.drawable.car_icon,R.drawable.car_icon,R.drawable.car_icon};
     private List<String> bannerList;
     ArrayList arrayList = new ArrayList();
+    int   finalHeight=0;
+    int   finalWidth=0;
+
     public ViewPagerAdapter(Context context, List<String> bannerList) {
         this.context = context;
         this.bannerList = bannerList;
@@ -49,14 +58,55 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.custom_layout, null);
-        ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
-        imageView.setPadding(0,0,0,0);
+        ImageView imageView = (ImageView) view.findViewById(R.id.image_View  );
+     //   imageView.setPadding(0,0,0,0);
 //        imageView.setImageResource(images[position]);
 
-        if (bannerList != null && bannerList.size() > 0) {
+
+
+        ViewTreeObserver vto = imageView.getViewTreeObserver();
+        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                finalHeight = imageView.getMeasuredHeight();
+                finalWidth = imageView.getMeasuredWidth();
+                return true;
+            }
+        });
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(finalWidth, finalWidth/2);
+                imageView.setLayoutParams(layoutParams);
+                if (bannerList != null && bannerList.size() > 0) {
+                    Glide.with(context)
+                            .load(bannerList.get(position))
+                            .apply(Global.getGlideOptions()/*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*/)
+                            .into(imageView);
+                } else {
+                    imageView.setImageResource(R.drawable.logo_new);
+                    imageView.setPadding((int) context.getResources().getDimension(R.dimen._10sdp)
+                            ,(int) context.getResources().getDimension(R.dimen._10sdp)
+                            ,(int) context.getResources().getDimension(R.dimen._10sdp)
+                            ,(int) context.getResources().getDimension(R.dimen._10sdp));
+//            imageView.setImageResource(R.drawable.app_dummy_logo);
+                }
+            }
+        }, 100);
+
+
+
+
+
+
+/*       if (bannerList != null && bannerList.size() > 0) {
             Glide.with(context)
                     .load(bannerList.get(position))
-                    .apply(Global.getGlideOptions()/*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*/)
+                    .apply(Global.getGlideOptions()*//*.placeholder(R.drawable.logo_new).error(R.drawable.logo_new)*//*)
                     .into(imageView);
         } else {
             imageView.setImageResource(R.drawable.logo_new);
@@ -65,7 +115,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                     ,(int) context.getResources().getDimension(R.dimen._10sdp)
                     ,(int) context.getResources().getDimension(R.dimen._10sdp));
 //            imageView.setImageResource(R.drawable.app_dummy_logo);
-        }
+        }*/
 
 
         view.setOnClickListener(new View.OnClickListener() {
@@ -90,9 +140,10 @@ public class ViewPagerAdapter extends PagerAdapter {
         vp.removeView(view);
 
     }
-    @Override
+/*    @Override
     public float getPageWidth(int position) {
-        return(0.60f);
-    }
+        return(0.90f);
+      //  return(0.60f);
+    }*/
 
 }

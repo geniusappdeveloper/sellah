@@ -53,7 +53,7 @@
                 android:id="@+id/btn_mess"
                 android:layout_width="@dimen/_120sdp"
                 android:layout_height="@dimen/_35sdp"
-                android:text="Followings"
+                android:text="Following"
                 android:gravity="center"
                 android:textColor="@color/colorBlack"
                 android:background="@drawable/noti_button_bg_normal_right"

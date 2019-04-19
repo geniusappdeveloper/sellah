@@ -14,9 +14,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
@@ -71,8 +69,6 @@ import com.app.admin.sellah.view.CustomDialogs.PromoteDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_dialogfragment;
 import com.app.admin.sellah.view.CustomDialogs.Stripe_image_verification_dialogfragment;
-import com.app.admin.sellah.view.activities.AddNewInfo;
-import com.app.admin.sellah.view.activities.AddNewVideos;
 import com.app.admin.sellah.view.activities.ChatActivity;
 import com.app.admin.sellah.view.activities.MainActivity;
 import com.app.admin.sellah.view.activities.Previewvideo;
@@ -92,7 +88,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import butterknife.BindView;
@@ -115,7 +110,6 @@ import static com.app.admin.sellah.controller.utils.Global.BackstackConstants.PR
 import static com.app.admin.sellah.controller.utils.Global.getTimeAgo;
 import static com.app.admin.sellah.controller.utils.Global.getUser.isLogined;
 import static com.app.admin.sellah.controller.utils.Global.makeTextViewResizable;
-import static com.app.admin.sellah.controller.utils.SAConstants.Keys.DEEP_LINKING;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.MAKE_OFFER_DATA;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PRODUCT_DETAIL;
 import static com.app.admin.sellah.controller.utils.SAConstants.Keys.PUSH_NOTIFICATION;
@@ -241,6 +235,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     TextView promoteDaysleft;
     @BindView(R.id.txt_views)
     TextView txtViews;
+    @BindView(R.id.shareBlackIcon)
+    ImageView shareBlackIcon;
     private RecyclerView tagRcView;
     ArrayList<String> tagList;
     Button btn_makeOffer;
@@ -253,13 +249,12 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     String prodct_id, package_id;
 
     GetProductList getProductList;
-
-
+    String quantity = "";
 
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter(PUSH_NOTIFICATION));
         view = inflater.inflate(R.layout.product_fragment, container, false);
@@ -268,13 +263,19 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         hideSearch();
         service = Global.WebServiceConstants.getRetrofitinstance();
 
-        if (getArguments()!=null && getArguments().containsKey(SAConstants.Keys.PRODUCT_DETAIL))
-        {
+        if (getArguments() != null && getArguments().containsKey(SAConstants.Keys.PRODUCT_DETAIL)) {
+            Log.e("productPrint", "inner");
             productDetial = getArguments().getParcelable(SAConstants.Keys.PRODUCT_DETAIL);
 
+            Log.e("productPrint", productDetial.getId() + " inner");
+            Log.e("productPrint", productDetial.getName() + " inner");
+
+            Gson gson = new Gson();
+            String json = gson.toJson(productDetial);
+            Log.e("responsePrint", json);
+
+
         }
-
-
 
 
         dialog = S_Dialogs.getLoadingDialog(getActivity());
@@ -291,31 +292,24 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
         } else {
 
             //----------------to open specific product from deep link----------------------
-            if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
-            {
+            if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable")) {
 
                 getProductDetailsApi(Global.DEEP_LINKING_PRODUCT_ID);
                 getProductUrlApi(Global.DEEP_LINKING_PRODUCT_ID);
 
                 //--------------clearing deep linking status-----------------
                 if (Global.DEEP_LINKING_STATUS.equalsIgnoreCase("enable"))
-                    Global.DEEP_LINKING_STATUS="disable";
+                    Global.DEEP_LINKING_STATUS = "disable";
 
             }
 
             //----------------------------------------------
-            else
-            {
+            else {
 
                 getActivity().onBackPressed();
             }
 
         }
-
-
-
-
-
 
 
         return view;
@@ -341,35 +335,49 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
         listeners();
         txtSellallProduct.setPaintFlags(txtSellallProduct.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-        if (productDetial!=null && productDetial.getCatId()!=null)
-         getSuggestedPostList();
+        if (productDetial != null && productDetial.getCatId() != null)
+            getSuggestedPostList();
         productback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Bundle bundle = getArguments();
 
-                if (bundle!=null)
-                {
+                if (bundle != null) {
 
 
-                String myString = bundle.containsKey("from_add") ? bundle.getString("from_add") : "default";
+                    String myString = bundle.containsKey("from_add") ? bundle.getString("from_add") : "default";
 
-                Log.e("onClick: ", myString);
-                if (myString.equalsIgnoreCase("from_add")) {
-                    Log.e("onClick: ", "ff");
-                    ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
-                    //getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment());
+                    Log.e("onClick: ", myString);
+                    if (myString.equalsIgnoreCase("from_add")) {
+                        Log.e("onClick: ", "ff");
+                        ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
+                        //getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new HomeFragment());
+                    } else {
+                        Log.e("onClick: ", "esl");
+                        getActivity().onBackPressed();
+                    }
                 } else {
-                    Log.e("onClick: ", "esl");
-                    getActivity().onBackPressed();
-                }
-                }
-                else
-                {
                     ((MainActivity) getActivity()).loadFragment(new HomeFragment(), HOMETAG);
                 }
             }
         });
+
+
+        shareBlackIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBodyText = Global.DEEP_LINKING_PRODUCT_URL;
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
+                startActivity(Intent.createChooser(sharingIntent, "Sharing Option"));
+
+            }
+        });
+
+
 
        /* LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         commentsRecyclerView.setLayoutManager(mLayoutManager);
@@ -382,7 +390,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     private void setUpSuggestedPosts(GetProductList list) {
 
         getProductList = list;
-        Log.e("fetchDataProduct",list.getResult().get(0).getCategoryName());
+        Log.e("fetchDataProduct", list.getResult().get(0).getCategoryName());
         List<Result> resultList = list.getResult();
         for (int i = 0; i < resultList.size(); i++) {
             Result row = resultList.get(i);
@@ -411,7 +419,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 if (productDetial1.getProduct_view_count().isEmpty())
                     txtViews.setText("0 view");
                 else
-                    txtViews.setText(productDetial1.getProduct_view_count() +" views");
+                    txtViews.setText(productDetial1.getProduct_view_count() + " views");
 
                 if (productDetial1.getSellInternationally().equalsIgnoreCase("N"))
                     txtProductLocation.setText("Singapore");
@@ -486,7 +494,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                 txtProductPostTime.setText("Posted " + getTimeAgo(Global.convertUTCToLocal(productDetial1.getCreatedAt())));
 //                txtProductPostTime.setText(getTimeAgo(productDetial.getCreatedAt()));
                 setTagAdapter(productDetial1.getTags());
-                setUpPackages(productDetial1.getUserId(), productDetial1.getPromotes(), productDetial1.getPromoteProduct(),productDetial1.getNoOfClicks());
+                setUpPackages(productDetial1.getUserId(), productDetial1.getPromotes(), productDetial1.getPromoteProduct(), productDetial1.getNoOfClicks());
 
                 if (productDetial1.getProductVideo().equals("") || productDetial1.getProductVideo() == null) {
                     ishasthumbnail = false;
@@ -522,7 +530,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
     }
 
-    private void setUpPackages(String userId, List<Promote> promoteDetail, String promoteStatus,String no_of_clicks) {
+    private void setUpPackages(String userId, List<Promote> promoteDetail, String promoteStatus, String no_of_clicks) {
 
         if (promoteDetail != null && userId.equalsIgnoreCase(HelperPreferences.get(getActivity()).getString(UID)) && promoteStatus.equalsIgnoreCase("S")) {
 
@@ -542,7 +550,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
             list.setClicks("135");
             list.setValidity("55");
             packagesList.add(list);*/
-           int _totalCount=0;
+                int _totalCount = 0;
                 try {
                     _totalCount = Integer.parseInt(promoteDetail.get(0).getClicks()) + Integer.parseInt(productDetial.getNoOfClicks());
 
@@ -550,7 +558,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                     _totalCount = Integer.parseInt(promoteDetail.get(0).getClicks());
 
                 }
-                PromotePackagesAdapter adapter = new PromotePackagesAdapter(getActivity(),no_of_clicks,_totalCount, promoteDetail, (id) -> {
+                PromotePackagesAdapter adapter = new PromotePackagesAdapter(getActivity(), no_of_clicks, _totalCount, promoteDetail, (id) -> {
 
 
                     PopupMenu popup = null;
@@ -620,10 +628,10 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                     totalCount = Integer.parseInt(promoteDetail.get(0).getClicks());
 
                 }
-                if (no_of_clicks==null || no_of_clicks.equalsIgnoreCase(""))
-                     txtRemainingPackage.setText("0" + "/" + totalCount + " clicks");
+                if (no_of_clicks == null || no_of_clicks.equalsIgnoreCase(""))
+                    txtRemainingPackage.setText("0" + "/" + totalCount + " clicks");
                 else
-                     txtRemainingPackage.setText(no_of_clicks + "/" + totalCount + " clicks");
+                    txtRemainingPackage.setText(no_of_clicks + "/" + totalCount + " clicks");
 
 
             } else {
@@ -710,9 +718,9 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                         return true;
                     }
                 });
-
-
                 break;
+
+
             case R.id.img_send_camera:
                 if (isLogined(getActivity())) {
                     if (Build.VERSION.SDK_INT >= 23) {
@@ -801,7 +809,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 //                    navLogout.setVisibility(View.VISIBLE);
 
 
-                    if (productDetial.getQuantity().isEmpty() || Integer.parseInt(productDetial.getQuantity()) <= 0) {
+                    if (quantity.isEmpty() || Integer.parseInt(quantity) <= 0) {
                         Toast.makeText(getActivity(), "Product is out of stock", Toast.LENGTH_SHORT).show();
                     } else {
 
@@ -822,7 +830,7 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
                             })).show();
                         } else {
-                            BuyerMakeOfferDialog.create(getActivity(), productDetial.getPrice(), productDetial.getQuantity(), new BuyerMakeOfferDialog.OnmakeOfferClick() {
+                            BuyerMakeOfferDialog.create(getActivity(), productDetial.getPrice(), quantity, new BuyerMakeOfferDialog.OnmakeOfferClick() {
                                 @Override
                                 public void onMakeOfferClick(String price, String quantity, BuyerMakeOfferDialog buyerMakeOfferDialog) {
                                     makeOfferApi(productDetial.getId(), price, productDetial.getName(), quantity, buyerMakeOfferDialog);
@@ -1054,7 +1062,6 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
                                     intentt.putExtra("position",String.valueOf(0));
                                     intentt.putExtras(bundle);
                                     getActivity().startActivity(intentt);*/
-
 
 
                                     Bundle bundle = new Bundle();
@@ -1876,6 +1883,8 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
 
                         Gson gson = new GsonBuilder().create();
 
+                        quantity = response.body().getResult().getQuantity();
+
 
                         Log.e("ProductDetailApi", gson.toJson(response.body()));
 //                        Snackbar.make(productDetailRoot, response.body().getMessage(), Snackbar.LENGTH_SHORT)
@@ -1946,23 +1955,21 @@ public class ProductFrgament extends Fragment implements View.OnClickListener, P
     }
 
 
-   //------------------generate product url---------------------
+    //------------------generate product url---------------------
     public void getProductUrlApi(String productId) {
         Call<JsonObject> productUrl;
-        productUrl = service.getProductUrl(HelperPreferences.get(getActivity()).getString(UID), productId,"p");
+        productUrl = service.getProductUrl(HelperPreferences.get(getActivity()).getString(UID), productId, "p");
         productUrl.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 
 
-                if (response.isSuccessful())
-                {
+                if (response.isSuccessful()) {
                     try {
 
                         JSONObject jsonObject = new JSONObject(response.body().toString());
                         String status = jsonObject.getString("status");
-                        if (status.equalsIgnoreCase("1"))
-                        {
+                        if (status.equalsIgnoreCase("1")) {
                             Global.DEEP_LINKING_PRODUCT_URL = jsonObject.getString("url");
                         }
                     } catch (JSONException e) {

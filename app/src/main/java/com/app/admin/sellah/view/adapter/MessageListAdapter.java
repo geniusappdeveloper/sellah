@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,13 +23,17 @@ import android.widget.Toast;
 
 import com.app.admin.sellah.R;
 import com.app.admin.sellah.controller.utils.HelperPreferences;
+import com.app.admin.sellah.controller.utils.OnSwipeTouchListener;
 import com.app.admin.sellah.controller.utils.SAConstants;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.ChattedListModel;
 import com.app.admin.sellah.controller.utils.Global;
 import com.app.admin.sellah.model.extra.ChatHeadermodel.Record;
+import com.app.admin.sellah.model.extra.SwipeHelper;
 import com.app.admin.sellah.model.extra.commonResults.Common;
+import com.app.admin.sellah.view.CustomDialogs.ReportUserDialog;
 import com.app.admin.sellah.view.CustomDialogs.S_Dialogs;
 import com.app.admin.sellah.view.activities.ChatActivity;
+import com.app.admin.sellah.view.fragments.MessageFragment;
 import com.app.admin.sellah.view.fragments.PersonalProfileFragment;
 import com.bumptech.glide.Glide;
 
@@ -50,16 +56,20 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     Context context;
     FragmentManager manager;
     int state;
+    RecyclerView messRecyclers;
     String ongoing;
+    onSwipeLeft callback;
 //    private ChattedListModel notificationListFilter;
 
-    public MessageListAdapter(List<Record> chattedListModel, Activity activity, int state, FragmentManager manager) {
+    public MessageListAdapter(List<Record> chattedListModel, Activity activity, int state, FragmentManager manager,RecyclerView messRecycler,onSwipeLeft callback) {
 
         this.chattedListModel = chattedListModel;
 //        notificationListFilter = chattedListModel;
         context = activity;
         this.state = state;
         this.manager = manager;
+        this.messRecyclers = messRecycler;
+        this.callback = callback;
         Log.e("adapter_state", "working");
 
     }
@@ -107,10 +117,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
            holder.msgTime.setText(Global.formateDateTo_HHmm(Global.convertUTCToLocal(chattedListModel.get(position).getLastMsgTime())));
 
 
-
            holder.relDetails.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
+
+                   MessageFragment.post_selId = chattedListModel.get(position).getFriendId();
+
                    if (!TextUtils.isEmpty(chattedListModel.get(position).getIsBlocked())&&chattedListModel.get(position).getIsBlocked().equalsIgnoreCase("y")) {
 
                        if(!TextUtils.isEmpty(chattedListModel.get(position).getBlockedBy())&&chattedListModel.get(position).getBlockedBy().equalsIgnoreCase(HelperPreferences.get(context).getString(UID))){
@@ -133,6 +145,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                    }
                }
            });
+
+
 
            holder.imageView.setOnClickListener(new View.OnClickListener() {
                @Override
@@ -163,6 +177,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
 
        }
+
+
+
+
+
+
+
+
+
     }
     private void blockUnBlockUser(String blockStatus, int pos, String userId) {
         Dialog dialog = S_Dialogs.getLoadingDialog(context);
@@ -248,5 +271,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             return true;
         }
         return false;
+    }
+
+  public interface onSwipeLeft {
+        void onSwipeLeftSuccess(int pos);
+        void onSwipeLeftFailure();
     }
 }

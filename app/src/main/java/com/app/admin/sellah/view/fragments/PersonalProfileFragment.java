@@ -422,7 +422,7 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
                                     }
                                 });
 
-
+                                break;
                             case R.id.menu_share:
 
                                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -431,8 +431,9 @@ public class PersonalProfileFragment extends Fragment implements PersonalProfile
                                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject here");
                                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBodyText);
                                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                                break;
                         }
-                        return true;
+                          return true;
                     }
                 });
 
